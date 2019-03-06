@@ -42,7 +42,7 @@ func ({{$c.Name}} {{$c.Type}}) areArgsSame({{.NonContextArgsDecl}}) bool {
 		return false
 	}
 	for {{$a.Name}}Idx := range {{$a.Name}} {
-		if {{$a.Name}}[{{$a.Name}}Idx] != {{$c.Name}}.memoized.{{$a.Name}}[{{$a.Name}}.Idx] {
+		if {{$a.Name}}[{{$a.Name}}Idx] != {{$c.Name}}.memoized.{{$a.Name}}[{{$a.Name}}Idx] {
 			return false
 		}
 	}
