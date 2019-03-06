@@ -530,7 +530,7 @@ func (ctx *taskCtx) areArgsSame(boo bool, children []int) bool {
 		return false
 	}
 	for childrenIdx := range children {
-		if children[childrenIdx] != ctx.memoized.children[children.Idx] {
+		if children[childrenIdx] != ctx.memoized.children[childrenIdx] {
 			return false
 		}
 	}
@@ -635,7 +635,7 @@ func (ctx *taskCtx) areArgsSame(children []int) bool {
 		return false
 	}
 	for childrenIdx := range children {
-		if children[childrenIdx] != ctx.memoized.children[children.Idx] {
+		if children[childrenIdx] != ctx.memoized.children[childrenIdx] {
 			return false
 		}
 	}
