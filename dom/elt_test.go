@@ -29,11 +29,11 @@ func TestElt(t *testing.T) {
 		t.Error(x)
 	}
 
-	if x := elt("one", dom.Props{TextContent: "boo"}); x != one {
+	if x := elt("one", dom.Props{TextContent: "boouya"}); x != one {
 		t.Error("node changed", x)
 	}
 
-	if x := fmt.Sprint(one); x != "<div>boo</div>" {
+	if x := fmt.Sprint(one); x != "<div>boouya</div>" {
 		t.Error(x)
 	}
 

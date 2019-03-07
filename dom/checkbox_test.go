@@ -20,17 +20,10 @@ func TestCheckboxEdit(t *testing.T) {
 	checked := dom.NewBoolStream(true)
 
 	cb.Begin()
-	elt := cb.CheckboxEdit("root", dom.Styles{}, checked)
+	elt := cb.CheckboxEdit("root", dom.Styles{Color: "red"}, checked)
 	cb.End()
 
-	// sadly attribute order is not guaranteed
-	// TODO: sort them?
-	options := map[string]bool{
-		"<input checked=\"\" type=\"checkbox\"/>": true,
-		"<input type=\"checkbox\" checked=\"\"/>": true,
-	}
-
-	if x := fmt.Sprint(elt); !options[x] {
+	if x := fmt.Sprint(elt); x != "<input checked=\"\" style=\"color: red\" type=\"checkbox\"/>" {
 		t.Error(x)
 	}
 
