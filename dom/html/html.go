@@ -32,7 +32,7 @@ func (d driver) NewElement(props dom.Props, children ...dom.Element) dom.Element
 		DataAtom: a,
 		Data:     a.String(),
 	}
-	elt := &element{n, nil}
+	elt := &element{n, nil, nil}
 	for k, v := range props.ToMap() {
 		elt.SetProp(k, v)
 	}
@@ -44,6 +44,7 @@ func (d driver) NewElement(props dom.Props, children ...dom.Element) dom.Element
 
 type element struct {
 	*html.Node
+	OnChange *dom.EventHandler
 	children []dom.Element
 }
 
@@ -92,6 +93,7 @@ func (e *element) SetProp(key string, value interface{}) {
 			e.Node.Attr = append(e.Node.Attr, html.Attribute{Key: "style", Val: css})
 		}
 	case "OnChange":
+		e.OnChange = value.(*dom.EventHandler)
 	default:
 		panic("Unknown key: " + key)
 	}
@@ -129,6 +131,26 @@ func (e *element) Value() string {
 	}
 
 	return ""
+}
+
+func (e *element) SetValue(s string) {
+	inputType := ""
+	for _, a := range e.Node.Attr {
+		switch a.Key {
+		case "type":
+			inputType = a.Val
+		}
+	}
+
+	if inputType == "checkbox" {
+		e.SetProp("Checked", s == "on")
+	} else {
+		e.SetProp("TextContent", s)
+	}
+
+	if cx := e.OnChange; cx != nil {
+		cx.Handle(dom.Event{})
+	}
 }
 
 func (e *element) Children() []dom.Element {
