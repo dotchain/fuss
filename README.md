@@ -162,35 +162,52 @@ single state stream but that was not done for the sake of simplicity.
 
 ## How does all this work?
 
-Most of the  magic here is by code generation. 
+Every component function has two associated types that are
+automatically generated: the context type  (the first parameter to the
+function) as well as a *struct* type which is the primary interface
+for consumers of the component.
 
-### The core interface
+The context type caches the input and output params from the last call
+as well as all the sub-components used. When a component uses the
+context to create a sub-component, the corresponding cache of that
+subcomponent is used to reuse a prior value if no parameters to it
+have changed.
 
-For every pure function (which can be private), there is a struct defined with the following shape:
+### The context type
+
+The context type roughly looks like this:
 
 ```golang
 
-type ComponentStruct {....}
-func (c *ComponentStruct) Begin() {...}
-func (c *ComponentStruct) End() {...}
-func (c *ComponentStruct) MainMethod(key interface{}, args) results {
-     // args are same as for pure function except:  no context or state
-     // results are same as for pure function except: no state 
-     
-     // function checks if key exists in cache.
-     // if not, the pure function is called with a new context
-     // else pure function is called only if args  differ, using cached results instead
+type componentContext {
+	// for each subPkg.subComponent used by the component
+	subPkg struct {
+		subComponentStruct
+	}
+
+        // memoized tracks all previous args and results
+        memoized struct {
+        	arg1 argType1 ....
+        }
 }
 ```
 
-This struct is the core contract between components: the `Begin` is
-used to indicate a new round with the `End` concluding the current
-round.  This allows tracking if the parent  is no longer using  this
-sub-componennt and dropping it out of the cache when that happens. 
+In the previous examples, when a component decides to create a
+checkbox via `c.dom.CheckboxEdit(...)`, the associated context type
+would have a field like so:
 
-For each pure function, the corresponding struct is automatically
-created  where the cache simply maintains the context. The context
-itself contains all the sub-components used by a particular
-component.
+```golang
 
-More explanation to follow.
+type componentContext {
+	dom struct {
+        	dom.CheckboxEditStruct
+        }
+        ...
+}
+```
+
+The  `dom.CheckboxEditStruct` implements a `CheckboxEdit(...)`
+function and so the call to `c.dom.CheckboxEdit(...)`
+works. Underneath the covers, every `Struct` type maintains a cache of
+its contexts. This cache is used to lookup an individual context and
+if found, previous values are reused as necessary.
