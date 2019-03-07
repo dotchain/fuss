@@ -29,6 +29,7 @@ import (
 var contextTpl = newTemplate(`
 type {{.ContextType}} struct {
 	core.Cache
+	finalizer func()
 	{{range $ps := .PkgSubcomps}}{{if not (eq $ps.Pkg "")}}{{$ps.Pkg}} struct { {{end}}
 		{{range $ps.Subcomps}}{{.}}
 	{{end}} {{if not (eq $ps.Pkg "")}} } {{end}}
@@ -97,18 +98,22 @@ func ({{$c.Name}} {{$c.Type}}) refresh({{.NonContextArgsDecl}}) ({{.ResultsDecl}
 
 func ({{$c.Name}} {{$c.Type}}) close() {
 	{{$c.Name}}.Cache.Begin()
-	defer {{$c.Name}}.Cache.End()
+	{{$c.Name}}.Cache.End()
 
 	{{range $i := .Subcomponents}}
 	{{$c.Name}}.{{$i}}.Begin()
-	defer {{$c.Name}}.{{$i}}.End()
+	{{$c.Name}}.{{$i}}.End()
 	{{end -}}
 
 	{{range $sa := .StateArgs -}}
-	if {{$c.Name}}.memoized.{{$sa.Name}} != nil {
-		{{$c.Name}}.memoized.{{$sa.Name}}.Off(&{{$c.Name}}.stateHandler)
+	if {{$c.Name}}.memoized.{{$sa.ResultName}} != nil {
+		{{$c.Name}}.memoized.{{$sa.ResultName}}.Off(&{{$c.Name}}.stateHandler)
 	}
 	{{end -}}
+
+	if {{$c.Name}}.finalizer != nil {
+		{{$c.Name}}.finalizer()
+	}
 }
 
 {{.ComponentComments}}

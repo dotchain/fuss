@@ -504,6 +504,7 @@ func (s *TasksStream) Substream(cache core.Cache, index int) (entry *Task) {
 
 type taskCtx struct {
 	core.Cache
+	finalizer func()
 
 	initialized  bool
 	stateHandler core.Handler
@@ -571,16 +572,19 @@ func (ctx *taskCtx) refresh(boo bool, children []int) (result1 int) {
 
 func (ctx *taskCtx) close() {
 	ctx.Cache.Begin()
-	defer ctx.Cache.End()
+	ctx.Cache.End()
 
 	ctx.subTasker.Begin()
-	defer ctx.subTasker.End()
+	ctx.subTasker.End()
 
 	ctx.fn.Checkbox.Begin()
-	defer ctx.fn.Checkbox.End()
+	ctx.fn.Checkbox.End()
 
 	ctx.fn.TextEdit.Begin()
-	defer ctx.fn.TextEdit.End()
+	ctx.fn.TextEdit.End()
+	if ctx.finalizer != nil {
+		ctx.finalizer()
+	}
 }
 
 // TaskViewCache is something
@@ -615,6 +619,7 @@ func (c *TaskViewCache) TaskView(ctxKey interface{}, boo bool, children ...int) 
 
 type taskStateCtx struct {
 	core.Cache
+	finalizer func()
 
 	initialized  bool
 	stateHandler core.Handler
@@ -692,13 +697,16 @@ func (ctx *taskCtx) refresh(children []int) (result1 int) {
 
 func (ctx *taskCtx) close() {
 	ctx.Cache.Begin()
-	defer ctx.Cache.End()
+	ctx.Cache.End()
 
-	if ctx.memoized.boo1State != nil {
-		ctx.memoized.boo1State.Off(&ctx.stateHandler)
+	if ctx.memoized.result2 != nil {
+		ctx.memoized.result2.Off(&ctx.stateHandler)
 	}
-	if ctx.memoized.boo2State != nil {
-		ctx.memoized.boo2State.Off(&ctx.stateHandler)
+	if ctx.memoized.result3 != nil {
+		ctx.memoized.result3.Off(&ctx.stateHandler)
+	}
+	if ctx.finalizer != nil {
+		ctx.finalizer()
 	}
 }
 

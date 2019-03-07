@@ -76,4 +76,9 @@ func TestElt(t *testing.T) {
 	if x := fmt.Sprint(one); x != "<div><div>inner3</div></div>" {
 		t.Error(x)
 	}
+
+	// cleanup
+	e.Begin()
+	e.End()
+	reportDriverLeaks(t)
 }

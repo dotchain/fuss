@@ -17,14 +17,18 @@ import (
 )
 
 func init() {
-	dom.RegisterDriver(driver{OnChange: map[*html.Node]*dom.EventHandler{}})
+	dom.RegisterDriver(Driver{OnChange: map[*html.Node]*dom.EventHandler{}})
 }
 
-type driver struct {
+// Driver implements the dom.Driver interface on top of net/html's
+// Node type
+type Driver struct {
+	// OnChange tracks all the OnChange handlers registered
 	OnChange map[*html.Node]*dom.EventHandler
 }
 
-func (d driver) NewElement(props dom.Props, children ...dom.Element) dom.Element {
+// NewElement implements the dom.Driver NewElement method
+func (d Driver) NewElement(props dom.Props, children ...dom.Element) dom.Element {
 	tag := strings.ToLower(props.Tag)
 	if tag == "" {
 		tag = "div"
@@ -48,7 +52,7 @@ func (d driver) NewElement(props dom.Props, children ...dom.Element) dom.Element
 
 type element struct {
 	*html.Node
-	d *driver
+	d *Driver
 }
 
 func (e element) String() string {
@@ -221,4 +225,8 @@ func (e element) InsertChild(index int, elt dom.Element) {
 	} else {
 		e.Node.AppendChild(elt.(element).Node)
 	}
+}
+
+func (e element) Close() {
+	delete(e.d.OnChange, e.Node)
 }

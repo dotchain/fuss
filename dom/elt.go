@@ -28,7 +28,10 @@ func elt(c *nodeCtx, lastState *nodeStream, props Props, children ...Element) (*
 	if lastState == nil {
 		lastState = &nodeStream{Notifier: &core.Notifier{}}
 	}
-	return lastState, lastState.reconcile(props, children)
+	elt := lastState.reconcile(props, children)
+
+	c.finalizer = elt.Close
+	return lastState, elt
 }
 
 type diff struct {

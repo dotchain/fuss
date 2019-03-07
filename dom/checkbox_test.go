@@ -31,4 +31,9 @@ func TestCheckboxEdit(t *testing.T) {
 	if checked.Latest().Value {
 		t.Error("SetValue did not take effect")
 	}
+
+	// cleanup
+	cb.Begin()
+	cb.End()
+	reportDriverLeaks(t)
 }

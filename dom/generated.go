@@ -208,6 +208,7 @@ func (s *TextStream) unwrapValue(v changes.Value) string {
 
 type cbEditCtx struct {
 	core.Cache
+	finalizer func()
 
 	EltStruct
 	initialized  bool
@@ -257,10 +258,13 @@ func (c *cbEditCtx) refresh(styles Styles, checked *BoolStream) (result1 Element
 
 func (c *cbEditCtx) close() {
 	c.Cache.Begin()
-	defer c.Cache.End()
+	c.Cache.End()
 
 	c.EltStruct.Begin()
-	defer c.EltStruct.End()
+	c.EltStruct.End()
+	if c.finalizer != nil {
+		c.finalizer()
+	}
 }
 
 // CheckboxEditStruct is a cache for CheckboxEdit
@@ -296,6 +300,7 @@ func (c *CheckboxEditStruct) CheckboxEdit(cKey interface{}, styles Styles, check
 
 type nodeCtx struct {
 	core.Cache
+	finalizer func()
 
 	initialized  bool
 	stateHandler core.Handler
@@ -364,10 +369,13 @@ func (c *nodeCtx) refresh(props Props, children []Element) (result2 Element) {
 
 func (c *nodeCtx) close() {
 	c.Cache.Begin()
-	defer c.Cache.End()
+	c.Cache.End()
 
-	if c.memoized.lastState != nil {
-		c.memoized.lastState.Off(&c.stateHandler)
+	if c.memoized.result1 != nil {
+		c.memoized.result1.Off(&c.stateHandler)
+	}
+	if c.finalizer != nil {
+		c.finalizer()
 	}
 }
 
@@ -410,6 +418,7 @@ func (c *EltStruct) Elt(cKey interface{}, props Props, children ...Element) (res
 
 type textEditCtx struct {
 	core.Cache
+	finalizer func()
 
 	EltStruct
 	initialized  bool
@@ -459,10 +468,13 @@ func (c *textEditCtx) refresh(styles Styles, text *TextStream) (result1 Element)
 
 func (c *textEditCtx) close() {
 	c.Cache.Begin()
-	defer c.Cache.End()
+	c.Cache.End()
 
 	c.EltStruct.Begin()
-	defer c.EltStruct.End()
+	c.EltStruct.End()
+	if c.finalizer != nil {
+		c.finalizer()
+	}
 }
 
 // TextEditStruct is a cache for TextEdit
