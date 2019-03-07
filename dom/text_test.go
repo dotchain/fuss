@@ -19,14 +19,7 @@ func TestTextEdit(t *testing.T) {
 	elt := edit.TextEdit("root", dom.Styles{}, text)
 	edit.End()
 
-	// sadly attribute order is not guaranteed
-	// TODO: sort them?
-	options := map[string]bool{
-		"<input value=\"boo\" type=\"text\"/>": true,
-		"<input type=\"text\" value=\"boo\"/>": true,
-	}
-
-	if x := fmt.Sprint(elt); !options[x] {
+	if x := fmt.Sprint(elt); x != "<input type=\"text\" value=\"boo\"/>" {
 		t.Error(x)
 	}
 

@@ -12,6 +12,7 @@ import (
 	"github.com/dotchain/fuss/dom"
 	"golang.org/x/net/html"
 	"golang.org/x/net/html/atom"
+	"sort"
 	"strings"
 )
 
@@ -39,6 +40,7 @@ func (d driver) NewElement(props dom.Props, children ...dom.Element) dom.Element
 	for kk, child := range children {
 		elt.InsertChild(kk, child)
 	}
+	elt.sortAttr()
 	return elt
 }
 
@@ -56,7 +58,14 @@ func (e *element) String() string {
 	return buf.String()
 }
 
+func (e *element) sortAttr() {
+	sort.Slice(e.Node.Attr, func(i, j int) bool {
+		return e.Node.Attr[i].Key < e.Node.Attr[j].Key
+	})
+}
+
 func (e *element) SetProp(key string, value interface{}) {
+	defer e.sortAttr()
 	switch key {
 	case "Tag":
 		tag := strings.ToLower(value.(string))
@@ -91,7 +100,7 @@ func (e *element) SetProp(key string, value interface{}) {
 			}
 			return
 		}
-			
+
 		if x := value.(string); x != "" {
 			e.Node.AppendChild(&html.Node{Type: html.TextNode, Data: x})
 		}
