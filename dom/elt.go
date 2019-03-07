@@ -97,8 +97,14 @@ func (e *node) bestDiff(before, after []Element, offset int, ops []diff) []diff 
 			offset++
 		}
 	case len(after) == 0:
-		for range before {
-			ops = append(ops, diff{false, nil, offset})
+		for _, item := range before {
+			found := false
+			for _, op := range ops {
+				found = found || op.elt == item
+			}
+			if !found {
+				ops = append(ops, diff{false, nil, offset})
+			}
 		}
 	default:
 		ops = e.chooseDiff(before, after, offset, ops)
@@ -108,6 +114,14 @@ func (e *node) bestDiff(before, after []Element, offset int, ops []diff) []diff 
 }
 
 func (e *node) chooseDiff(before, after []Element, offset int, ops []diff) []diff {
+	if len(before) > 0 && len(ops) > 0 {
+		for _, op := range ops {
+			if op.insert && op.elt == before[0] {
+				return e.bestDiff(before[1:], after, offset, ops)
+			}
+		}
+	}
+
 	// choice1 = clone of ops + delete first before elt
 	choice1 := append(ops, diff{false, nil, offset})
 	choice1 = e.bestDiff(before[1:], after, offset, choice1)

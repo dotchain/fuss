@@ -7,6 +7,7 @@ package dom_test
 import (
 	"fmt"
 	"github.com/dotchain/fuss/dom"
+	_ "github.com/dotchain/fuss/dom/html"
 	"testing"
 )
 
@@ -24,7 +25,7 @@ func TestElt(t *testing.T) {
 	}
 
 	one := elt("one", dom.Props{})
-	if x := fmt.Sprint(one); x != "div[]()" {
+	if x := fmt.Sprint(one); x != "<div></div>" {
 		t.Error(x)
 	}
 
@@ -32,7 +33,7 @@ func TestElt(t *testing.T) {
 		t.Error("node changed", x)
 	}
 
-	if x := fmt.Sprint(one); x != "div[](boo)" {
+	if x := fmt.Sprint(one); x != "<div>boo</div>" {
 		t.Error(x)
 	}
 
@@ -50,7 +51,7 @@ func TestElt(t *testing.T) {
 		t.Error("node changed", x)
 	}
 
-	if x := fmt.Sprint(one); x != "div[]( div[](inner1) div[](inner2))" {
+	if x := fmt.Sprint(one); x != "<div><div>inner1</div><div>inner2</div></div>" {
 		t.Error(x)
 	}
 
@@ -60,7 +61,7 @@ func TestElt(t *testing.T) {
 		t.Error("node changed", x)
 	}
 
-	if x := fmt.Sprint(one); x != "div[]( div[](inner3) div[](inner1))" {
+	if x := fmt.Sprint(one); x != "<div><div>inner3</div><div>inner1</div></div>" {
 		t.Error(x)
 	}
 
@@ -72,7 +73,7 @@ func TestElt(t *testing.T) {
 		t.Error("node changed", x)
 	}
 
-	if x := fmt.Sprint(one); x != "div[]( div[](inner3))" {
+	if x := fmt.Sprint(one); x != "<div><div>inner3</div></div>" {
 		t.Error(x)
 	}
 }
