@@ -43,6 +43,15 @@ type Styles struct {
 	Color string
 }
 
+// ToCSS converts style to "CSS" text
+func (s Styles) ToCSS() string {
+	if s.Color == "" {
+		return ""
+	}
+
+	return "color: " + s.Color
+}
+
 // Props represents the props of an element
 type Props struct {
 	Styles
