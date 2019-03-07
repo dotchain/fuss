@@ -27,4 +27,9 @@ func TestTextEdit(t *testing.T) {
 	if text.Latest().Value != "booya" {
 		t.Error("SetValue did not take effect")
 	}
+
+	// cleanup
+	edit.Begin()
+	edit.End()
+	reportDriverLeaks(t)
 }

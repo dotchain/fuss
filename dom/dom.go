@@ -36,6 +36,9 @@ type Element interface {
 
 	// InsertChild inserts a child element at the provided index
 	InsertChild(index int, elt Element)
+
+	// Close releases any resources held by this resource
+	Close()
 }
 
 // Styles represents a set of CSS Styles
@@ -84,8 +87,9 @@ type EventHandler struct {
 
 // RegisterDriver allows drivers to register their concrete
 // implementation
-func RegisterDriver(d Driver) {
-	driver = d
+func RegisterDriver(d Driver) (old Driver) {
+	old, driver = driver, d
+	return old
 }
 
 var driver Driver
