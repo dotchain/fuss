@@ -13,10 +13,11 @@ import (
 
 func main() {
 	output := "generated.go"
-	files := []string{"dom.go", "elt.go", "checkbox.go"}
+	files := []string{"dom.go", "elt.go", "checkbox.go", "text.go"}
 	info := fussy.ParseFiles(files, output)
 	info.Streams = []fussy.StreamInfo{
 		{StreamType: "BoolStream", ValueType: "bool"},
+		{StreamType: "TextStream", ValueType: "string"},
 	}
 	ioutil.WriteFile(output, []byte(fussy.Generate(info)), 0644)
 }
