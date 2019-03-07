@@ -83,6 +83,15 @@ func (e *element) SetProp(key string, value interface{}) {
 			e.Node.RemoveChild(e.Node.FirstChild)
 		}
 
+		if e.Node.Data == "input" {
+			e.removeAttribute("value")
+			if x := value.(string); x != "" {
+				a := html.Attribute{Key: "value", Val: x}
+				e.Node.Attr = append(e.Node.Attr, a)
+			}
+			return
+		}
+			
 		if x := value.(string); x != "" {
 			e.Node.AppendChild(&html.Node{Type: html.TextNode, Data: x})
 		}
@@ -112,11 +121,14 @@ func (e *element) removeAttribute(key string) {
 
 func (e *element) Value() string {
 	checked := "off"
+	var val *string
 	inputType := ""
 	for _, a := range e.Node.Attr {
 		switch a.Key {
 		case "checked":
 			checked = "on"
+		case "value":
+			val = &a.Val
 		case "type":
 			inputType = a.Val
 		}
@@ -124,6 +136,10 @@ func (e *element) Value() string {
 
 	if inputType == "checkbox" {
 		return checked
+	}
+
+	if val != nil {
+		return *val
 	}
 
 	if e.Node.FirstChild != nil {
