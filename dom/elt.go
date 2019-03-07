@@ -43,11 +43,10 @@ type node struct {
 }
 
 func (e *node) reconcile(props Props, children []Element) Element {
+	children = e.filterNil(children)
 	if len(children) > 0 {
 		props.TextContent = ""
 	}
-
-	children = e.filterNil(children)
 
 	if e.root == nil {
 		e.root = NewElement(props, children...)

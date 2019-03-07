@@ -17,10 +17,12 @@ import (
 )
 
 func init() {
-	dom.RegisterDriver(driver{})
+	dom.RegisterDriver(driver{OnChange: map[*html.Node]*dom.EventHandler{}})
 }
 
-type driver struct{}
+type driver struct {
+	OnChange map[*html.Node]*dom.EventHandler
+}
 
 func (d driver) NewElement(props dom.Props, children ...dom.Element) dom.Element {
 	tag := strings.ToLower(props.Tag)
@@ -33,7 +35,7 @@ func (d driver) NewElement(props dom.Props, children ...dom.Element) dom.Element
 		DataAtom: a,
 		Data:     a.String(),
 	}
-	elt := &element{n, nil, nil}
+	elt := element{n, &d}
 	for k, v := range props.ToMap() {
 		elt.SetProp(k, v)
 	}
@@ -46,11 +48,10 @@ func (d driver) NewElement(props dom.Props, children ...dom.Element) dom.Element
 
 type element struct {
 	*html.Node
-	OnChange *dom.EventHandler
-	children []dom.Element
+	d *driver
 }
 
-func (e *element) String() string {
+func (e element) String() string {
 	var buf bytes.Buffer
 	if err := html.Render(&buf, e.Node); err != nil {
 		panic(err)
@@ -58,13 +59,13 @@ func (e *element) String() string {
 	return buf.String()
 }
 
-func (e *element) sortAttr() {
+func (e element) sortAttr() {
 	sort.Slice(e.Node.Attr, func(i, j int) bool {
 		return e.Node.Attr[i].Key < e.Node.Attr[j].Key
 	})
 }
 
-func (e *element) SetProp(key string, value interface{}) {
+func (e element) SetProp(key string, value interface{}) {
 	defer e.sortAttr()
 	switch key {
 	case "Tag":
@@ -111,13 +112,21 @@ func (e *element) SetProp(key string, value interface{}) {
 			e.Node.Attr = append(e.Node.Attr, html.Attribute{Key: "style", Val: css})
 		}
 	case "OnChange":
-		e.OnChange = value.(*dom.EventHandler)
+		if v := value.(*dom.EventHandler); v == nil {
+			delete(e.d.OnChange, e.Node)
+		} else {
+			e.d.OnChange[e.Node] = v
+		}
 	default:
 		panic("Unknown key: " + key)
 	}
 }
 
-func (e *element) removeAttribute(key string) {
+func (e element) HTMLElement() *html.Node {
+	return e.Node
+}
+
+func (e element) removeAttribute(key string) {
 	attr := e.Node.Attr
 	for kk, a := range attr {
 		if a.Key == key {
@@ -128,7 +137,7 @@ func (e *element) removeAttribute(key string) {
 	}
 }
 
-func (e *element) Value() string {
+func (e element) Value() string {
 	checked := "off"
 	var val *string
 	inputType := ""
@@ -158,7 +167,7 @@ func (e *element) Value() string {
 	return ""
 }
 
-func (e *element) SetValue(s string) {
+func (e element) SetValue(s string) {
 	inputType := ""
 	for _, a := range e.Node.Attr {
 		switch a.Key {
@@ -173,52 +182,43 @@ func (e *element) SetValue(s string) {
 		e.SetProp("TextContent", s)
 	}
 
-	if cx := e.OnChange; cx != nil {
+	if cx, ok := e.d.OnChange[e.Node]; ok {
 		cx.Handle(dom.Event{})
 	}
 }
 
-func (e *element) Children() []dom.Element {
-	return e.children
+func (e element) Children() []dom.Element {
+	if x := e.Node.FirstChild; x != nil && x.Type == html.TextNode {
+		return nil
+	}
+
+	result := []dom.Element{}
+	for n := e.Node.FirstChild; n != nil; n = n.NextSibling {
+		result = append(result, element{n, e.d})
+	}
+	return result
 }
 
-func (e *element) RemoveChild(index int) {
-	c := make([]dom.Element, len(e.children)-1)
-	copy(c, e.children[:index])
-	copy(c[index:], e.children[index+1:])
-	e.children = c
+func (e element) RemoveChild(index int) {
 	n := e.Node.FirstChild
 	for kk := 0; kk < index; kk++ {
 		n = n.NextSibling
 	}
-	if n == nil {
-		panic(index)
-	}
 	e.Node.RemoveChild(n)
 }
 
-func (e *element) InsertChild(index int, elt dom.Element) {
-	if n := elt.(*element).Node; n.Parent == e.Node {
-		for kk, ee := range e.children {
-			if ee == elt {
-				e.RemoveChild(kk)
-			}
-		}
+func (e element) InsertChild(index int, elt dom.Element) {
+	if n := elt.(element).Node; n.Parent == e.Node {
+		e.Node.RemoveChild(n)
 	}
-
-	c := make([]dom.Element, len(e.children)+1)
-	copy(c, e.children[:index])
-	c[index] = elt
-	copy(c[index+1:], e.children[index:])
-	e.children = c
 
 	n := e.Node.FirstChild
 	for kk := 0; kk < index; kk++ {
 		n = n.NextSibling
 	}
 	if n != nil {
-		e.Node.InsertBefore(elt.(*element).Node, n)
+		e.Node.InsertBefore(elt.(element).Node, n)
 	} else {
-		e.Node.AppendChild(elt.(*element).Node)
+		e.Node.AppendChild(elt.(element).Node)
 	}
 }
