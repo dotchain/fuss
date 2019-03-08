@@ -1,0 +1,10 @@
+language: go
+sudo: false
+before_script:
+- go get github.com/alecthomas/gometalinter
+- gometalinter --install --update
+- bash ./x/lint.sh
+notifications:
+  email: false
+script: bash ./x/coverage.sh
+after_success: bash ./upload_x/coverage.sh bash <(curl -s https://codecov.io/bash)

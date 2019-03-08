@@ -100,7 +100,6 @@ package task
 import (
 	"github.com/dotchain/dot/changes"
 	"github.com/dotchain/dot/refs"
-	"github.com/dotchain/dot/ux/fn"
 	"github.com/dotchain/fuss/core"
 )
 
