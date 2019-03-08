@@ -10,16 +10,15 @@ import (
 	"go/format"
 	"go/parser"
 	"go/token"
-	"io/ioutil"
 	"path"
 	"sort"
 	"strings"
 )
 
+// ParseFiles parses the files and returns info suitable for generating code.
 func ParseFiles(files []string, skipName string) Info {
 	var info Info
 
-	srcs := [][]byte{}
 	ff := []*ast.File{}
 	fset := token.NewFileSet()
 
@@ -28,12 +27,8 @@ func ParseFiles(files []string, skipName string) Info {
 			continue
 		}
 
-		src, err := ioutil.ReadFile(fname)
+		f, err := parser.ParseFile(fset, fname, nil, parser.ParseComments)
 		must(err)
-
-		f, err := parser.ParseFile(fset, fname, src, parser.ParseComments)
-		must(err)
-		srcs = append(srcs, src)
 		ff = append(ff, f)
 		info.Package = f.Name.Name
 	}
