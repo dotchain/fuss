@@ -14,7 +14,7 @@ import (
 	"strings"
 )
 
-// Info contians all the info needed to generate code
+// Info contains all the info needed to generate code
 type Info struct {
 	Package  string
 	Imports  [][2]string

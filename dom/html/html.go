@@ -81,48 +81,63 @@ func (e element) SetProp(key string, value interface{}) {
 			panic("Cannot change the tag of an element: " + tag)
 		}
 	case "Checked":
-		e.removeAttribute("checked")
-		if value.(bool) {
-			a := html.Attribute{Key: "checked"}
-			e.Node.Attr = append(e.Node.Attr, a)
-		}
+		e.setChecked(value.(bool))
 	case "Type":
-		e.removeAttribute("type")
-		if x := value.(string); x != "" {
-			a := html.Attribute{Key: "type", Val: x}
-			e.Node.Attr = append(e.Node.Attr, a)
-		}
+		e.setType(value.(string))
 	case "TextContent":
-		for e.Node.FirstChild != nil {
-			e.Node.RemoveChild(e.Node.FirstChild)
-		}
-
-		if e.Node.Data == "input" {
-			e.removeAttribute("value")
-			if x := value.(string); x != "" {
-				a := html.Attribute{Key: "value", Val: x}
-				e.Node.Attr = append(e.Node.Attr, a)
-			}
-			return
-		}
-
-		if x := value.(string); x != "" {
-			e.Node.AppendChild(&html.Node{Type: html.TextNode, Data: x})
-		}
+		e.setTextContent(value.(string))
 	case "Styles":
-		e.removeAttribute("style")
-		css := value.(dom.Styles).ToCSS()
-		if css != "" {
-			e.Node.Attr = append(e.Node.Attr, html.Attribute{Key: "style", Val: css})
-		}
+		e.setStyles(value.(dom.Styles).ToCSS())
 	case "OnChange":
-		if v := value.(*dom.EventHandler); v == nil {
-			delete(e.d.OnChange, e.Node)
-		} else {
-			e.d.OnChange[e.Node] = v
-		}
+		e.onChange(value.(*dom.EventHandler))
 	default:
 		panic("Unknown key: " + key)
+	}
+}
+
+func (e element) setChecked(v bool) {
+	e.removeAttribute("checked")
+	if v {
+		e.Node.Attr = append(e.Node.Attr, html.Attribute{Key: "checked"})
+	}
+}
+
+func (e element) setType(s string) {
+	e.removeAttribute("type")
+	if s != "" {
+		e.Node.Attr = append(e.Node.Attr, html.Attribute{Key: "type", Val: s})
+	}
+}
+
+func (e element) setTextContent(s string) {
+	for e.Node.FirstChild != nil {
+		e.Node.RemoveChild(e.Node.FirstChild)
+	}
+
+	if e.Node.Data == "input" {
+		e.removeAttribute("value")
+		if s != "" {
+			a := html.Attribute{Key: "value", Val: s}
+			e.Node.Attr = append(e.Node.Attr, a)
+		}
+	} else if s != "" {
+		e.Node.AppendChild(&html.Node{Type: html.TextNode, Data: s})
+	}
+}
+
+func (e element) setStyles(css string) {
+	e.removeAttribute("style")
+	if css != "" {
+		a := html.Attribute{Key: "style", Val: css}
+		e.Node.Attr = append(e.Node.Attr, a)
+	}
+}
+
+func (e element) onChange(v *dom.EventHandler) {
+	if v == nil {
+		delete(e.d.OnChange, e.Node)
+	} else {
+		e.d.OnChange[e.Node] = v
 	}
 }
 
