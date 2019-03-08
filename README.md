@@ -1,6 +1,6 @@
 # Fuss
 
-[![Status](https://travis-ci.com/dotchain/fuss.svg?branch=master)](https://travis-ci.org/dotchain/fuss?branch=master)
+[![Status](https://travis-ci.com/dotchain/fuss.svg?branch=master)](https://travis-ci.com/dotchain/fuss?branch=master)
 [![GoDoc](https://godoc.org/github.com/dotchain/fuss?status.svg)](https://godoc.org/github.com/dotchain/fuss)
 [![codecov](https://codecov.io/gh/dotchain/fuss/branch/master/graph/badge.svg)](https://codecov.io/gh/dotchain/fuss)
 [![Go Report Card](https://goreportcard.com/badge/github.com/dotchain/fuss)](https://goreportcard.com/report/github.com/dotchain/fuss)
