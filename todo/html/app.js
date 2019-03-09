@@ -3968,7 +3968,7 @@ $packages["github.com/dotchain/dot/changes"] = (function() {
 	return $pkg;
 })();
 $packages["github.com/dotchain/fuss/dom"] = (function() {
-	var $pkg = {}, $init, changes, core, Element, Styles, Props, EventHandler, Event, nodeStream, diff, node, BoolStream, TextStream, cbEditCtx, CheckboxEditStruct, nodeCtx, EltStruct, textEditCtx, TextEditStruct, ptrType, sliceType, ptrType$1, ptrType$2, ptrType$3, sliceType$1, sliceType$2, ptrType$4, ptrType$5, ptrType$6, structType, ptrType$7, structType$1, ptrType$8, structType$2, mapType, funcType, ptrType$9, funcType$1, ptrType$10, mapType$1, ptrType$11, mapType$2, ptrType$12, mapType$3, driver, checkboxEdit, NewElement, RegisterDriver, elt, NewBoolStream, NewTextStream, textEdit;
+	var $pkg = {}, $init, changes, core, Element, Styles, Props, EventHandler, Event, nodeStream, diff, node, BoolStream, TextStream, cbEditCtx, CheckboxEditStruct, nodeCtx, EltStruct, labelViewCtx, LabelViewStruct, textEditCtx, TextEditStruct, ptrType, sliceType, ptrType$1, ptrType$2, ptrType$3, sliceType$1, sliceType$2, ptrType$4, ptrType$5, ptrType$6, structType, ptrType$7, structType$1, ptrType$8, structType$2, ptrType$9, structType$3, mapType, funcType, ptrType$10, funcType$1, ptrType$11, mapType$1, ptrType$12, mapType$2, ptrType$13, mapType$3, ptrType$14, mapType$4, driver, checkboxEdit, NewElement, RegisterDriver, elt, NewBoolStream, NewTextStream, labelView, textEdit;
 	changes = $packages["github.com/dotchain/dot/changes"];
 	core = $packages["github.com/dotchain/fuss/core"];
 	Element = $pkg.Element = $newType(8, $kindInterface, "dom.Element", true, "github.com/dotchain/fuss/dom", true, null);
@@ -3980,7 +3980,7 @@ $packages["github.com/dotchain/fuss/dom"] = (function() {
 		}
 		this.Color = Color_;
 	});
-	Props = $pkg.Props = $newType(0, $kindStruct, "dom.Props", true, "github.com/dotchain/fuss/dom", true, function(Styles_, Tag_, Checked_, Type_, TextContent_, OnChange_) {
+	Props = $pkg.Props = $newType(0, $kindStruct, "dom.Props", true, "github.com/dotchain/fuss/dom", true, function(Styles_, Tag_, Checked_, Type_, TextContent_, ID_, For_, OnChange_) {
 		this.$val = this;
 		if (arguments.length === 0) {
 			this.Styles = new Styles.ptr("");
@@ -3988,6 +3988,8 @@ $packages["github.com/dotchain/fuss/dom"] = (function() {
 			this.Checked = false;
 			this.Type = "";
 			this.TextContent = "";
+			this.ID = "";
+			this.For = "";
 			this.OnChange = ptrType.nil;
 			return;
 		}
@@ -3996,6 +3998,8 @@ $packages["github.com/dotchain/fuss/dom"] = (function() {
 		this.Checked = Checked_;
 		this.Type = Type_;
 		this.TextContent = TextContent_;
+		this.ID = ID_;
+		this.For = For_;
 		this.OnChange = OnChange_;
 	});
 	EventHandler = $pkg.EventHandler = $newType(0, $kindStruct, "dom.EventHandler", true, "github.com/dotchain/fuss/dom", true, function(Handle_) {
@@ -4016,7 +4020,7 @@ $packages["github.com/dotchain/fuss/dom"] = (function() {
 		this.$val = this;
 		if (arguments.length === 0) {
 			this.Notifier = ptrType$2.nil;
-			this.node = new node.ptr($ifaceNil, new Props.ptr(new Styles.ptr(""), "", false, "", "", ptrType.nil));
+			this.node = new node.ptr($ifaceNil, new Props.ptr(new Styles.ptr(""), "", false, "", "", "", "", ptrType.nil));
 			return;
 		}
 		this.Notifier = Notifier_;
@@ -4038,7 +4042,7 @@ $packages["github.com/dotchain/fuss/dom"] = (function() {
 		this.$val = this;
 		if (arguments.length === 0) {
 			this.root = $ifaceNil;
-			this.props = new Props.ptr(new Styles.ptr(""), "", false, "", "", ptrType.nil);
+			this.props = new Props.ptr(new Styles.ptr(""), "", false, "", "", "", "", ptrType.nil);
 			return;
 		}
 		this.root = root_;
@@ -4080,7 +4084,7 @@ $packages["github.com/dotchain/fuss/dom"] = (function() {
 			this.EltStruct = new EltStruct.ptr(false, false);
 			this.initialized = false;
 			this.stateHandler = new core.Handler.ptr($throwNilPointerError);
-			this.memoized = new structType.ptr(ptrType$4.nil, $ifaceNil, new Styles.ptr(""));
+			this.memoized = new structType.ptr(ptrType$4.nil, "", $ifaceNil, new Styles.ptr(""));
 			return;
 		}
 		this.Cache = Cache_;
@@ -4107,7 +4111,7 @@ $packages["github.com/dotchain/fuss/dom"] = (function() {
 			this.finalizer = $throwNilPointerError;
 			this.initialized = false;
 			this.stateHandler = new core.Handler.ptr($throwNilPointerError);
-			this.memoized = new structType$1.ptr(sliceType.nil, ptrType$1.nil, new Props.ptr(new Styles.ptr(""), "", false, "", "", ptrType.nil), ptrType$1.nil, $ifaceNil);
+			this.memoized = new structType$1.ptr(sliceType.nil, ptrType$1.nil, new Props.ptr(new Styles.ptr(""), "", false, "", "", "", "", ptrType.nil), ptrType$1.nil, $ifaceNil);
 			return;
 		}
 		this.Cache = Cache_;
@@ -4126,6 +4130,34 @@ $packages["github.com/dotchain/fuss/dom"] = (function() {
 		this.old = old_;
 		this.current = current_;
 	});
+	labelViewCtx = $pkg.labelViewCtx = $newType(0, $kindStruct, "dom.labelViewCtx", true, "github.com/dotchain/fuss/dom", false, function(Cache_, finalizer_, EltStruct_, initialized_, stateHandler_, memoized_) {
+		this.$val = this;
+		if (arguments.length === 0) {
+			this.Cache = new core.Cache.ptr(false, false);
+			this.finalizer = $throwNilPointerError;
+			this.EltStruct = new EltStruct.ptr(false, false);
+			this.initialized = false;
+			this.stateHandler = new core.Handler.ptr($throwNilPointerError);
+			this.memoized = new structType$2.ptr("", $ifaceNil, new Styles.ptr(""), "");
+			return;
+		}
+		this.Cache = Cache_;
+		this.finalizer = finalizer_;
+		this.EltStruct = EltStruct_;
+		this.initialized = initialized_;
+		this.stateHandler = stateHandler_;
+		this.memoized = memoized_;
+	});
+	LabelViewStruct = $pkg.LabelViewStruct = $newType(0, $kindStruct, "dom.LabelViewStruct", true, "github.com/dotchain/fuss/dom", true, function(old_, current_) {
+		this.$val = this;
+		if (arguments.length === 0) {
+			this.old = false;
+			this.current = false;
+			return;
+		}
+		this.old = old_;
+		this.current = current_;
+	});
 	textEditCtx = $pkg.textEditCtx = $newType(0, $kindStruct, "dom.textEditCtx", true, "github.com/dotchain/fuss/dom", false, function(Cache_, finalizer_, EltStruct_, initialized_, stateHandler_, memoized_) {
 		this.$val = this;
 		if (arguments.length === 0) {
@@ -4134,7 +4166,7 @@ $packages["github.com/dotchain/fuss/dom"] = (function() {
 			this.EltStruct = new EltStruct.ptr(false, false);
 			this.initialized = false;
 			this.stateHandler = new core.Handler.ptr($throwNilPointerError);
-			this.memoized = new structType$2.ptr($ifaceNil, new Styles.ptr(""), ptrType$5.nil);
+			this.memoized = new structType$3.ptr($ifaceNil, new Styles.ptr(""), ptrType$5.nil);
 			return;
 		}
 		this.Cache = Cache_;
@@ -4164,28 +4196,32 @@ $packages["github.com/dotchain/fuss/dom"] = (function() {
 	ptrType$4 = $ptrType(BoolStream);
 	ptrType$5 = $ptrType(TextStream);
 	ptrType$6 = $ptrType(cbEditCtx);
-	structType = $structType("github.com/dotchain/fuss/dom", [{prop: "checked", name: "checked", anonymous: false, exported: false, typ: ptrType$4, tag: ""}, {prop: "result1", name: "result1", anonymous: false, exported: false, typ: Element, tag: ""}, {prop: "styles", name: "styles", anonymous: false, exported: false, typ: Styles, tag: ""}]);
+	structType = $structType("github.com/dotchain/fuss/dom", [{prop: "checked", name: "checked", anonymous: false, exported: false, typ: ptrType$4, tag: ""}, {prop: "id", name: "id", anonymous: false, exported: false, typ: $String, tag: ""}, {prop: "result1", name: "result1", anonymous: false, exported: false, typ: Element, tag: ""}, {prop: "styles", name: "styles", anonymous: false, exported: false, typ: Styles, tag: ""}]);
 	ptrType$7 = $ptrType(nodeCtx);
 	structType$1 = $structType("github.com/dotchain/fuss/dom", [{prop: "children", name: "children", anonymous: false, exported: false, typ: sliceType, tag: ""}, {prop: "lastState", name: "lastState", anonymous: false, exported: false, typ: ptrType$1, tag: ""}, {prop: "props", name: "props", anonymous: false, exported: false, typ: Props, tag: ""}, {prop: "result1", name: "result1", anonymous: false, exported: false, typ: ptrType$1, tag: ""}, {prop: "result2", name: "result2", anonymous: false, exported: false, typ: Element, tag: ""}]);
-	ptrType$8 = $ptrType(textEditCtx);
-	structType$2 = $structType("github.com/dotchain/fuss/dom", [{prop: "result1", name: "result1", anonymous: false, exported: false, typ: Element, tag: ""}, {prop: "styles", name: "styles", anonymous: false, exported: false, typ: Styles, tag: ""}, {prop: "text", name: "text", anonymous: false, exported: false, typ: ptrType$5, tag: ""}]);
+	ptrType$8 = $ptrType(labelViewCtx);
+	structType$2 = $structType("github.com/dotchain/fuss/dom", [{prop: "inputID", name: "inputID", anonymous: false, exported: false, typ: $String, tag: ""}, {prop: "result1", name: "result1", anonymous: false, exported: false, typ: Element, tag: ""}, {prop: "styles", name: "styles", anonymous: false, exported: false, typ: Styles, tag: ""}, {prop: "text", name: "text", anonymous: false, exported: false, typ: $String, tag: ""}]);
+	ptrType$9 = $ptrType(textEditCtx);
+	structType$3 = $structType("github.com/dotchain/fuss/dom", [{prop: "result1", name: "result1", anonymous: false, exported: false, typ: Element, tag: ""}, {prop: "styles", name: "styles", anonymous: false, exported: false, typ: Styles, tag: ""}, {prop: "text", name: "text", anonymous: false, exported: false, typ: ptrType$5, tag: ""}]);
 	mapType = $mapType($String, $emptyInterface);
 	funcType = $funcType([Event], [], false);
-	ptrType$9 = $ptrType(node);
+	ptrType$10 = $ptrType(node);
 	funcType$1 = $funcType([], [], false);
-	ptrType$10 = $ptrType(CheckboxEditStruct);
+	ptrType$11 = $ptrType(CheckboxEditStruct);
 	mapType$1 = $mapType($emptyInterface, ptrType$6);
-	ptrType$11 = $ptrType(EltStruct);
+	ptrType$12 = $ptrType(EltStruct);
 	mapType$2 = $mapType($emptyInterface, ptrType$7);
-	ptrType$12 = $ptrType(TextEditStruct);
+	ptrType$13 = $ptrType(LabelViewStruct);
 	mapType$3 = $mapType($emptyInterface, ptrType$8);
-	checkboxEdit = function(c, styles, checked) {
-		var _r, c, checked, result, styles, $s, $r;
-		/* */ $s = 0; var $f, $c = false; if (this !== undefined && this.$blk !== undefined) { $f = this; $c = true; _r = $f._r; c = $f.c; checked = $f.checked; result = $f.result; styles = $f.styles; $s = $f.$s; $r = $f.$r; } s: while (true) { switch ($s) { case 0:
+	ptrType$14 = $ptrType(TextEditStruct);
+	mapType$4 = $mapType($emptyInterface, ptrType$9);
+	checkboxEdit = function(c, styles, checked, id) {
+		var _r, c, checked, id, result, styles, $s, $r;
+		/* */ $s = 0; var $f, $c = false; if (this !== undefined && this.$blk !== undefined) { $f = this; $c = true; _r = $f._r; c = $f.c; checked = $f.checked; id = $f.id; result = $f.result; styles = $f.styles; $s = $f.$s; $r = $f.$r; } s: while (true) { switch ($s) { case 0:
 		checked = [checked];
 		result = [result];
 		result[0] = $ifaceNil;
-		_r = c.EltStruct.Elt(new $String("root"), new Props.ptr($clone(styles, Styles), "input", checked[0].Value, "checkbox", "", new EventHandler.ptr((function(checked, result) { return function $b(param) {
+		_r = c.EltStruct.Elt(new $String("root"), new Props.ptr($clone(styles, Styles), "input", checked[0].Value, "checkbox", "", id, "", new EventHandler.ptr((function(checked, result) { return function $b(param) {
 			var _arg, _arg$1, _r, _r$1, param, $s, $r;
 			/* */ $s = 0; var $f, $c = false; if (this !== undefined && this.$blk !== undefined) { $f = this; $c = true; _arg = $f._arg; _arg$1 = $f._arg$1; _r = $f._r; _r$1 = $f._r$1; param = $f.param; $s = $f.$s; $r = $f.$r; } s: while (true) { switch ($s) { case 0:
 			_arg = $ifaceNil;
@@ -4198,7 +4234,7 @@ $packages["github.com/dotchain/fuss/dom"] = (function() {
 		}; })(checked, result))), new sliceType([])); /* */ $s = 1; case 1: if($c) { $c = false; _r = _r.$blk(); } if (_r && _r.$blk !== undefined) { break s; }
 		result[0] = _r;
 		$s = -1; return result[0];
-		/* */ } return; } if ($f === undefined) { $f = { $blk: checkboxEdit }; } $f._r = _r; $f.c = c; $f.checked = checked; $f.result = result; $f.styles = styles; $f.$s = $s; $f.$r = $r; return $f;
+		/* */ } return; } if ($f === undefined) { $f = { $blk: checkboxEdit }; } $f._r = _r; $f.c = c; $f.checked = checked; $f.id = id; $f.result = result; $f.styles = styles; $f.$s = $s; $f.$r = $r; return $f;
 	};
 	NewElement = function(props, children) {
 		var _r, children, props, $s, $r;
@@ -4220,7 +4256,7 @@ $packages["github.com/dotchain/fuss/dom"] = (function() {
 	Props.ptr.prototype.ToMap = function() {
 		var p, x;
 		p = this;
-		return $makeMap($String.keyFor, [{ k: "Tag", v: new $String(p.Tag) }, { k: "Checked", v: new $Bool(p.Checked) }, { k: "Type", v: new $String(p.Type) }, { k: "TextContent", v: new $String(p.TextContent) }, { k: "Styles", v: (x = p.Styles, new x.constructor.elem(x)) }, { k: "OnChange", v: p.OnChange }]);
+		return $makeMap($String.keyFor, [{ k: "ID", v: new $String(p.ID) }, { k: "For", v: new $String(p.For) }, { k: "Tag", v: new $String(p.Tag) }, { k: "Checked", v: new $Bool(p.Checked) }, { k: "Type", v: new $String(p.Type) }, { k: "TextContent", v: new $String(p.TextContent) }, { k: "Styles", v: (x = p.Styles, new x.constructor.elem(x)) }, { k: "OnChange", v: p.OnChange }]);
 	};
 	Props.prototype.ToMap = function() { return this.$val.ToMap(); };
 	RegisterDriver = function(d) {
@@ -4244,7 +4280,7 @@ $packages["github.com/dotchain/fuss/dom"] = (function() {
 		var _r, c, children, elt$1, lastState, props, $s, $r;
 		/* */ $s = 0; var $f, $c = false; if (this !== undefined && this.$blk !== undefined) { $f = this; $c = true; _r = $f._r; c = $f.c; children = $f.children; elt$1 = $f.elt$1; lastState = $f.lastState; props = $f.props; $s = $f.$s; $r = $f.$r; } s: while (true) { switch ($s) { case 0:
 		if (lastState === ptrType$1.nil) {
-			lastState = new nodeStream.ptr(new core.Notifier.ptr(sliceType$1.nil), new node.ptr($ifaceNil, new Props.ptr(new Styles.ptr(""), "", false, "", "", ptrType.nil)));
+			lastState = new nodeStream.ptr(new core.Notifier.ptr(sliceType$1.nil), new node.ptr($ifaceNil, new Props.ptr(new Styles.ptr(""), "", false, "", "", "", "", ptrType.nil)));
 		}
 		_r = lastState.node.reconcile($clone(props, Props), children); /* */ $s = 1; case 1: if($c) { $c = false; _r = _r.$blk(); } if (_r && _r.$blk !== undefined) { break s; }
 		elt$1 = _r;
@@ -4634,64 +4670,70 @@ $packages["github.com/dotchain/fuss/dom"] = (function() {
 		return $assertType($assertType(v, changes.Atomic).Value, $String);
 	};
 	TextStream.prototype.unwrapValue = function(v) { return this.$val.unwrapValue(v); };
-	cbEditCtx.ptr.prototype.areArgsSame = function(styles, checked) {
-		var c, checked, styles;
+	cbEditCtx.ptr.prototype.areArgsSame = function(styles, checked, id) {
+		var c, checked, id, styles;
 		c = this;
 		if (!($equal(styles, c.memoized.styles, Styles))) {
 			return false;
 		}
-		return checked === c.memoized.checked;
+		if (!(checked === c.memoized.checked)) {
+			return false;
+		}
+		return id === c.memoized.id;
 	};
-	cbEditCtx.prototype.areArgsSame = function(styles, checked) { return this.$val.areArgsSame(styles, checked); };
-	cbEditCtx.ptr.prototype.refreshIfNeeded = function(styles, checked) {
-		var _r, c, checked, result1, styles, $s, $r;
-		/* */ $s = 0; var $f, $c = false; if (this !== undefined && this.$blk !== undefined) { $f = this; $c = true; _r = $f._r; c = $f.c; checked = $f.checked; result1 = $f.result1; styles = $f.styles; $s = $f.$s; $r = $f.$r; } s: while (true) { switch ($s) { case 0:
+	cbEditCtx.prototype.areArgsSame = function(styles, checked, id) { return this.$val.areArgsSame(styles, checked, id); };
+	cbEditCtx.ptr.prototype.refreshIfNeeded = function(styles, checked, id) {
+		var _r, c, checked, id, result1, styles, $s, $r;
+		/* */ $s = 0; var $f, $c = false; if (this !== undefined && this.$blk !== undefined) { $f = this; $c = true; _r = $f._r; c = $f.c; checked = $f.checked; id = $f.id; result1 = $f.result1; styles = $f.styles; $s = $f.$s; $r = $f.$r; } s: while (true) { switch ($s) { case 0:
 		result1 = $ifaceNil;
 		c = this;
-		/* */ if (!c.initialized || !c.areArgsSame($clone(styles, Styles), checked)) { $s = 1; continue; }
+		/* */ if (!c.initialized || !c.areArgsSame($clone(styles, Styles), checked, id)) { $s = 1; continue; }
 		/* */ $s = 2; continue;
-		/* if (!c.initialized || !c.areArgsSame($clone(styles, Styles), checked)) { */ case 1:
-			_r = c.refresh($clone(styles, Styles), checked); /* */ $s = 3; case 3: if($c) { $c = false; _r = _r.$blk(); } if (_r && _r.$blk !== undefined) { break s; }
+		/* if (!c.initialized || !c.areArgsSame($clone(styles, Styles), checked, id)) { */ case 1:
+			_r = c.refresh($clone(styles, Styles), checked, id); /* */ $s = 3; case 3: if($c) { $c = false; _r = _r.$blk(); } if (_r && _r.$blk !== undefined) { break s; }
 			result1 = _r;
 			$s = -1; return result1;
 		/* } */ case 2:
 		result1 = c.memoized.result1;
 		$s = -1; return result1;
-		/* */ } return; } if ($f === undefined) { $f = { $blk: cbEditCtx.ptr.prototype.refreshIfNeeded }; } $f._r = _r; $f.c = c; $f.checked = checked; $f.result1 = result1; $f.styles = styles; $f.$s = $s; $f.$r = $r; return $f;
+		/* */ } return; } if ($f === undefined) { $f = { $blk: cbEditCtx.ptr.prototype.refreshIfNeeded }; } $f._r = _r; $f.c = c; $f.checked = checked; $f.id = id; $f.result1 = result1; $f.styles = styles; $f.$s = $s; $f.$r = $r; return $f;
 	};
-	cbEditCtx.prototype.refreshIfNeeded = function(styles, checked) { return this.$val.refreshIfNeeded(styles, checked); };
-	cbEditCtx.ptr.prototype.refresh = function(styles, checked) {
-		var _r, _tmp, _tmp$1, c, checked, result1, styles, $s, $deferred, $r;
-		/* */ $s = 0; var $f, $c = false; if (this !== undefined && this.$blk !== undefined) { $f = this; $c = true; _r = $f._r; _tmp = $f._tmp; _tmp$1 = $f._tmp$1; c = $f.c; checked = $f.checked; result1 = $f.result1; styles = $f.styles; $s = $f.$s; $deferred = $f.$deferred; $r = $f.$r; } var $err = null; try { s: while (true) { switch ($s) { case 0: $deferred = []; $deferred.index = $curGoroutine.deferStack.length; $curGoroutine.deferStack.push($deferred);
+	cbEditCtx.prototype.refreshIfNeeded = function(styles, checked, id) { return this.$val.refreshIfNeeded(styles, checked, id); };
+	cbEditCtx.ptr.prototype.refresh = function(styles, checked, id) {
+		var _r, _tmp, _tmp$1, _tmp$2, c, checked, id, result1, styles, $s, $deferred, $r;
+		/* */ $s = 0; var $f, $c = false; if (this !== undefined && this.$blk !== undefined) { $f = this; $c = true; _r = $f._r; _tmp = $f._tmp; _tmp$1 = $f._tmp$1; _tmp$2 = $f._tmp$2; c = $f.c; checked = $f.checked; id = $f.id; result1 = $f.result1; styles = $f.styles; $s = $f.$s; $deferred = $f.$deferred; $r = $f.$r; } var $err = null; try { s: while (true) { switch ($s) { case 0: $deferred = []; $deferred.index = $curGoroutine.deferStack.length; $curGoroutine.deferStack.push($deferred);
 		c = [c];
 		checked = [checked];
+		id = [id];
 		styles = [styles];
 		result1 = $ifaceNil;
 		c[0] = this;
 		c[0].initialized = true;
-		c[0].stateHandler.Handle = (function(c, checked, styles) { return function $b() {
+		c[0].stateHandler.Handle = (function(c, checked, id, styles) { return function $b() {
 			var _r, $s, $r;
 			/* */ $s = 0; var $f, $c = false; if (this !== undefined && this.$blk !== undefined) { $f = this; $c = true; _r = $f._r; $s = $f.$s; $r = $f.$r; } s: while (true) { switch ($s) { case 0:
-			_r = c[0].refresh($clone(styles[0], Styles), checked[0]); /* */ $s = 1; case 1: if($c) { $c = false; _r = _r.$blk(); } if (_r && _r.$blk !== undefined) { break s; }
+			_r = c[0].refresh($clone(styles[0], Styles), checked[0], id[0]); /* */ $s = 1; case 1: if($c) { $c = false; _r = _r.$blk(); } if (_r && _r.$blk !== undefined) { break s; }
 			_r;
 			$s = -1; return;
 			/* */ } return; } if ($f === undefined) { $f = { $blk: $b }; } $f._r = _r; $f.$s = $s; $f.$r = $r; return $f;
-		}; })(c, checked, styles);
+		}; })(c, checked, id, styles);
 		_tmp = $clone(styles[0], Styles);
 		_tmp$1 = checked[0];
+		_tmp$2 = id[0];
 		Styles.copy(c[0].memoized.styles, _tmp);
 		c[0].memoized.checked = _tmp$1;
+		c[0].memoized.id = _tmp$2;
 		c[0].Cache.Begin();
 		$deferred.push([$methodVal(c[0].Cache, "End"), []]);
 		c[0].EltStruct.Begin();
 		$deferred.push([$methodVal(c[0].EltStruct, "End"), []]);
-		_r = checkboxEdit(c[0], $clone(styles[0], Styles), checked[0]); /* */ $s = 1; case 1: if($c) { $c = false; _r = _r.$blk(); } if (_r && _r.$blk !== undefined) { break s; }
+		_r = checkboxEdit(c[0], $clone(styles[0], Styles), checked[0], id[0]); /* */ $s = 1; case 1: if($c) { $c = false; _r = _r.$blk(); } if (_r && _r.$blk !== undefined) { break s; }
 		c[0].memoized.result1 = _r;
 		result1 = c[0].memoized.result1;
 		$s = -1; return result1;
-		/* */ } return; } } catch(err) { $err = err; $s = -1; } finally { $callDeferred($deferred, $err); if (!$curGoroutine.asleep) { return  result1; } if($curGoroutine.asleep) { if ($f === undefined) { $f = { $blk: cbEditCtx.ptr.prototype.refresh }; } $f._r = _r; $f._tmp = _tmp; $f._tmp$1 = _tmp$1; $f.c = c; $f.checked = checked; $f.result1 = result1; $f.styles = styles; $f.$s = $s; $f.$deferred = $deferred; $f.$r = $r; return $f; } }
+		/* */ } return; } } catch(err) { $err = err; $s = -1; } finally { $callDeferred($deferred, $err); if (!$curGoroutine.asleep) { return  result1; } if($curGoroutine.asleep) { if ($f === undefined) { $f = { $blk: cbEditCtx.ptr.prototype.refresh }; } $f._r = _r; $f._tmp = _tmp; $f._tmp$1 = _tmp$1; $f._tmp$2 = _tmp$2; $f.c = c; $f.checked = checked; $f.id = id; $f.result1 = result1; $f.styles = styles; $f.$s = $s; $f.$deferred = $deferred; $f.$r = $r; return $f; } }
 	};
-	cbEditCtx.prototype.refresh = function(styles, checked) { return this.$val.refresh(styles, checked); };
+	cbEditCtx.prototype.refresh = function(styles, checked, id) { return this.$val.refresh(styles, checked, id); };
 	cbEditCtx.ptr.prototype.close = function() {
 		var c, $s, $r;
 		/* */ $s = 0; var $f, $c = false; if (this !== undefined && this.$blk !== undefined) { $f = this; $c = true; c = $f.c; $s = $f.$s; $r = $f.$r; } s: while (true) { switch ($s) { case 0:
@@ -4741,9 +4783,9 @@ $packages["github.com/dotchain/fuss/dom"] = (function() {
 		/* */ } return; } if ($f === undefined) { $f = { $blk: CheckboxEditStruct.ptr.prototype.End }; } $f._entry = _entry; $f._i = _i; $f._keys = _keys; $f._ref = _ref; $f.c = c; $f.ctx = ctx; $f.$s = $s; $f.$r = $r; return $f;
 	};
 	CheckboxEditStruct.prototype.End = function() { return this.$val.End(); };
-	CheckboxEditStruct.ptr.prototype.CheckboxEdit = function(cKey, styles, checked) {
-		var _entry, _key, _r, _tuple, c, cKey, cOld, checked, ok, result1, styles, $s, $r;
-		/* */ $s = 0; var $f, $c = false; if (this !== undefined && this.$blk !== undefined) { $f = this; $c = true; _entry = $f._entry; _key = $f._key; _r = $f._r; _tuple = $f._tuple; c = $f.c; cKey = $f.cKey; cOld = $f.cOld; checked = $f.checked; ok = $f.ok; result1 = $f.result1; styles = $f.styles; $s = $f.$s; $r = $f.$r; } s: while (true) { switch ($s) { case 0:
+	CheckboxEditStruct.ptr.prototype.CheckboxEdit = function(cKey, styles, checked, id) {
+		var _entry, _key, _r, _tuple, c, cKey, cOld, checked, id, ok, result1, styles, $s, $r;
+		/* */ $s = 0; var $f, $c = false; if (this !== undefined && this.$blk !== undefined) { $f = this; $c = true; _entry = $f._entry; _key = $f._key; _r = $f._r; _tuple = $f._tuple; c = $f.c; cKey = $f.cKey; cOld = $f.cOld; checked = $f.checked; id = $f.id; ok = $f.ok; result1 = $f.result1; styles = $f.styles; $s = $f.$s; $r = $f.$r; } s: while (true) { switch ($s) { case 0:
 		result1 = $ifaceNil;
 		c = this;
 		_tuple = (_entry = c.old[$emptyInterface.keyFor(cKey)], _entry !== undefined ? [_entry.v, true] : [ptrType$6.nil, false]);
@@ -4752,15 +4794,15 @@ $packages["github.com/dotchain/fuss/dom"] = (function() {
 		if (ok) {
 			delete c.old[$emptyInterface.keyFor(cKey)];
 		} else {
-			cOld = new cbEditCtx.ptr(new core.Cache.ptr(false, false), $throwNilPointerError, new EltStruct.ptr(false, false), false, new core.Handler.ptr($throwNilPointerError), new structType.ptr(ptrType$4.nil, $ifaceNil, new Styles.ptr("")));
+			cOld = new cbEditCtx.ptr(new core.Cache.ptr(false, false), $throwNilPointerError, new EltStruct.ptr(false, false), false, new core.Handler.ptr($throwNilPointerError), new structType.ptr(ptrType$4.nil, "", $ifaceNil, new Styles.ptr("")));
 		}
 		_key = cKey; (c.current || $throwRuntimeError("assignment to entry in nil map"))[$emptyInterface.keyFor(_key)] = { k: _key, v: cOld };
-		_r = cOld.refreshIfNeeded($clone(styles, Styles), checked); /* */ $s = 1; case 1: if($c) { $c = false; _r = _r.$blk(); } if (_r && _r.$blk !== undefined) { break s; }
+		_r = cOld.refreshIfNeeded($clone(styles, Styles), checked, id); /* */ $s = 1; case 1: if($c) { $c = false; _r = _r.$blk(); } if (_r && _r.$blk !== undefined) { break s; }
 		result1 = _r;
 		$s = -1; return result1;
-		/* */ } return; } if ($f === undefined) { $f = { $blk: CheckboxEditStruct.ptr.prototype.CheckboxEdit }; } $f._entry = _entry; $f._key = _key; $f._r = _r; $f._tuple = _tuple; $f.c = c; $f.cKey = cKey; $f.cOld = cOld; $f.checked = checked; $f.ok = ok; $f.result1 = result1; $f.styles = styles; $f.$s = $s; $f.$r = $r; return $f;
+		/* */ } return; } if ($f === undefined) { $f = { $blk: CheckboxEditStruct.ptr.prototype.CheckboxEdit }; } $f._entry = _entry; $f._key = _key; $f._r = _r; $f._tuple = _tuple; $f.c = c; $f.cKey = cKey; $f.cOld = cOld; $f.checked = checked; $f.id = id; $f.ok = ok; $f.result1 = result1; $f.styles = styles; $f.$s = $s; $f.$r = $r; return $f;
 	};
-	CheckboxEditStruct.prototype.CheckboxEdit = function(cKey, styles, checked) { return this.$val.CheckboxEdit(cKey, styles, checked); };
+	CheckboxEditStruct.prototype.CheckboxEdit = function(cKey, styles, checked, id) { return this.$val.CheckboxEdit(cKey, styles, checked, id); };
 	nodeCtx.ptr.prototype.areArgsSame = function(props, children) {
 		var _i, _ref, c, children, childrenIdx, props, x;
 		c = this;
@@ -4905,7 +4947,7 @@ $packages["github.com/dotchain/fuss/dom"] = (function() {
 		if (ok) {
 			delete c.old[$emptyInterface.keyFor(cKey)];
 		} else {
-			cOld = new nodeCtx.ptr(new core.Cache.ptr(false, false), $throwNilPointerError, false, new core.Handler.ptr($throwNilPointerError), new structType$1.ptr(sliceType.nil, ptrType$1.nil, new Props.ptr(new Styles.ptr(""), "", false, "", "", ptrType.nil), ptrType$1.nil, $ifaceNil));
+			cOld = new nodeCtx.ptr(new core.Cache.ptr(false, false), $throwNilPointerError, false, new core.Handler.ptr($throwNilPointerError), new structType$1.ptr(sliceType.nil, ptrType$1.nil, new Props.ptr(new Styles.ptr(""), "", false, "", "", "", "", ptrType.nil), ptrType$1.nil, $ifaceNil));
 		}
 		_key = cKey; (c.current || $throwRuntimeError("assignment to entry in nil map"))[$emptyInterface.keyFor(_key)] = { k: _key, v: cOld };
 		_r = cOld.refreshIfNeeded($clone(props, Props), children); /* */ $s = 1; case 1: if($c) { $c = false; _r = _r.$blk(); } if (_r && _r.$blk !== undefined) { break s; }
@@ -4914,6 +4956,139 @@ $packages["github.com/dotchain/fuss/dom"] = (function() {
 		/* */ } return; } if ($f === undefined) { $f = { $blk: EltStruct.ptr.prototype.Elt }; } $f._entry = _entry; $f._key = _key; $f._r = _r; $f._tuple = _tuple; $f.c = c; $f.cKey = cKey; $f.cOld = cOld; $f.children = children; $f.ok = ok; $f.props = props; $f.result2 = result2; $f.$s = $s; $f.$r = $r; return $f;
 	};
 	EltStruct.prototype.Elt = function(cKey, props, children) { return this.$val.Elt(cKey, props, children); };
+	labelViewCtx.ptr.prototype.areArgsSame = function(styles, text, inputID) {
+		var c, inputID, styles, text;
+		c = this;
+		if (!($equal(styles, c.memoized.styles, Styles))) {
+			return false;
+		}
+		if (!(text === c.memoized.text)) {
+			return false;
+		}
+		return inputID === c.memoized.inputID;
+	};
+	labelViewCtx.prototype.areArgsSame = function(styles, text, inputID) { return this.$val.areArgsSame(styles, text, inputID); };
+	labelViewCtx.ptr.prototype.refreshIfNeeded = function(styles, text, inputID) {
+		var _r, c, inputID, result1, styles, text, $s, $r;
+		/* */ $s = 0; var $f, $c = false; if (this !== undefined && this.$blk !== undefined) { $f = this; $c = true; _r = $f._r; c = $f.c; inputID = $f.inputID; result1 = $f.result1; styles = $f.styles; text = $f.text; $s = $f.$s; $r = $f.$r; } s: while (true) { switch ($s) { case 0:
+		result1 = $ifaceNil;
+		c = this;
+		/* */ if (!c.initialized || !c.areArgsSame($clone(styles, Styles), text, inputID)) { $s = 1; continue; }
+		/* */ $s = 2; continue;
+		/* if (!c.initialized || !c.areArgsSame($clone(styles, Styles), text, inputID)) { */ case 1:
+			_r = c.refresh($clone(styles, Styles), text, inputID); /* */ $s = 3; case 3: if($c) { $c = false; _r = _r.$blk(); } if (_r && _r.$blk !== undefined) { break s; }
+			result1 = _r;
+			$s = -1; return result1;
+		/* } */ case 2:
+		result1 = c.memoized.result1;
+		$s = -1; return result1;
+		/* */ } return; } if ($f === undefined) { $f = { $blk: labelViewCtx.ptr.prototype.refreshIfNeeded }; } $f._r = _r; $f.c = c; $f.inputID = inputID; $f.result1 = result1; $f.styles = styles; $f.text = text; $f.$s = $s; $f.$r = $r; return $f;
+	};
+	labelViewCtx.prototype.refreshIfNeeded = function(styles, text, inputID) { return this.$val.refreshIfNeeded(styles, text, inputID); };
+	labelViewCtx.ptr.prototype.refresh = function(styles, text, inputID) {
+		var _r, _tmp, _tmp$1, _tmp$2, c, inputID, result1, styles, text, $s, $deferred, $r;
+		/* */ $s = 0; var $f, $c = false; if (this !== undefined && this.$blk !== undefined) { $f = this; $c = true; _r = $f._r; _tmp = $f._tmp; _tmp$1 = $f._tmp$1; _tmp$2 = $f._tmp$2; c = $f.c; inputID = $f.inputID; result1 = $f.result1; styles = $f.styles; text = $f.text; $s = $f.$s; $deferred = $f.$deferred; $r = $f.$r; } var $err = null; try { s: while (true) { switch ($s) { case 0: $deferred = []; $deferred.index = $curGoroutine.deferStack.length; $curGoroutine.deferStack.push($deferred);
+		c = [c];
+		inputID = [inputID];
+		styles = [styles];
+		text = [text];
+		result1 = $ifaceNil;
+		c[0] = this;
+		c[0].initialized = true;
+		c[0].stateHandler.Handle = (function(c, inputID, styles, text) { return function $b() {
+			var _r, $s, $r;
+			/* */ $s = 0; var $f, $c = false; if (this !== undefined && this.$blk !== undefined) { $f = this; $c = true; _r = $f._r; $s = $f.$s; $r = $f.$r; } s: while (true) { switch ($s) { case 0:
+			_r = c[0].refresh($clone(styles[0], Styles), text[0], inputID[0]); /* */ $s = 1; case 1: if($c) { $c = false; _r = _r.$blk(); } if (_r && _r.$blk !== undefined) { break s; }
+			_r;
+			$s = -1; return;
+			/* */ } return; } if ($f === undefined) { $f = { $blk: $b }; } $f._r = _r; $f.$s = $s; $f.$r = $r; return $f;
+		}; })(c, inputID, styles, text);
+		_tmp = $clone(styles[0], Styles);
+		_tmp$1 = text[0];
+		_tmp$2 = inputID[0];
+		Styles.copy(c[0].memoized.styles, _tmp);
+		c[0].memoized.text = _tmp$1;
+		c[0].memoized.inputID = _tmp$2;
+		c[0].Cache.Begin();
+		$deferred.push([$methodVal(c[0].Cache, "End"), []]);
+		c[0].EltStruct.Begin();
+		$deferred.push([$methodVal(c[0].EltStruct, "End"), []]);
+		_r = labelView(c[0], $clone(styles[0], Styles), text[0], inputID[0]); /* */ $s = 1; case 1: if($c) { $c = false; _r = _r.$blk(); } if (_r && _r.$blk !== undefined) { break s; }
+		c[0].memoized.result1 = _r;
+		result1 = c[0].memoized.result1;
+		$s = -1; return result1;
+		/* */ } return; } } catch(err) { $err = err; $s = -1; } finally { $callDeferred($deferred, $err); if (!$curGoroutine.asleep) { return  result1; } if($curGoroutine.asleep) { if ($f === undefined) { $f = { $blk: labelViewCtx.ptr.prototype.refresh }; } $f._r = _r; $f._tmp = _tmp; $f._tmp$1 = _tmp$1; $f._tmp$2 = _tmp$2; $f.c = c; $f.inputID = inputID; $f.result1 = result1; $f.styles = styles; $f.text = text; $f.$s = $s; $f.$deferred = $deferred; $f.$r = $r; return $f; } }
+	};
+	labelViewCtx.prototype.refresh = function(styles, text, inputID) { return this.$val.refresh(styles, text, inputID); };
+	labelViewCtx.ptr.prototype.close = function() {
+		var c, $s, $r;
+		/* */ $s = 0; var $f, $c = false; if (this !== undefined && this.$blk !== undefined) { $f = this; $c = true; c = $f.c; $s = $f.$s; $r = $f.$r; } s: while (true) { switch ($s) { case 0:
+		c = this;
+		c.Cache.Begin();
+		$r = c.Cache.End(); /* */ $s = 1; case 1: if($c) { $c = false; $r = $r.$blk(); } if ($r && $r.$blk !== undefined) { break s; }
+		c.EltStruct.Begin();
+		$r = c.EltStruct.End(); /* */ $s = 2; case 2: if($c) { $c = false; $r = $r.$blk(); } if ($r && $r.$blk !== undefined) { break s; }
+		/* */ if (!(c.finalizer === $throwNilPointerError)) { $s = 3; continue; }
+		/* */ $s = 4; continue;
+		/* if (!(c.finalizer === $throwNilPointerError)) { */ case 3:
+			$r = c.finalizer(); /* */ $s = 5; case 5: if($c) { $c = false; $r = $r.$blk(); } if ($r && $r.$blk !== undefined) { break s; }
+		/* } */ case 4:
+		$s = -1; return;
+		/* */ } return; } if ($f === undefined) { $f = { $blk: labelViewCtx.ptr.prototype.close }; } $f.c = c; $f.$s = $s; $f.$r = $r; return $f;
+	};
+	labelViewCtx.prototype.close = function() { return this.$val.close(); };
+	LabelViewStruct.ptr.prototype.Begin = function() {
+		var _tmp, _tmp$1, c;
+		c = this;
+		_tmp = c.current;
+		_tmp$1 = $makeMap($emptyInterface.keyFor, []);
+		c.old = _tmp;
+		c.current = _tmp$1;
+	};
+	LabelViewStruct.prototype.Begin = function() { return this.$val.Begin(); };
+	LabelViewStruct.ptr.prototype.End = function() {
+		var _entry, _i, _keys, _ref, c, ctx, $s, $r;
+		/* */ $s = 0; var $f, $c = false; if (this !== undefined && this.$blk !== undefined) { $f = this; $c = true; _entry = $f._entry; _i = $f._i; _keys = $f._keys; _ref = $f._ref; c = $f.c; ctx = $f.ctx; $s = $f.$s; $r = $f.$r; } s: while (true) { switch ($s) { case 0:
+		c = this;
+		_ref = c.old;
+		_i = 0;
+		_keys = $keys(_ref);
+		/* while (true) { */ case 1:
+			/* if (!(_i < _keys.length)) { break; } */ if(!(_i < _keys.length)) { $s = 2; continue; }
+			_entry = _ref[_keys[_i]];
+			if (_entry === undefined) {
+				_i++;
+				/* continue; */ $s = 1; continue;
+			}
+			ctx = _entry.v;
+			$r = ctx.close(); /* */ $s = 3; case 3: if($c) { $c = false; $r = $r.$blk(); } if ($r && $r.$blk !== undefined) { break s; }
+			_i++;
+		/* } */ $s = 1; continue; case 2:
+		c.old = false;
+		$s = -1; return;
+		/* */ } return; } if ($f === undefined) { $f = { $blk: LabelViewStruct.ptr.prototype.End }; } $f._entry = _entry; $f._i = _i; $f._keys = _keys; $f._ref = _ref; $f.c = c; $f.ctx = ctx; $f.$s = $s; $f.$r = $r; return $f;
+	};
+	LabelViewStruct.prototype.End = function() { return this.$val.End(); };
+	LabelViewStruct.ptr.prototype.LabelView = function(cKey, styles, text, inputID) {
+		var _entry, _key, _r, _tuple, c, cKey, cOld, inputID, ok, result1, styles, text, $s, $r;
+		/* */ $s = 0; var $f, $c = false; if (this !== undefined && this.$blk !== undefined) { $f = this; $c = true; _entry = $f._entry; _key = $f._key; _r = $f._r; _tuple = $f._tuple; c = $f.c; cKey = $f.cKey; cOld = $f.cOld; inputID = $f.inputID; ok = $f.ok; result1 = $f.result1; styles = $f.styles; text = $f.text; $s = $f.$s; $r = $f.$r; } s: while (true) { switch ($s) { case 0:
+		result1 = $ifaceNil;
+		c = this;
+		_tuple = (_entry = c.old[$emptyInterface.keyFor(cKey)], _entry !== undefined ? [_entry.v, true] : [ptrType$8.nil, false]);
+		cOld = _tuple[0];
+		ok = _tuple[1];
+		if (ok) {
+			delete c.old[$emptyInterface.keyFor(cKey)];
+		} else {
+			cOld = new labelViewCtx.ptr(new core.Cache.ptr(false, false), $throwNilPointerError, new EltStruct.ptr(false, false), false, new core.Handler.ptr($throwNilPointerError), new structType$2.ptr("", $ifaceNil, new Styles.ptr(""), ""));
+		}
+		_key = cKey; (c.current || $throwRuntimeError("assignment to entry in nil map"))[$emptyInterface.keyFor(_key)] = { k: _key, v: cOld };
+		_r = cOld.refreshIfNeeded($clone(styles, Styles), text, inputID); /* */ $s = 1; case 1: if($c) { $c = false; _r = _r.$blk(); } if (_r && _r.$blk !== undefined) { break s; }
+		result1 = _r;
+		$s = -1; return result1;
+		/* */ } return; } if ($f === undefined) { $f = { $blk: LabelViewStruct.ptr.prototype.LabelView }; } $f._entry = _entry; $f._key = _key; $f._r = _r; $f._tuple = _tuple; $f.c = c; $f.cKey = cKey; $f.cOld = cOld; $f.inputID = inputID; $f.ok = ok; $f.result1 = result1; $f.styles = styles; $f.text = text; $f.$s = $s; $f.$r = $r; return $f;
+	};
+	LabelViewStruct.prototype.LabelView = function(cKey, styles, text, inputID) { return this.$val.LabelView(cKey, styles, text, inputID); };
 	textEditCtx.ptr.prototype.areArgsSame = function(styles, text) {
 		var c, styles, text;
 		c = this;
@@ -5026,13 +5201,13 @@ $packages["github.com/dotchain/fuss/dom"] = (function() {
 		/* */ $s = 0; var $f, $c = false; if (this !== undefined && this.$blk !== undefined) { $f = this; $c = true; _entry = $f._entry; _key = $f._key; _r = $f._r; _tuple = $f._tuple; c = $f.c; cKey = $f.cKey; cOld = $f.cOld; ok = $f.ok; result1 = $f.result1; styles = $f.styles; text = $f.text; $s = $f.$s; $r = $f.$r; } s: while (true) { switch ($s) { case 0:
 		result1 = $ifaceNil;
 		c = this;
-		_tuple = (_entry = c.old[$emptyInterface.keyFor(cKey)], _entry !== undefined ? [_entry.v, true] : [ptrType$8.nil, false]);
+		_tuple = (_entry = c.old[$emptyInterface.keyFor(cKey)], _entry !== undefined ? [_entry.v, true] : [ptrType$9.nil, false]);
 		cOld = _tuple[0];
 		ok = _tuple[1];
 		if (ok) {
 			delete c.old[$emptyInterface.keyFor(cKey)];
 		} else {
-			cOld = new textEditCtx.ptr(new core.Cache.ptr(false, false), $throwNilPointerError, new EltStruct.ptr(false, false), false, new core.Handler.ptr($throwNilPointerError), new structType$2.ptr($ifaceNil, new Styles.ptr(""), ptrType$5.nil));
+			cOld = new textEditCtx.ptr(new core.Cache.ptr(false, false), $throwNilPointerError, new EltStruct.ptr(false, false), false, new core.Handler.ptr($throwNilPointerError), new structType$3.ptr($ifaceNil, new Styles.ptr(""), ptrType$5.nil));
 		}
 		_key = cKey; (c.current || $throwRuntimeError("assignment to entry in nil map"))[$emptyInterface.keyFor(_key)] = { k: _key, v: cOld };
 		_r = cOld.refreshIfNeeded($clone(styles, Styles), text); /* */ $s = 1; case 1: if($c) { $c = false; _r = _r.$blk(); } if (_r && _r.$blk !== undefined) { break s; }
@@ -5041,13 +5216,20 @@ $packages["github.com/dotchain/fuss/dom"] = (function() {
 		/* */ } return; } if ($f === undefined) { $f = { $blk: TextEditStruct.ptr.prototype.TextEdit }; } $f._entry = _entry; $f._key = _key; $f._r = _r; $f._tuple = _tuple; $f.c = c; $f.cKey = cKey; $f.cOld = cOld; $f.ok = ok; $f.result1 = result1; $f.styles = styles; $f.text = text; $f.$s = $s; $f.$r = $r; return $f;
 	};
 	TextEditStruct.prototype.TextEdit = function(cKey, styles, text) { return this.$val.TextEdit(cKey, styles, text); };
+	labelView = function(c, styles, text, inputID) {
+		var _r, c, inputID, styles, text, $s, $r;
+		/* */ $s = 0; var $f, $c = false; if (this !== undefined && this.$blk !== undefined) { $f = this; $c = true; _r = $f._r; c = $f.c; inputID = $f.inputID; styles = $f.styles; text = $f.text; $s = $f.$s; $r = $f.$r; } s: while (true) { switch ($s) { case 0:
+		_r = c.EltStruct.Elt(new $String("root"), new Props.ptr($clone(styles, Styles), "label", false, "", text, "", inputID, ptrType.nil), new sliceType([])); /* */ $s = 1; case 1: if($c) { $c = false; _r = _r.$blk(); } if (_r && _r.$blk !== undefined) { break s; }
+		$s = -1; return _r;
+		/* */ } return; } if ($f === undefined) { $f = { $blk: labelView }; } $f._r = _r; $f.c = c; $f.inputID = inputID; $f.styles = styles; $f.text = text; $f.$s = $s; $f.$r = $r; return $f;
+	};
 	textEdit = function(c, styles, text) {
 		var _r, c, result, styles, text, $s, $r;
 		/* */ $s = 0; var $f, $c = false; if (this !== undefined && this.$blk !== undefined) { $f = this; $c = true; _r = $f._r; c = $f.c; result = $f.result; styles = $f.styles; text = $f.text; $s = $f.$s; $r = $f.$r; } s: while (true) { switch ($s) { case 0:
 		result = [result];
 		text = [text];
 		result[0] = $ifaceNil;
-		_r = c.EltStruct.Elt(new $String("root"), new Props.ptr($clone(styles, Styles), "input", false, "text", text[0].Value, new EventHandler.ptr((function(result, text) { return function $b(param) {
+		_r = c.EltStruct.Elt(new $String("root"), new Props.ptr($clone(styles, Styles), "input", false, "text", text[0].Value, "", "", new EventHandler.ptr((function(result, text) { return function $b(param) {
 			var _arg, _arg$1, _r, _r$1, param, $s, $r;
 			/* */ $s = 0; var $f, $c = false; if (this !== undefined && this.$blk !== undefined) { $f = this; $c = true; _arg = $f._arg; _arg$1 = $f._arg$1; _r = $f._r; _r$1 = $f._r$1; param = $f.param; $s = $f.$s; $r = $f.$r; } s: while (true) { switch ($s) { case 0:
 			_arg = $ifaceNil;
@@ -5065,18 +5247,20 @@ $packages["github.com/dotchain/fuss/dom"] = (function() {
 	Styles.methods = [{prop: "ToCSS", name: "ToCSS", pkg: "", typ: $funcType([], [$String], false)}];
 	Props.methods = [{prop: "ToMap", name: "ToMap", pkg: "", typ: $funcType([], [mapType], false)}];
 	ptrType$1.methods = [{prop: "Latest", name: "Latest", pkg: "", typ: $funcType([], [ptrType$1], false)}];
-	ptrType$9.methods = [{prop: "reconcile", name: "reconcile", pkg: "github.com/dotchain/fuss/dom", typ: $funcType([Props, sliceType], [Element], false)}, {prop: "filterNil", name: "filterNil", pkg: "github.com/dotchain/fuss/dom", typ: $funcType([sliceType], [sliceType], false)}, {prop: "updateChildren", name: "updateChildren", pkg: "github.com/dotchain/fuss/dom", typ: $funcType([sliceType], [], false)}, {prop: "bestDiff", name: "bestDiff", pkg: "github.com/dotchain/fuss/dom", typ: $funcType([sliceType, sliceType, $Int, sliceType$2], [sliceType$2], false)}, {prop: "chooseDiff", name: "chooseDiff", pkg: "github.com/dotchain/fuss/dom", typ: $funcType([sliceType, sliceType, $Int, sliceType$2], [sliceType$2], false)}, {prop: "indexOf", name: "indexOf", pkg: "github.com/dotchain/fuss/dom", typ: $funcType([Element, sliceType], [$Int], false)}];
+	ptrType$10.methods = [{prop: "reconcile", name: "reconcile", pkg: "github.com/dotchain/fuss/dom", typ: $funcType([Props, sliceType], [Element], false)}, {prop: "filterNil", name: "filterNil", pkg: "github.com/dotchain/fuss/dom", typ: $funcType([sliceType], [sliceType], false)}, {prop: "updateChildren", name: "updateChildren", pkg: "github.com/dotchain/fuss/dom", typ: $funcType([sliceType], [], false)}, {prop: "bestDiff", name: "bestDiff", pkg: "github.com/dotchain/fuss/dom", typ: $funcType([sliceType, sliceType, $Int, sliceType$2], [sliceType$2], false)}, {prop: "chooseDiff", name: "chooseDiff", pkg: "github.com/dotchain/fuss/dom", typ: $funcType([sliceType, sliceType, $Int, sliceType$2], [sliceType$2], false)}, {prop: "indexOf", name: "indexOf", pkg: "github.com/dotchain/fuss/dom", typ: $funcType([Element, sliceType], [$Int], false)}];
 	ptrType$4.methods = [{prop: "Latest", name: "Latest", pkg: "", typ: $funcType([], [ptrType$4], false)}, {prop: "Append", name: "Append", pkg: "", typ: $funcType([changes.Change, $Bool, $Bool], [ptrType$4], false)}, {prop: "wrapValue", name: "wrapValue", pkg: "github.com/dotchain/fuss/dom", typ: $funcType([$emptyInterface], [changes.Value], false)}, {prop: "unwrapValue", name: "unwrapValue", pkg: "github.com/dotchain/fuss/dom", typ: $funcType([changes.Value], [$Bool], false)}];
 	ptrType$5.methods = [{prop: "Latest", name: "Latest", pkg: "", typ: $funcType([], [ptrType$5], false)}, {prop: "Append", name: "Append", pkg: "", typ: $funcType([changes.Change, $String, $Bool], [ptrType$5], false)}, {prop: "wrapValue", name: "wrapValue", pkg: "github.com/dotchain/fuss/dom", typ: $funcType([$emptyInterface], [changes.Value], false)}, {prop: "unwrapValue", name: "unwrapValue", pkg: "github.com/dotchain/fuss/dom", typ: $funcType([changes.Value], [$String], false)}];
-	ptrType$6.methods = [{prop: "areArgsSame", name: "areArgsSame", pkg: "github.com/dotchain/fuss/dom", typ: $funcType([Styles, ptrType$4], [$Bool], false)}, {prop: "refreshIfNeeded", name: "refreshIfNeeded", pkg: "github.com/dotchain/fuss/dom", typ: $funcType([Styles, ptrType$4], [Element], false)}, {prop: "refresh", name: "refresh", pkg: "github.com/dotchain/fuss/dom", typ: $funcType([Styles, ptrType$4], [Element], false)}, {prop: "close", name: "close", pkg: "github.com/dotchain/fuss/dom", typ: $funcType([], [], false)}];
-	ptrType$10.methods = [{prop: "Begin", name: "Begin", pkg: "", typ: $funcType([], [], false)}, {prop: "End", name: "End", pkg: "", typ: $funcType([], [], false)}, {prop: "CheckboxEdit", name: "CheckboxEdit", pkg: "", typ: $funcType([$emptyInterface, Styles, ptrType$4], [Element], false)}];
+	ptrType$6.methods = [{prop: "areArgsSame", name: "areArgsSame", pkg: "github.com/dotchain/fuss/dom", typ: $funcType([Styles, ptrType$4, $String], [$Bool], false)}, {prop: "refreshIfNeeded", name: "refreshIfNeeded", pkg: "github.com/dotchain/fuss/dom", typ: $funcType([Styles, ptrType$4, $String], [Element], false)}, {prop: "refresh", name: "refresh", pkg: "github.com/dotchain/fuss/dom", typ: $funcType([Styles, ptrType$4, $String], [Element], false)}, {prop: "close", name: "close", pkg: "github.com/dotchain/fuss/dom", typ: $funcType([], [], false)}];
+	ptrType$11.methods = [{prop: "Begin", name: "Begin", pkg: "", typ: $funcType([], [], false)}, {prop: "End", name: "End", pkg: "", typ: $funcType([], [], false)}, {prop: "CheckboxEdit", name: "CheckboxEdit", pkg: "", typ: $funcType([$emptyInterface, Styles, ptrType$4, $String], [Element], false)}];
 	ptrType$7.methods = [{prop: "areArgsSame", name: "areArgsSame", pkg: "github.com/dotchain/fuss/dom", typ: $funcType([Props, sliceType], [$Bool], false)}, {prop: "refreshIfNeeded", name: "refreshIfNeeded", pkg: "github.com/dotchain/fuss/dom", typ: $funcType([Props, sliceType], [Element], false)}, {prop: "refresh", name: "refresh", pkg: "github.com/dotchain/fuss/dom", typ: $funcType([Props, sliceType], [Element], false)}, {prop: "close", name: "close", pkg: "github.com/dotchain/fuss/dom", typ: $funcType([], [], false)}];
-	ptrType$11.methods = [{prop: "Begin", name: "Begin", pkg: "", typ: $funcType([], [], false)}, {prop: "End", name: "End", pkg: "", typ: $funcType([], [], false)}, {prop: "Elt", name: "Elt", pkg: "", typ: $funcType([$emptyInterface, Props, sliceType], [Element], true)}];
-	ptrType$8.methods = [{prop: "areArgsSame", name: "areArgsSame", pkg: "github.com/dotchain/fuss/dom", typ: $funcType([Styles, ptrType$5], [$Bool], false)}, {prop: "refreshIfNeeded", name: "refreshIfNeeded", pkg: "github.com/dotchain/fuss/dom", typ: $funcType([Styles, ptrType$5], [Element], false)}, {prop: "refresh", name: "refresh", pkg: "github.com/dotchain/fuss/dom", typ: $funcType([Styles, ptrType$5], [Element], false)}, {prop: "close", name: "close", pkg: "github.com/dotchain/fuss/dom", typ: $funcType([], [], false)}];
-	ptrType$12.methods = [{prop: "Begin", name: "Begin", pkg: "", typ: $funcType([], [], false)}, {prop: "End", name: "End", pkg: "", typ: $funcType([], [], false)}, {prop: "TextEdit", name: "TextEdit", pkg: "", typ: $funcType([$emptyInterface, Styles, ptrType$5], [Element], false)}];
+	ptrType$12.methods = [{prop: "Begin", name: "Begin", pkg: "", typ: $funcType([], [], false)}, {prop: "End", name: "End", pkg: "", typ: $funcType([], [], false)}, {prop: "Elt", name: "Elt", pkg: "", typ: $funcType([$emptyInterface, Props, sliceType], [Element], true)}];
+	ptrType$8.methods = [{prop: "areArgsSame", name: "areArgsSame", pkg: "github.com/dotchain/fuss/dom", typ: $funcType([Styles, $String, $String], [$Bool], false)}, {prop: "refreshIfNeeded", name: "refreshIfNeeded", pkg: "github.com/dotchain/fuss/dom", typ: $funcType([Styles, $String, $String], [Element], false)}, {prop: "refresh", name: "refresh", pkg: "github.com/dotchain/fuss/dom", typ: $funcType([Styles, $String, $String], [Element], false)}, {prop: "close", name: "close", pkg: "github.com/dotchain/fuss/dom", typ: $funcType([], [], false)}];
+	ptrType$13.methods = [{prop: "Begin", name: "Begin", pkg: "", typ: $funcType([], [], false)}, {prop: "End", name: "End", pkg: "", typ: $funcType([], [], false)}, {prop: "LabelView", name: "LabelView", pkg: "", typ: $funcType([$emptyInterface, Styles, $String, $String], [Element], false)}];
+	ptrType$9.methods = [{prop: "areArgsSame", name: "areArgsSame", pkg: "github.com/dotchain/fuss/dom", typ: $funcType([Styles, ptrType$5], [$Bool], false)}, {prop: "refreshIfNeeded", name: "refreshIfNeeded", pkg: "github.com/dotchain/fuss/dom", typ: $funcType([Styles, ptrType$5], [Element], false)}, {prop: "refresh", name: "refresh", pkg: "github.com/dotchain/fuss/dom", typ: $funcType([Styles, ptrType$5], [Element], false)}, {prop: "close", name: "close", pkg: "github.com/dotchain/fuss/dom", typ: $funcType([], [], false)}];
+	ptrType$14.methods = [{prop: "Begin", name: "Begin", pkg: "", typ: $funcType([], [], false)}, {prop: "End", name: "End", pkg: "", typ: $funcType([], [], false)}, {prop: "TextEdit", name: "TextEdit", pkg: "", typ: $funcType([$emptyInterface, Styles, ptrType$5], [Element], false)}];
 	Element.init([{prop: "Children", name: "Children", pkg: "", typ: $funcType([], [sliceType], false)}, {prop: "Close", name: "Close", pkg: "", typ: $funcType([], [], false)}, {prop: "InsertChild", name: "InsertChild", pkg: "", typ: $funcType([$Int, Element], [], false)}, {prop: "RemoveChild", name: "RemoveChild", pkg: "", typ: $funcType([$Int], [], false)}, {prop: "SetProp", name: "SetProp", pkg: "", typ: $funcType([$String, $emptyInterface], [], false)}, {prop: "Value", name: "Value", pkg: "", typ: $funcType([], [$String], false)}]);
 	Styles.init("", [{prop: "Color", name: "Color", anonymous: false, exported: true, typ: $String, tag: ""}]);
-	Props.init("", [{prop: "Styles", name: "Styles", anonymous: true, exported: true, typ: Styles, tag: ""}, {prop: "Tag", name: "Tag", anonymous: false, exported: true, typ: $String, tag: ""}, {prop: "Checked", name: "Checked", anonymous: false, exported: true, typ: $Bool, tag: ""}, {prop: "Type", name: "Type", anonymous: false, exported: true, typ: $String, tag: ""}, {prop: "TextContent", name: "TextContent", anonymous: false, exported: true, typ: $String, tag: ""}, {prop: "OnChange", name: "OnChange", anonymous: false, exported: true, typ: ptrType, tag: ""}]);
+	Props.init("", [{prop: "Styles", name: "Styles", anonymous: true, exported: true, typ: Styles, tag: ""}, {prop: "Tag", name: "Tag", anonymous: false, exported: true, typ: $String, tag: ""}, {prop: "Checked", name: "Checked", anonymous: false, exported: true, typ: $Bool, tag: ""}, {prop: "Type", name: "Type", anonymous: false, exported: true, typ: $String, tag: ""}, {prop: "TextContent", name: "TextContent", anonymous: false, exported: true, typ: $String, tag: ""}, {prop: "ID", name: "ID", anonymous: false, exported: true, typ: $String, tag: ""}, {prop: "For", name: "For", anonymous: false, exported: true, typ: $String, tag: ""}, {prop: "OnChange", name: "OnChange", anonymous: false, exported: true, typ: ptrType, tag: ""}]);
 	EventHandler.init("", [{prop: "Handle", name: "Handle", anonymous: false, exported: true, typ: funcType, tag: ""}]);
 	Event.init("", []);
 	nodeStream.init("github.com/dotchain/fuss/dom", [{prop: "Notifier", name: "Notifier", anonymous: true, exported: true, typ: ptrType$2, tag: ""}, {prop: "node", name: "node", anonymous: true, exported: false, typ: node, tag: ""}]);
@@ -5088,8 +5272,10 @@ $packages["github.com/dotchain/fuss/dom"] = (function() {
 	CheckboxEditStruct.init("github.com/dotchain/fuss/dom", [{prop: "old", name: "old", anonymous: false, exported: false, typ: mapType$1, tag: ""}, {prop: "current", name: "current", anonymous: false, exported: false, typ: mapType$1, tag: ""}]);
 	nodeCtx.init("github.com/dotchain/fuss/dom", [{prop: "Cache", name: "Cache", anonymous: true, exported: true, typ: core.Cache, tag: ""}, {prop: "finalizer", name: "finalizer", anonymous: false, exported: false, typ: funcType$1, tag: ""}, {prop: "initialized", name: "initialized", anonymous: false, exported: false, typ: $Bool, tag: ""}, {prop: "stateHandler", name: "stateHandler", anonymous: false, exported: false, typ: core.Handler, tag: ""}, {prop: "memoized", name: "memoized", anonymous: false, exported: false, typ: structType$1, tag: ""}]);
 	EltStruct.init("github.com/dotchain/fuss/dom", [{prop: "old", name: "old", anonymous: false, exported: false, typ: mapType$2, tag: ""}, {prop: "current", name: "current", anonymous: false, exported: false, typ: mapType$2, tag: ""}]);
-	textEditCtx.init("github.com/dotchain/fuss/dom", [{prop: "Cache", name: "Cache", anonymous: true, exported: true, typ: core.Cache, tag: ""}, {prop: "finalizer", name: "finalizer", anonymous: false, exported: false, typ: funcType$1, tag: ""}, {prop: "EltStruct", name: "EltStruct", anonymous: true, exported: true, typ: EltStruct, tag: ""}, {prop: "initialized", name: "initialized", anonymous: false, exported: false, typ: $Bool, tag: ""}, {prop: "stateHandler", name: "stateHandler", anonymous: false, exported: false, typ: core.Handler, tag: ""}, {prop: "memoized", name: "memoized", anonymous: false, exported: false, typ: structType$2, tag: ""}]);
-	TextEditStruct.init("github.com/dotchain/fuss/dom", [{prop: "old", name: "old", anonymous: false, exported: false, typ: mapType$3, tag: ""}, {prop: "current", name: "current", anonymous: false, exported: false, typ: mapType$3, tag: ""}]);
+	labelViewCtx.init("github.com/dotchain/fuss/dom", [{prop: "Cache", name: "Cache", anonymous: true, exported: true, typ: core.Cache, tag: ""}, {prop: "finalizer", name: "finalizer", anonymous: false, exported: false, typ: funcType$1, tag: ""}, {prop: "EltStruct", name: "EltStruct", anonymous: true, exported: true, typ: EltStruct, tag: ""}, {prop: "initialized", name: "initialized", anonymous: false, exported: false, typ: $Bool, tag: ""}, {prop: "stateHandler", name: "stateHandler", anonymous: false, exported: false, typ: core.Handler, tag: ""}, {prop: "memoized", name: "memoized", anonymous: false, exported: false, typ: structType$2, tag: ""}]);
+	LabelViewStruct.init("github.com/dotchain/fuss/dom", [{prop: "old", name: "old", anonymous: false, exported: false, typ: mapType$3, tag: ""}, {prop: "current", name: "current", anonymous: false, exported: false, typ: mapType$3, tag: ""}]);
+	textEditCtx.init("github.com/dotchain/fuss/dom", [{prop: "Cache", name: "Cache", anonymous: true, exported: true, typ: core.Cache, tag: ""}, {prop: "finalizer", name: "finalizer", anonymous: false, exported: false, typ: funcType$1, tag: ""}, {prop: "EltStruct", name: "EltStruct", anonymous: true, exported: true, typ: EltStruct, tag: ""}, {prop: "initialized", name: "initialized", anonymous: false, exported: false, typ: $Bool, tag: ""}, {prop: "stateHandler", name: "stateHandler", anonymous: false, exported: false, typ: core.Handler, tag: ""}, {prop: "memoized", name: "memoized", anonymous: false, exported: false, typ: structType$3, tag: ""}]);
+	TextEditStruct.init("github.com/dotchain/fuss/dom", [{prop: "old", name: "old", anonymous: false, exported: false, typ: mapType$4, tag: ""}, {prop: "current", name: "current", anonymous: false, exported: false, typ: mapType$4, tag: ""}]);
 	$init = function() {
 		$pkg.$init = function() {};
 		/* */ var $f, $c = false, $s = 0, $r; if (this !== undefined && this.$blk !== undefined) { $f = this; $c = true; $s = $f.$s; $r = $f.$r; } s: while (true) { switch ($s) { case 0:
@@ -6003,49 +6189,57 @@ $packages["github.com/dotchain/fuss/dom/js"] = (function() {
 			/* */ if (_1 === ("Tag")) { $s = 2; continue; }
 			/* */ if (_1 === ("Checked")) { $s = 3; continue; }
 			/* */ if (_1 === ("Type")) { $s = 4; continue; }
-			/* */ if (_1 === ("TextContent")) { $s = 5; continue; }
-			/* */ if (_1 === ("Styles")) { $s = 6; continue; }
-			/* */ if (_1 === ("OnChange")) { $s = 7; continue; }
-			/* */ $s = 8; continue;
+			/* */ if (_1 === ("ID")) { $s = 5; continue; }
+			/* */ if (_1 === ("For")) { $s = 6; continue; }
+			/* */ if (_1 === ("TextContent")) { $s = 7; continue; }
+			/* */ if (_1 === ("Styles")) { $s = 8; continue; }
+			/* */ if (_1 === ("OnChange")) { $s = 9; continue; }
+			/* */ $s = 10; continue;
 			/* if (_1 === ("Tag")) { */ case 2:
-				_r = strings.ToLower($assertType(value, $String)); /* */ $s = 10; case 10: if($c) { $c = false; _r = _r.$blk(); } if (_r && _r.$blk !== undefined) { break s; }
+				_r = strings.ToLower($assertType(value, $String)); /* */ $s = 12; case 12: if($c) { $c = false; _r = _r.$blk(); } if (_r && _r.$blk !== undefined) { break s; }
 				tag = _r;
 				if (tag === "") {
 					tag = "div";
 				}
-				_r$1 = strings.ToLower($internalize(e.n.tagName, $String)); /* */ $s = 13; case 13: if($c) { $c = false; _r$1 = _r$1.$blk(); } if (_r$1 && _r$1.$blk !== undefined) { break s; }
-				/* */ if (!(tag === _r$1)) { $s = 11; continue; }
-				/* */ $s = 12; continue;
-				/* if (!(tag === _r$1)) { */ case 11:
+				_r$1 = strings.ToLower($internalize(e.n.tagName, $String)); /* */ $s = 15; case 15: if($c) { $c = false; _r$1 = _r$1.$blk(); } if (_r$1 && _r$1.$blk !== undefined) { break s; }
+				/* */ if (!(tag === _r$1)) { $s = 13; continue; }
+				/* */ $s = 14; continue;
+				/* if (!(tag === _r$1)) { */ case 13:
 					$panic(new $String("Cannot change the tag of an element: " + tag));
-				/* } */ case 12:
-				$s = 9; continue;
+				/* } */ case 14:
+				$s = 11; continue;
 			/* } else if (_1 === ("Checked")) { */ case 3:
 				e.n.checked = $externalize($assertType(value, $Bool), $Bool);
-				$s = 9; continue;
+				$s = 11; continue;
 			/* } else if (_1 === ("Type")) { */ case 4:
 				e.n.setAttribute($externalize("type", $String), $externalize($assertType(value, $String), $String));
-				$s = 9; continue;
-			/* } else if (_1 === ("TextContent")) { */ case 5:
-				_r$2 = strings.ToLower($internalize(e.n.tagName, $String)); /* */ $s = 17; case 17: if($c) { $c = false; _r$2 = _r$2.$blk(); } if (_r$2 && _r$2.$blk !== undefined) { break s; }
-				/* */ if (_r$2 === "input") { $s = 14; continue; }
-				/* */ $s = 15; continue;
-				/* if (_r$2 === "input") { */ case 14:
+				$s = 11; continue;
+			/* } else if (_1 === ("ID")) { */ case 5:
+				e.n.id = $externalize($assertType(value, $String), $String);
+				$s = 11; continue;
+			/* } else if (_1 === ("For")) { */ case 6:
+				e.n.setAttribute($externalize("for", $String), $externalize($assertType(value, $String), $String));
+				$s = 11; continue;
+			/* } else if (_1 === ("TextContent")) { */ case 7:
+				_r$2 = strings.ToLower($internalize(e.n.tagName, $String)); /* */ $s = 19; case 19: if($c) { $c = false; _r$2 = _r$2.$blk(); } if (_r$2 && _r$2.$blk !== undefined) { break s; }
+				/* */ if (_r$2 === "input") { $s = 16; continue; }
+				/* */ $s = 17; continue;
+				/* if (_r$2 === "input") { */ case 16:
 					e.n.value = $externalize($assertType(value, $String), $String);
-					$s = 16; continue;
-				/* } else { */ case 15:
+					$s = 18; continue;
+				/* } else { */ case 17:
 					e.n.textContent = $externalize($assertType(value, $String), $String);
-				/* } */ case 16:
-				$s = 9; continue;
-			/* } else if (_1 === ("Styles")) { */ case 6:
+				/* } */ case 18:
+				$s = 11; continue;
+			/* } else if (_1 === ("Styles")) { */ case 8:
 				e.n.setAttribute($externalize("style", $String), $externalize($clone($assertType(value, dom.Styles), dom.Styles).ToCSS(), $String));
-				$s = 9; continue;
-			/* } else if (_1 === ("OnChange")) { */ case 7:
+				$s = 11; continue;
+			/* } else if (_1 === ("OnChange")) { */ case 9:
 				$clone(e, element).onChange($assertType(value, ptrType));
-				$s = 9; continue;
-			/* } else { */ case 8:
+				$s = 11; continue;
+			/* } else { */ case 10:
 				$panic(new $String("Unknown key: " + key));
-			/* } */ case 9:
+			/* } */ case 11:
 		case 1:
 		$s = -1; return;
 		/* */ } return; } if ($f === undefined) { $f = { $blk: element.ptr.prototype.SetProp }; } $f._1 = _1; $f._r = _r; $f._r$1 = _r$1; $f._r$2 = _r$2; $f.e = e; $f.key = key; $f.tag = tag; $f.value = value; $f.$s = $s; $f.$r = $r; return $f;
@@ -6386,7 +6580,7 @@ $packages["github.com/dotchain/dot/refs"] = (function() {
 	return $pkg;
 })();
 $packages["github.com/dotchain/fuss/todo"] = (function() {
-	var $pkg = {}, $init, changes, refs, core, dom, TaskStream, TasksStream, appCtx, AppStruct, taskEditCtx, TaskEditStruct, tasksViewCtx, TasksViewStruct, Task, Tasks, ptrType, sliceType, ptrType$1, ptrType$2, sliceType$1, ptrType$3, ptrType$4, ptrType$5, ptrType$6, sliceType$2, ptrType$7, structType, structType$1, ptrType$8, structType$2, structType$3, ptrType$9, structType$4, structType$5, ptrType$10, sliceType$3, ptrType$11, mapType, ptrType$12, mapType$1, ptrType$13, mapType$2, NewTaskStream, NewTasksStream, taskEdit, tasksView, renderTasks, app;
+	var $pkg = {}, $init, changes, refs, core, dom, TaskStream, TasksStream, appCtx, AppStruct, taskEditCtx, TaskEditStruct, tasksViewCtx, TasksViewStruct, Task, Tasks, ptrType, sliceType, ptrType$1, ptrType$2, sliceType$1, ptrType$3, ptrType$4, ptrType$5, ptrType$6, sliceType$2, ptrType$7, structType, structType$1, ptrType$8, structType$2, structType$3, ptrType$9, structType$4, structType$5, ptrType$10, sliceType$3, funcType, ptrType$11, mapType, ptrType$12, mapType$1, ptrType$13, mapType$2, NewTaskStream, NewTasksStream, taskEdit, tasksView, renderTasks, app;
 	changes = $packages["github.com/dotchain/dot/changes"];
 	refs = $packages["github.com/dotchain/dot/refs"];
 	core = $packages["github.com/dotchain/fuss/core"];
@@ -6419,18 +6613,20 @@ $packages["github.com/dotchain/fuss/todo"] = (function() {
 		this.Change = Change_;
 		this.Next = Next_;
 	});
-	appCtx = $pkg.appCtx = $newType(0, $kindStruct, "todo.appCtx", true, "github.com/dotchain/fuss/todo", false, function(Cache_, TasksViewStruct_, initialized_, stateHandler_, dom_, memoized_) {
+	appCtx = $pkg.appCtx = $newType(0, $kindStruct, "todo.appCtx", true, "github.com/dotchain/fuss/todo", false, function(Cache_, finalizer_, TasksViewStruct_, initialized_, stateHandler_, dom_, memoized_) {
 		this.$val = this;
 		if (arguments.length === 0) {
 			this.Cache = new core.Cache.ptr(false, false);
+			this.finalizer = $throwNilPointerError;
 			this.TasksViewStruct = new TasksViewStruct.ptr(false, false);
 			this.initialized = false;
 			this.stateHandler = new core.Handler.ptr($throwNilPointerError);
-			this.dom = new structType.ptr(new dom.CheckboxEditStruct.ptr(false, false), new dom.EltStruct.ptr(false, false));
+			this.dom = new structType.ptr(new dom.CheckboxEditStruct.ptr(false, false), new dom.EltStruct.ptr(false, false), new dom.LabelViewStruct.ptr(false, false));
 			this.memoized = new structType$1.ptr(ptrType$3.nil, ptrType$3.nil, ptrType$3.nil, ptrType$3.nil, $ifaceNil, new dom.Styles.ptr(""), ptrType$6.nil);
 			return;
 		}
 		this.Cache = Cache_;
+		this.finalizer = finalizer_;
 		this.TasksViewStruct = TasksViewStruct_;
 		this.initialized = initialized_;
 		this.stateHandler = stateHandler_;
@@ -6447,10 +6643,11 @@ $packages["github.com/dotchain/fuss/todo"] = (function() {
 		this.old = old_;
 		this.current = current_;
 	});
-	taskEditCtx = $pkg.taskEditCtx = $newType(0, $kindStruct, "todo.taskEditCtx", true, "github.com/dotchain/fuss/todo", false, function(Cache_, initialized_, stateHandler_, dom_, memoized_) {
+	taskEditCtx = $pkg.taskEditCtx = $newType(0, $kindStruct, "todo.taskEditCtx", true, "github.com/dotchain/fuss/todo", false, function(Cache_, finalizer_, initialized_, stateHandler_, dom_, memoized_) {
 		this.$val = this;
 		if (arguments.length === 0) {
 			this.Cache = new core.Cache.ptr(false, false);
+			this.finalizer = $throwNilPointerError;
 			this.initialized = false;
 			this.stateHandler = new core.Handler.ptr($throwNilPointerError);
 			this.dom = new structType$2.ptr(new dom.CheckboxEditStruct.ptr(false, false), new dom.EltStruct.ptr(false, false), new dom.TextEditStruct.ptr(false, false));
@@ -6458,6 +6655,7 @@ $packages["github.com/dotchain/fuss/todo"] = (function() {
 			return;
 		}
 		this.Cache = Cache_;
+		this.finalizer = finalizer_;
 		this.initialized = initialized_;
 		this.stateHandler = stateHandler_;
 		this.dom = dom_;
@@ -6473,10 +6671,11 @@ $packages["github.com/dotchain/fuss/todo"] = (function() {
 		this.old = old_;
 		this.current = current_;
 	});
-	tasksViewCtx = $pkg.tasksViewCtx = $newType(0, $kindStruct, "todo.tasksViewCtx", true, "github.com/dotchain/fuss/todo", false, function(Cache_, TaskEditStruct_, initialized_, stateHandler_, dom_, memoized_) {
+	tasksViewCtx = $pkg.tasksViewCtx = $newType(0, $kindStruct, "todo.tasksViewCtx", true, "github.com/dotchain/fuss/todo", false, function(Cache_, finalizer_, TaskEditStruct_, initialized_, stateHandler_, dom_, memoized_) {
 		this.$val = this;
 		if (arguments.length === 0) {
 			this.Cache = new core.Cache.ptr(false, false);
+			this.finalizer = $throwNilPointerError;
 			this.TaskEditStruct = new TaskEditStruct.ptr(false, false);
 			this.initialized = false;
 			this.stateHandler = new core.Handler.ptr($throwNilPointerError);
@@ -6485,6 +6684,7 @@ $packages["github.com/dotchain/fuss/todo"] = (function() {
 			return;
 		}
 		this.Cache = Cache_;
+		this.finalizer = finalizer_;
 		this.TaskEditStruct = TaskEditStruct_;
 		this.initialized = initialized_;
 		this.stateHandler = stateHandler_;
@@ -6525,7 +6725,7 @@ $packages["github.com/dotchain/fuss/todo"] = (function() {
 	ptrType$6 = $ptrType(TasksStream);
 	sliceType$2 = $sliceType(Task);
 	ptrType$7 = $ptrType(appCtx);
-	structType = $structType("", [{prop: "CheckboxEditStruct", name: "CheckboxEditStruct", anonymous: true, exported: true, typ: dom.CheckboxEditStruct, tag: ""}, {prop: "EltStruct", name: "EltStruct", anonymous: true, exported: true, typ: dom.EltStruct, tag: ""}]);
+	structType = $structType("", [{prop: "CheckboxEditStruct", name: "CheckboxEditStruct", anonymous: true, exported: true, typ: dom.CheckboxEditStruct, tag: ""}, {prop: "EltStruct", name: "EltStruct", anonymous: true, exported: true, typ: dom.EltStruct, tag: ""}, {prop: "LabelViewStruct", name: "LabelViewStruct", anonymous: true, exported: true, typ: dom.LabelViewStruct, tag: ""}]);
 	structType$1 = $structType("github.com/dotchain/fuss/todo", [{prop: "doneState", name: "doneState", anonymous: false, exported: false, typ: ptrType$3, tag: ""}, {prop: "notDoneState", name: "notDoneState", anonymous: false, exported: false, typ: ptrType$3, tag: ""}, {prop: "result1", name: "result1", anonymous: false, exported: false, typ: ptrType$3, tag: ""}, {prop: "result2", name: "result2", anonymous: false, exported: false, typ: ptrType$3, tag: ""}, {prop: "result3", name: "result3", anonymous: false, exported: false, typ: dom.Element, tag: ""}, {prop: "styles", name: "styles", anonymous: false, exported: false, typ: dom.Styles, tag: ""}, {prop: "tasks", name: "tasks", anonymous: false, exported: false, typ: ptrType$6, tag: ""}]);
 	ptrType$8 = $ptrType(taskEditCtx);
 	structType$2 = $structType("", [{prop: "CheckboxEditStruct", name: "CheckboxEditStruct", anonymous: true, exported: true, typ: dom.CheckboxEditStruct, tag: ""}, {prop: "EltStruct", name: "EltStruct", anonymous: true, exported: true, typ: dom.EltStruct, tag: ""}, {prop: "TextEditStruct", name: "TextEditStruct", anonymous: true, exported: true, typ: dom.TextEditStruct, tag: ""}]);
@@ -6535,6 +6735,7 @@ $packages["github.com/dotchain/fuss/todo"] = (function() {
 	structType$5 = $structType("github.com/dotchain/fuss/todo", [{prop: "result1", name: "result1", anonymous: false, exported: false, typ: dom.Element, tag: ""}, {prop: "showDone", name: "showDone", anonymous: false, exported: false, typ: ptrType$3, tag: ""}, {prop: "showNotDone", name: "showNotDone", anonymous: false, exported: false, typ: ptrType$3, tag: ""}, {prop: "styles", name: "styles", anonymous: false, exported: false, typ: dom.Styles, tag: ""}, {prop: "tasks", name: "tasks", anonymous: false, exported: false, typ: ptrType$6, tag: ""}]);
 	ptrType$10 = $ptrType(dom.EventHandler);
 	sliceType$3 = $sliceType(dom.Element);
+	funcType = $funcType([], [], false);
 	ptrType$11 = $ptrType(AppStruct);
 	mapType = $mapType($emptyInterface, ptrType$7);
 	ptrType$12 = $ptrType(TaskEditStruct);
@@ -7067,6 +7268,8 @@ $packages["github.com/dotchain/fuss/todo"] = (function() {
 		$deferred.push([$methodVal(c[0].dom.CheckboxEditStruct, "End"), []]);
 		c[0].dom.EltStruct.Begin();
 		$deferred.push([$methodVal(c[0].dom.EltStruct, "End"), []]);
+		c[0].dom.LabelViewStruct.Begin();
+		$deferred.push([$methodVal(c[0].dom.LabelViewStruct, "End"), []]);
 		_r = app(c[0], $clone(styles[0], dom.Styles), tasks[0], c[0].memoized.doneState, c[0].memoized.notDoneState); /* */ $s = 1; case 1: if($c) { $c = false; _r = _r.$blk(); } if (_r && _r.$blk !== undefined) { break s; }
 		_tuple = _r;
 		c[0].memoized.result1 = _tuple[0];
@@ -7096,25 +7299,32 @@ $packages["github.com/dotchain/fuss/todo"] = (function() {
 	};
 	appCtx.prototype.refresh = function(styles, tasks) { return this.$val.refresh(styles, tasks); };
 	appCtx.ptr.prototype.close = function() {
-		var c, $s, $deferred, $r;
-		/* */ $s = 0; var $f, $c = false; if (this !== undefined && this.$blk !== undefined) { $f = this; $c = true; c = $f.c; $s = $f.$s; $deferred = $f.$deferred; $r = $f.$r; } var $err = null; try { s: while (true) { switch ($s) { case 0: $deferred = []; $deferred.index = $curGoroutine.deferStack.length; $curGoroutine.deferStack.push($deferred);
+		var c, $s, $r;
+		/* */ $s = 0; var $f, $c = false; if (this !== undefined && this.$blk !== undefined) { $f = this; $c = true; c = $f.c; $s = $f.$s; $r = $f.$r; } s: while (true) { switch ($s) { case 0:
 		c = this;
 		c.Cache.Begin();
-		$deferred.push([$methodVal(c.Cache, "End"), []]);
+		$r = c.Cache.End(); /* */ $s = 1; case 1: if($c) { $c = false; $r = $r.$blk(); } if ($r && $r.$blk !== undefined) { break s; }
 		c.TasksViewStruct.Begin();
-		$deferred.push([$methodVal(c.TasksViewStruct, "End"), []]);
+		$r = c.TasksViewStruct.End(); /* */ $s = 2; case 2: if($c) { $c = false; $r = $r.$blk(); } if ($r && $r.$blk !== undefined) { break s; }
 		c.dom.CheckboxEditStruct.Begin();
-		$deferred.push([$methodVal(c.dom.CheckboxEditStruct, "End"), []]);
+		$r = c.dom.CheckboxEditStruct.End(); /* */ $s = 3; case 3: if($c) { $c = false; $r = $r.$blk(); } if ($r && $r.$blk !== undefined) { break s; }
 		c.dom.EltStruct.Begin();
-		$deferred.push([$methodVal(c.dom.EltStruct, "End"), []]);
-		if (!(c.memoized.doneState === ptrType$3.nil)) {
-			c.memoized.doneState.Notifier.Off(c.stateHandler);
+		$r = c.dom.EltStruct.End(); /* */ $s = 4; case 4: if($c) { $c = false; $r = $r.$blk(); } if ($r && $r.$blk !== undefined) { break s; }
+		c.dom.LabelViewStruct.Begin();
+		$r = c.dom.LabelViewStruct.End(); /* */ $s = 5; case 5: if($c) { $c = false; $r = $r.$blk(); } if ($r && $r.$blk !== undefined) { break s; }
+		if (!(c.memoized.result1 === ptrType$3.nil)) {
+			c.memoized.result1.Notifier.Off(c.stateHandler);
 		}
-		if (!(c.memoized.notDoneState === ptrType$3.nil)) {
-			c.memoized.notDoneState.Notifier.Off(c.stateHandler);
+		if (!(c.memoized.result2 === ptrType$3.nil)) {
+			c.memoized.result2.Notifier.Off(c.stateHandler);
 		}
+		/* */ if (!(c.finalizer === $throwNilPointerError)) { $s = 6; continue; }
+		/* */ $s = 7; continue;
+		/* if (!(c.finalizer === $throwNilPointerError)) { */ case 6:
+			$r = c.finalizer(); /* */ $s = 8; case 8: if($c) { $c = false; $r = $r.$blk(); } if ($r && $r.$blk !== undefined) { break s; }
+		/* } */ case 7:
 		$s = -1; return;
-		/* */ } return; } } catch(err) { $err = err; $s = -1; } finally { $callDeferred($deferred, $err); if($curGoroutine.asleep) { if ($f === undefined) { $f = { $blk: appCtx.ptr.prototype.close }; } $f.c = c; $f.$s = $s; $f.$deferred = $deferred; $f.$r = $r; return $f; } }
+		/* */ } return; } if ($f === undefined) { $f = { $blk: appCtx.ptr.prototype.close }; } $f.c = c; $f.$s = $s; $f.$r = $r; return $f;
 	};
 	appCtx.prototype.close = function() { return this.$val.close(); };
 	AppStruct.ptr.prototype.Begin = function() {
@@ -7160,7 +7370,7 @@ $packages["github.com/dotchain/fuss/todo"] = (function() {
 		if (ok) {
 			delete c.old[$emptyInterface.keyFor(cKey)];
 		} else {
-			cOld = new appCtx.ptr(new core.Cache.ptr(false, false), new TasksViewStruct.ptr(false, false), false, new core.Handler.ptr($throwNilPointerError), new structType.ptr(new dom.CheckboxEditStruct.ptr(false, false), new dom.EltStruct.ptr(false, false)), new structType$1.ptr(ptrType$3.nil, ptrType$3.nil, ptrType$3.nil, ptrType$3.nil, $ifaceNil, new dom.Styles.ptr(""), ptrType$6.nil));
+			cOld = new appCtx.ptr(new core.Cache.ptr(false, false), $throwNilPointerError, new TasksViewStruct.ptr(false, false), false, new core.Handler.ptr($throwNilPointerError), new structType.ptr(new dom.CheckboxEditStruct.ptr(false, false), new dom.EltStruct.ptr(false, false), new dom.LabelViewStruct.ptr(false, false)), new structType$1.ptr(ptrType$3.nil, ptrType$3.nil, ptrType$3.nil, ptrType$3.nil, $ifaceNil, new dom.Styles.ptr(""), ptrType$6.nil));
 		}
 		_key = cKey; (c.current || $throwRuntimeError("assignment to entry in nil map"))[$emptyInterface.keyFor(_key)] = { k: _key, v: cOld };
 		_r = cOld.refreshIfNeeded($clone(styles, dom.Styles), tasks); /* */ $s = 1; case 1: if($c) { $c = false; _r = _r.$blk(); } if (_r && _r.$blk !== undefined) { break s; }
@@ -7232,19 +7442,24 @@ $packages["github.com/dotchain/fuss/todo"] = (function() {
 	};
 	taskEditCtx.prototype.refresh = function(styles, task) { return this.$val.refresh(styles, task); };
 	taskEditCtx.ptr.prototype.close = function() {
-		var c, $s, $deferred, $r;
-		/* */ $s = 0; var $f, $c = false; if (this !== undefined && this.$blk !== undefined) { $f = this; $c = true; c = $f.c; $s = $f.$s; $deferred = $f.$deferred; $r = $f.$r; } var $err = null; try { s: while (true) { switch ($s) { case 0: $deferred = []; $deferred.index = $curGoroutine.deferStack.length; $curGoroutine.deferStack.push($deferred);
+		var c, $s, $r;
+		/* */ $s = 0; var $f, $c = false; if (this !== undefined && this.$blk !== undefined) { $f = this; $c = true; c = $f.c; $s = $f.$s; $r = $f.$r; } s: while (true) { switch ($s) { case 0:
 		c = this;
 		c.Cache.Begin();
-		$deferred.push([$methodVal(c.Cache, "End"), []]);
+		$r = c.Cache.End(); /* */ $s = 1; case 1: if($c) { $c = false; $r = $r.$blk(); } if ($r && $r.$blk !== undefined) { break s; }
 		c.dom.CheckboxEditStruct.Begin();
-		$deferred.push([$methodVal(c.dom.CheckboxEditStruct, "End"), []]);
+		$r = c.dom.CheckboxEditStruct.End(); /* */ $s = 2; case 2: if($c) { $c = false; $r = $r.$blk(); } if ($r && $r.$blk !== undefined) { break s; }
 		c.dom.EltStruct.Begin();
-		$deferred.push([$methodVal(c.dom.EltStruct, "End"), []]);
+		$r = c.dom.EltStruct.End(); /* */ $s = 3; case 3: if($c) { $c = false; $r = $r.$blk(); } if ($r && $r.$blk !== undefined) { break s; }
 		c.dom.TextEditStruct.Begin();
-		$deferred.push([$methodVal(c.dom.TextEditStruct, "End"), []]);
+		$r = c.dom.TextEditStruct.End(); /* */ $s = 4; case 4: if($c) { $c = false; $r = $r.$blk(); } if ($r && $r.$blk !== undefined) { break s; }
+		/* */ if (!(c.finalizer === $throwNilPointerError)) { $s = 5; continue; }
+		/* */ $s = 6; continue;
+		/* if (!(c.finalizer === $throwNilPointerError)) { */ case 5:
+			$r = c.finalizer(); /* */ $s = 7; case 7: if($c) { $c = false; $r = $r.$blk(); } if ($r && $r.$blk !== undefined) { break s; }
+		/* } */ case 6:
 		$s = -1; return;
-		/* */ } return; } } catch(err) { $err = err; $s = -1; } finally { $callDeferred($deferred, $err); if($curGoroutine.asleep) { if ($f === undefined) { $f = { $blk: taskEditCtx.ptr.prototype.close }; } $f.c = c; $f.$s = $s; $f.$deferred = $deferred; $f.$r = $r; return $f; } }
+		/* */ } return; } if ($f === undefined) { $f = { $blk: taskEditCtx.ptr.prototype.close }; } $f.c = c; $f.$s = $s; $f.$r = $r; return $f;
 	};
 	taskEditCtx.prototype.close = function() { return this.$val.close(); };
 	TaskEditStruct.ptr.prototype.Begin = function() {
@@ -7290,7 +7505,7 @@ $packages["github.com/dotchain/fuss/todo"] = (function() {
 		if (ok) {
 			delete c.old[$emptyInterface.keyFor(cKey)];
 		} else {
-			cOld = new taskEditCtx.ptr(new core.Cache.ptr(false, false), false, new core.Handler.ptr($throwNilPointerError), new structType$2.ptr(new dom.CheckboxEditStruct.ptr(false, false), new dom.EltStruct.ptr(false, false), new dom.TextEditStruct.ptr(false, false)), new structType$3.ptr($ifaceNil, new dom.Styles.ptr(""), ptrType$1.nil));
+			cOld = new taskEditCtx.ptr(new core.Cache.ptr(false, false), $throwNilPointerError, false, new core.Handler.ptr($throwNilPointerError), new structType$2.ptr(new dom.CheckboxEditStruct.ptr(false, false), new dom.EltStruct.ptr(false, false), new dom.TextEditStruct.ptr(false, false)), new structType$3.ptr($ifaceNil, new dom.Styles.ptr(""), ptrType$1.nil));
 		}
 		_key = cKey; (c.current || $throwRuntimeError("assignment to entry in nil map"))[$emptyInterface.keyFor(_key)] = { k: _key, v: cOld };
 		_r = cOld.refreshIfNeeded($clone(styles, dom.Styles), task); /* */ $s = 1; case 1: if($c) { $c = false; _r = _r.$blk(); } if (_r && _r.$blk !== undefined) { break s; }
@@ -7372,17 +7587,22 @@ $packages["github.com/dotchain/fuss/todo"] = (function() {
 	};
 	tasksViewCtx.prototype.refresh = function(styles, showDone, showNotDone, tasks) { return this.$val.refresh(styles, showDone, showNotDone, tasks); };
 	tasksViewCtx.ptr.prototype.close = function() {
-		var c, $s, $deferred, $r;
-		/* */ $s = 0; var $f, $c = false; if (this !== undefined && this.$blk !== undefined) { $f = this; $c = true; c = $f.c; $s = $f.$s; $deferred = $f.$deferred; $r = $f.$r; } var $err = null; try { s: while (true) { switch ($s) { case 0: $deferred = []; $deferred.index = $curGoroutine.deferStack.length; $curGoroutine.deferStack.push($deferred);
+		var c, $s, $r;
+		/* */ $s = 0; var $f, $c = false; if (this !== undefined && this.$blk !== undefined) { $f = this; $c = true; c = $f.c; $s = $f.$s; $r = $f.$r; } s: while (true) { switch ($s) { case 0:
 		c = this;
 		c.Cache.Begin();
-		$deferred.push([$methodVal(c.Cache, "End"), []]);
+		$r = c.Cache.End(); /* */ $s = 1; case 1: if($c) { $c = false; $r = $r.$blk(); } if ($r && $r.$blk !== undefined) { break s; }
 		c.TaskEditStruct.Begin();
-		$deferred.push([$methodVal(c.TaskEditStruct, "End"), []]);
+		$r = c.TaskEditStruct.End(); /* */ $s = 2; case 2: if($c) { $c = false; $r = $r.$blk(); } if ($r && $r.$blk !== undefined) { break s; }
 		c.dom.EltStruct.Begin();
-		$deferred.push([$methodVal(c.dom.EltStruct, "End"), []]);
+		$r = c.dom.EltStruct.End(); /* */ $s = 3; case 3: if($c) { $c = false; $r = $r.$blk(); } if ($r && $r.$blk !== undefined) { break s; }
+		/* */ if (!(c.finalizer === $throwNilPointerError)) { $s = 4; continue; }
+		/* */ $s = 5; continue;
+		/* if (!(c.finalizer === $throwNilPointerError)) { */ case 4:
+			$r = c.finalizer(); /* */ $s = 6; case 6: if($c) { $c = false; $r = $r.$blk(); } if ($r && $r.$blk !== undefined) { break s; }
+		/* } */ case 5:
 		$s = -1; return;
-		/* */ } return; } } catch(err) { $err = err; $s = -1; } finally { $callDeferred($deferred, $err); if($curGoroutine.asleep) { if ($f === undefined) { $f = { $blk: tasksViewCtx.ptr.prototype.close }; } $f.c = c; $f.$s = $s; $f.$deferred = $deferred; $f.$r = $r; return $f; } }
+		/* */ } return; } if ($f === undefined) { $f = { $blk: tasksViewCtx.ptr.prototype.close }; } $f.c = c; $f.$s = $s; $f.$r = $r; return $f;
 	};
 	tasksViewCtx.prototype.close = function() { return this.$val.close(); };
 	TasksViewStruct.ptr.prototype.Begin = function() {
@@ -7428,7 +7648,7 @@ $packages["github.com/dotchain/fuss/todo"] = (function() {
 		if (ok) {
 			delete c.old[$emptyInterface.keyFor(cKey)];
 		} else {
-			cOld = new tasksViewCtx.ptr(new core.Cache.ptr(false, false), new TaskEditStruct.ptr(false, false), false, new core.Handler.ptr($throwNilPointerError), new structType$4.ptr(new dom.EltStruct.ptr(false, false)), new structType$5.ptr($ifaceNil, ptrType$3.nil, ptrType$3.nil, new dom.Styles.ptr(""), ptrType$6.nil));
+			cOld = new tasksViewCtx.ptr(new core.Cache.ptr(false, false), $throwNilPointerError, new TaskEditStruct.ptr(false, false), false, new core.Handler.ptr($throwNilPointerError), new structType$4.ptr(new dom.EltStruct.ptr(false, false)), new structType$5.ptr($ifaceNil, ptrType$3.nil, ptrType$3.nil, new dom.Styles.ptr(""), ptrType$6.nil));
 		}
 		_key = cKey; (c.current || $throwRuntimeError("assignment to entry in nil map"))[$emptyInterface.keyFor(_key)] = { k: _key, v: cOld };
 		_r = cOld.refreshIfNeeded($clone(styles, dom.Styles), showDone, showNotDone, tasks); /* */ $s = 1; case 1: if($c) { $c = false; _r = _r.$blk(); } if (_r && _r.$blk !== undefined) { break s; }
@@ -7438,22 +7658,20 @@ $packages["github.com/dotchain/fuss/todo"] = (function() {
 	};
 	TasksViewStruct.prototype.TasksView = function(cKey, styles, showDone, showNotDone, tasks) { return this.$val.TasksView(cKey, styles, showDone, showNotDone, tasks); };
 	taskEdit = function(c, styles, task) {
-		var _arg, _arg$1, _arg$2, _arg$3, _arg$4, _arg$5, _arg$6, _r, _r$1, _r$2, _r$3, _r$4, c, styles, task, $s, $r;
-		/* */ $s = 0; var $f, $c = false; if (this !== undefined && this.$blk !== undefined) { $f = this; $c = true; _arg = $f._arg; _arg$1 = $f._arg$1; _arg$2 = $f._arg$2; _arg$3 = $f._arg$3; _arg$4 = $f._arg$4; _arg$5 = $f._arg$5; _arg$6 = $f._arg$6; _r = $f._r; _r$1 = $f._r$1; _r$2 = $f._r$2; _r$3 = $f._r$3; _r$4 = $f._r$4; c = $f.c; styles = $f.styles; task = $f.task; $s = $f.$s; $r = $f.$r; } s: while (true) { switch ($s) { case 0:
-		_arg = new dom.Props.ptr($clone(styles, dom.Styles), "div", false, "", "", ptrType$10.nil);
-		_arg$1 = new dom.Styles.ptr("");
+		var _arg, _arg$1, _arg$2, _r, _r$1, _r$2, _r$3, _r$4, c, desc, done, styles, task, $s, $r;
+		/* */ $s = 0; var $f, $c = false; if (this !== undefined && this.$blk !== undefined) { $f = this; $c = true; _arg = $f._arg; _arg$1 = $f._arg$1; _arg$2 = $f._arg$2; _r = $f._r; _r$1 = $f._r$1; _r$2 = $f._r$2; _r$3 = $f._r$3; _r$4 = $f._r$4; c = $f.c; desc = $f.desc; done = $f.done; styles = $f.styles; task = $f.task; $s = $f.$s; $r = $f.$r; } s: while (true) { switch ($s) { case 0:
 		_r = task.DoneSubstream($clone(c.Cache, core.Cache)); /* */ $s = 1; case 1: if($c) { $c = false; _r = _r.$blk(); } if (_r && _r.$blk !== undefined) { break s; }
-		_arg$2 = _r;
-		_r$1 = c.dom.CheckboxEditStruct.CheckboxEdit(new $String("cb"), _arg$1, _arg$2); /* */ $s = 2; case 2: if($c) { $c = false; _r$1 = _r$1.$blk(); } if (_r$1 && _r$1.$blk !== undefined) { break s; }
-		_arg$3 = _r$1;
-		_arg$4 = new dom.Styles.ptr("");
-		_r$2 = task.DescriptionSubstream($clone(c.Cache, core.Cache)); /* */ $s = 3; case 3: if($c) { $c = false; _r$2 = _r$2.$blk(); } if (_r$2 && _r$2.$blk !== undefined) { break s; }
-		_arg$5 = _r$2;
-		_r$3 = c.dom.TextEditStruct.TextEdit(new $String("textedit"), _arg$4, _arg$5); /* */ $s = 4; case 4: if($c) { $c = false; _r$3 = _r$3.$blk(); } if (_r$3 && _r$3.$blk !== undefined) { break s; }
-		_arg$6 = _r$3;
-		_r$4 = c.dom.EltStruct.Elt(new $String("root"), _arg, new sliceType$3([_arg$3, _arg$6])); /* */ $s = 5; case 5: if($c) { $c = false; _r$4 = _r$4.$blk(); } if (_r$4 && _r$4.$blk !== undefined) { break s; }
+		done = _r;
+		_r$1 = task.DescriptionSubstream($clone(c.Cache, core.Cache)); /* */ $s = 2; case 2: if($c) { $c = false; _r$1 = _r$1.$blk(); } if (_r$1 && _r$1.$blk !== undefined) { break s; }
+		desc = _r$1;
+		_arg = new dom.Props.ptr($clone(styles, dom.Styles), "div", false, "", "", "", "", ptrType$10.nil);
+		_r$2 = c.dom.CheckboxEditStruct.CheckboxEdit(new $String("cb"), new dom.Styles.ptr(""), done, ""); /* */ $s = 3; case 3: if($c) { $c = false; _r$2 = _r$2.$blk(); } if (_r$2 && _r$2.$blk !== undefined) { break s; }
+		_arg$1 = _r$2;
+		_r$3 = c.dom.TextEditStruct.TextEdit(new $String("textedit"), new dom.Styles.ptr(""), desc); /* */ $s = 4; case 4: if($c) { $c = false; _r$3 = _r$3.$blk(); } if (_r$3 && _r$3.$blk !== undefined) { break s; }
+		_arg$2 = _r$3;
+		_r$4 = c.dom.EltStruct.Elt(new $String("root"), _arg, new sliceType$3([_arg$1, _arg$2])); /* */ $s = 5; case 5: if($c) { $c = false; _r$4 = _r$4.$blk(); } if (_r$4 && _r$4.$blk !== undefined) { break s; }
 		$s = -1; return _r$4;
-		/* */ } return; } if ($f === undefined) { $f = { $blk: taskEdit }; } $f._arg = _arg; $f._arg$1 = _arg$1; $f._arg$2 = _arg$2; $f._arg$3 = _arg$3; $f._arg$4 = _arg$4; $f._arg$5 = _arg$5; $f._arg$6 = _arg$6; $f._r = _r; $f._r$1 = _r$1; $f._r$2 = _r$2; $f._r$3 = _r$3; $f._r$4 = _r$4; $f.c = c; $f.styles = styles; $f.task = task; $f.$s = $s; $f.$r = $r; return $f;
+		/* */ } return; } if ($f === undefined) { $f = { $blk: taskEdit }; } $f._arg = _arg; $f._arg$1 = _arg$1; $f._arg$2 = _arg$2; $f._r = _r; $f._r$1 = _r$1; $f._r$2 = _r$2; $f._r$3 = _r$3; $f._r$4 = _r$4; $f.c = c; $f.desc = desc; $f.done = done; $f.styles = styles; $f.task = task; $f.$s = $s; $f.$r = $r; return $f;
 	};
 	tasksView = function(c, styles, showDone, showNotDone, tasks) {
 		var _arg, _arg$1, _r, _r$1, c, showDone, showNotDone, styles, tasks, $s, $r;
@@ -7462,7 +7680,7 @@ $packages["github.com/dotchain/fuss/todo"] = (function() {
 		showDone = [showDone];
 		showNotDone = [showNotDone];
 		tasks = [tasks];
-		_arg = new dom.Props.ptr($clone(styles, dom.Styles), "div", false, "", "", ptrType$10.nil);
+		_arg = new dom.Props.ptr($clone(styles, dom.Styles), "div", false, "", "", "", "", ptrType$10.nil);
 		_r = renderTasks(tasks[0].Value, (function(c, showDone, showNotDone, tasks) { return function $b(index, t) {
 			var _arg$1, _arg$2, _arg$3, _r, _r$1, index, t, $s, $r;
 			/* */ $s = 0; var $f, $c = false; if (this !== undefined && this.$blk !== undefined) { $f = this; $c = true; _arg$1 = $f._arg$1; _arg$2 = $f._arg$2; _arg$3 = $f._arg$3; _r = $f._r; _r$1 = $f._r$1; index = $f.index; t = $f.t; $s = $f.$s; $r = $f.$r; } s: while (true) { switch ($s) { case 0:
@@ -7500,24 +7718,38 @@ $packages["github.com/dotchain/fuss/todo"] = (function() {
 		/* */ } return; } if ($f === undefined) { $f = { $blk: renderTasks }; } $f._i = _i; $f._r = _r; $f._ref = _ref; $f.elt = elt; $f.fn = fn; $f.kk = kk; $f.result = result; $f.t = t; $f.$s = $s; $f.$r = $r; return $f;
 	};
 	app = function(c, styles, tasks, doneState, notDoneState) {
-		var _arg, _arg$1, _arg$2, _arg$3, _r, _r$1, _r$2, _r$3, c, doneState, notDoneState, styles, tasks, $s, $r;
-		/* */ $s = 0; var $f, $c = false; if (this !== undefined && this.$blk !== undefined) { $f = this; $c = true; _arg = $f._arg; _arg$1 = $f._arg$1; _arg$2 = $f._arg$2; _arg$3 = $f._arg$3; _r = $f._r; _r$1 = $f._r$1; _r$2 = $f._r$2; _r$3 = $f._r$3; c = $f.c; doneState = $f.doneState; notDoneState = $f.notDoneState; styles = $f.styles; tasks = $f.tasks; $s = $f.$s; $r = $f.$r; } s: while (true) { switch ($s) { case 0:
+		var _arg, _arg$1, _arg$2, _arg$3, _arg$4, _arg$5, _r, _r$1, _r$2, _r$3, _r$4, _r$5, _tmp, _tmp$1, c, doneLabel, doneState, notDoneLabel, notDoneState, styles, tasks, $s, $r;
+		/* */ $s = 0; var $f, $c = false; if (this !== undefined && this.$blk !== undefined) { $f = this; $c = true; _arg = $f._arg; _arg$1 = $f._arg$1; _arg$2 = $f._arg$2; _arg$3 = $f._arg$3; _arg$4 = $f._arg$4; _arg$5 = $f._arg$5; _r = $f._r; _r$1 = $f._r$1; _r$2 = $f._r$2; _r$3 = $f._r$3; _r$4 = $f._r$4; _r$5 = $f._r$5; _tmp = $f._tmp; _tmp$1 = $f._tmp$1; c = $f.c; doneLabel = $f.doneLabel; doneState = $f.doneState; notDoneLabel = $f.notDoneLabel; notDoneState = $f.notDoneState; styles = $f.styles; tasks = $f.tasks; $s = $f.$s; $r = $f.$r; } s: while (true) { switch ($s) { case 0:
 		if (doneState === ptrType$3.nil) {
 			doneState = dom.NewBoolStream(true);
 		}
 		if (notDoneState === ptrType$3.nil) {
 			notDoneState = dom.NewBoolStream(true);
 		}
-		_arg = new dom.Props.ptr($clone(styles, dom.Styles), "div", false, "", "", ptrType$10.nil);
-		_r = c.dom.CheckboxEditStruct.CheckboxEdit(new $String("done"), new dom.Styles.ptr(""), doneState); /* */ $s = 1; case 1: if($c) { $c = false; _r = _r.$blk(); } if (_r && _r.$blk !== undefined) { break s; }
+		_tmp = "Show Completed";
+		_tmp$1 = "Show Incomplete";
+		doneLabel = _tmp;
+		notDoneLabel = _tmp$1;
+		if (doneState.Value) {
+			doneLabel = "Showing Completed";
+		}
+		if (notDoneState.Value) {
+			notDoneLabel = "Showing Incomplete";
+		}
+		_arg = new dom.Props.ptr($clone(styles, dom.Styles), "div", false, "", "", "", "", ptrType$10.nil);
+		_r = c.dom.CheckboxEditStruct.CheckboxEdit(new $String("done"), new dom.Styles.ptr(""), doneState, "done"); /* */ $s = 1; case 1: if($c) { $c = false; _r = _r.$blk(); } if (_r && _r.$blk !== undefined) { break s; }
 		_arg$1 = _r;
-		_r$1 = c.dom.CheckboxEditStruct.CheckboxEdit(new $String("notDone"), new dom.Styles.ptr(""), notDoneState); /* */ $s = 2; case 2: if($c) { $c = false; _r$1 = _r$1.$blk(); } if (_r$1 && _r$1.$blk !== undefined) { break s; }
+		_r$1 = c.dom.LabelViewStruct.LabelView(new $String("done"), new dom.Styles.ptr(""), doneLabel, "done"); /* */ $s = 2; case 2: if($c) { $c = false; _r$1 = _r$1.$blk(); } if (_r$1 && _r$1.$blk !== undefined) { break s; }
 		_arg$2 = _r$1;
-		_r$2 = c.TasksViewStruct.TasksView(new $String("tasks"), new dom.Styles.ptr(""), doneState, notDoneState, tasks); /* */ $s = 3; case 3: if($c) { $c = false; _r$2 = _r$2.$blk(); } if (_r$2 && _r$2.$blk !== undefined) { break s; }
+		_r$2 = c.dom.CheckboxEditStruct.CheckboxEdit(new $String("notDone"), new dom.Styles.ptr(""), notDoneState, "notDone"); /* */ $s = 3; case 3: if($c) { $c = false; _r$2 = _r$2.$blk(); } if (_r$2 && _r$2.$blk !== undefined) { break s; }
 		_arg$3 = _r$2;
-		_r$3 = c.dom.EltStruct.Elt(new $String("root"), _arg, new sliceType$3([_arg$1, _arg$2, _arg$3])); /* */ $s = 4; case 4: if($c) { $c = false; _r$3 = _r$3.$blk(); } if (_r$3 && _r$3.$blk !== undefined) { break s; }
-		$s = -1; return [doneState, notDoneState, _r$3];
-		/* */ } return; } if ($f === undefined) { $f = { $blk: app }; } $f._arg = _arg; $f._arg$1 = _arg$1; $f._arg$2 = _arg$2; $f._arg$3 = _arg$3; $f._r = _r; $f._r$1 = _r$1; $f._r$2 = _r$2; $f._r$3 = _r$3; $f.c = c; $f.doneState = doneState; $f.notDoneState = notDoneState; $f.styles = styles; $f.tasks = tasks; $f.$s = $s; $f.$r = $r; return $f;
+		_r$3 = c.dom.LabelViewStruct.LabelView(new $String("notDone"), new dom.Styles.ptr(""), notDoneLabel, "notDone"); /* */ $s = 4; case 4: if($c) { $c = false; _r$3 = _r$3.$blk(); } if (_r$3 && _r$3.$blk !== undefined) { break s; }
+		_arg$4 = _r$3;
+		_r$4 = c.TasksViewStruct.TasksView(new $String("tasks"), new dom.Styles.ptr(""), doneState, notDoneState, tasks); /* */ $s = 5; case 5: if($c) { $c = false; _r$4 = _r$4.$blk(); } if (_r$4 && _r$4.$blk !== undefined) { break s; }
+		_arg$5 = _r$4;
+		_r$5 = c.dom.EltStruct.Elt(new $String("root"), _arg, new sliceType$3([_arg$1, _arg$2, _arg$3, _arg$4, _arg$5])); /* */ $s = 6; case 6: if($c) { $c = false; _r$5 = _r$5.$blk(); } if (_r$5 && _r$5.$blk !== undefined) { break s; }
+		$s = -1; return [doneState, notDoneState, _r$5];
+		/* */ } return; } if ($f === undefined) { $f = { $blk: app }; } $f._arg = _arg; $f._arg$1 = _arg$1; $f._arg$2 = _arg$2; $f._arg$3 = _arg$3; $f._arg$4 = _arg$4; $f._arg$5 = _arg$5; $f._r = _r; $f._r$1 = _r$1; $f._r$2 = _r$2; $f._r$3 = _r$3; $f._r$4 = _r$4; $f._r$5 = _r$5; $f._tmp = _tmp; $f._tmp$1 = _tmp$1; $f.c = c; $f.doneLabel = doneLabel; $f.doneState = doneState; $f.notDoneLabel = notDoneLabel; $f.notDoneState = notDoneState; $f.styles = styles; $f.tasks = tasks; $f.$s = $s; $f.$r = $r; return $f;
 	};
 	ptrType$1.methods = [{prop: "Latest", name: "Latest", pkg: "", typ: $funcType([], [ptrType$1], false)}, {prop: "Append", name: "Append", pkg: "", typ: $funcType([changes.Change, Task, $Bool], [ptrType$1], false)}, {prop: "wrapValue", name: "wrapValue", pkg: "github.com/dotchain/fuss/todo", typ: $funcType([$emptyInterface], [changes.Value], false)}, {prop: "unwrapValue", name: "unwrapValue", pkg: "github.com/dotchain/fuss/todo", typ: $funcType([changes.Value], [Task], false)}, {prop: "SetDone", name: "SetDone", pkg: "", typ: $funcType([$Bool], [ptrType$1], false)}, {prop: "DoneSubstream", name: "DoneSubstream", pkg: "", typ: $funcType([core.Cache], [ptrType$3], false)}, {prop: "SetDescription", name: "SetDescription", pkg: "", typ: $funcType([$String], [ptrType$1], false)}, {prop: "DescriptionSubstream", name: "DescriptionSubstream", pkg: "", typ: $funcType([core.Cache], [ptrType$5], false)}];
 	ptrType$6.methods = [{prop: "Latest", name: "Latest", pkg: "", typ: $funcType([], [ptrType$6], false)}, {prop: "Append", name: "Append", pkg: "", typ: $funcType([changes.Change, Tasks, $Bool], [ptrType$6], false)}, {prop: "wrapValue", name: "wrapValue", pkg: "github.com/dotchain/fuss/todo", typ: $funcType([$emptyInterface], [changes.Value], false)}, {prop: "unwrapValue", name: "unwrapValue", pkg: "github.com/dotchain/fuss/todo", typ: $funcType([changes.Value], [Tasks], false)}, {prop: "Substream", name: "Substream", pkg: "", typ: $funcType([core.Cache, $Int], [ptrType$1], false)}];
@@ -7529,11 +7761,11 @@ $packages["github.com/dotchain/fuss/todo"] = (function() {
 	ptrType$13.methods = [{prop: "Begin", name: "Begin", pkg: "", typ: $funcType([], [], false)}, {prop: "End", name: "End", pkg: "", typ: $funcType([], [], false)}, {prop: "TasksView", name: "TasksView", pkg: "", typ: $funcType([$emptyInterface, dom.Styles, ptrType$3, ptrType$3, ptrType$6], [dom.Element], false)}];
 	TaskStream.init("", [{prop: "Notifier", name: "Notifier", anonymous: true, exported: true, typ: ptrType$2, tag: ""}, {prop: "Value", name: "Value", anonymous: false, exported: true, typ: Task, tag: ""}, {prop: "Change", name: "Change", anonymous: false, exported: true, typ: changes.Change, tag: ""}, {prop: "Next", name: "Next", anonymous: false, exported: true, typ: ptrType$1, tag: ""}]);
 	TasksStream.init("", [{prop: "Notifier", name: "Notifier", anonymous: true, exported: true, typ: ptrType$2, tag: ""}, {prop: "Value", name: "Value", anonymous: false, exported: true, typ: Tasks, tag: ""}, {prop: "Change", name: "Change", anonymous: false, exported: true, typ: changes.Change, tag: ""}, {prop: "Next", name: "Next", anonymous: false, exported: true, typ: ptrType$6, tag: ""}]);
-	appCtx.init("github.com/dotchain/fuss/todo", [{prop: "Cache", name: "Cache", anonymous: true, exported: true, typ: core.Cache, tag: ""}, {prop: "TasksViewStruct", name: "TasksViewStruct", anonymous: true, exported: true, typ: TasksViewStruct, tag: ""}, {prop: "initialized", name: "initialized", anonymous: false, exported: false, typ: $Bool, tag: ""}, {prop: "stateHandler", name: "stateHandler", anonymous: false, exported: false, typ: core.Handler, tag: ""}, {prop: "dom", name: "dom", anonymous: false, exported: false, typ: structType, tag: ""}, {prop: "memoized", name: "memoized", anonymous: false, exported: false, typ: structType$1, tag: ""}]);
+	appCtx.init("github.com/dotchain/fuss/todo", [{prop: "Cache", name: "Cache", anonymous: true, exported: true, typ: core.Cache, tag: ""}, {prop: "finalizer", name: "finalizer", anonymous: false, exported: false, typ: funcType, tag: ""}, {prop: "TasksViewStruct", name: "TasksViewStruct", anonymous: true, exported: true, typ: TasksViewStruct, tag: ""}, {prop: "initialized", name: "initialized", anonymous: false, exported: false, typ: $Bool, tag: ""}, {prop: "stateHandler", name: "stateHandler", anonymous: false, exported: false, typ: core.Handler, tag: ""}, {prop: "dom", name: "dom", anonymous: false, exported: false, typ: structType, tag: ""}, {prop: "memoized", name: "memoized", anonymous: false, exported: false, typ: structType$1, tag: ""}]);
 	AppStruct.init("github.com/dotchain/fuss/todo", [{prop: "old", name: "old", anonymous: false, exported: false, typ: mapType, tag: ""}, {prop: "current", name: "current", anonymous: false, exported: false, typ: mapType, tag: ""}]);
-	taskEditCtx.init("github.com/dotchain/fuss/todo", [{prop: "Cache", name: "Cache", anonymous: true, exported: true, typ: core.Cache, tag: ""}, {prop: "initialized", name: "initialized", anonymous: false, exported: false, typ: $Bool, tag: ""}, {prop: "stateHandler", name: "stateHandler", anonymous: false, exported: false, typ: core.Handler, tag: ""}, {prop: "dom", name: "dom", anonymous: false, exported: false, typ: structType$2, tag: ""}, {prop: "memoized", name: "memoized", anonymous: false, exported: false, typ: structType$3, tag: ""}]);
+	taskEditCtx.init("github.com/dotchain/fuss/todo", [{prop: "Cache", name: "Cache", anonymous: true, exported: true, typ: core.Cache, tag: ""}, {prop: "finalizer", name: "finalizer", anonymous: false, exported: false, typ: funcType, tag: ""}, {prop: "initialized", name: "initialized", anonymous: false, exported: false, typ: $Bool, tag: ""}, {prop: "stateHandler", name: "stateHandler", anonymous: false, exported: false, typ: core.Handler, tag: ""}, {prop: "dom", name: "dom", anonymous: false, exported: false, typ: structType$2, tag: ""}, {prop: "memoized", name: "memoized", anonymous: false, exported: false, typ: structType$3, tag: ""}]);
 	TaskEditStruct.init("github.com/dotchain/fuss/todo", [{prop: "old", name: "old", anonymous: false, exported: false, typ: mapType$1, tag: ""}, {prop: "current", name: "current", anonymous: false, exported: false, typ: mapType$1, tag: ""}]);
-	tasksViewCtx.init("github.com/dotchain/fuss/todo", [{prop: "Cache", name: "Cache", anonymous: true, exported: true, typ: core.Cache, tag: ""}, {prop: "TaskEditStruct", name: "TaskEditStruct", anonymous: true, exported: true, typ: TaskEditStruct, tag: ""}, {prop: "initialized", name: "initialized", anonymous: false, exported: false, typ: $Bool, tag: ""}, {prop: "stateHandler", name: "stateHandler", anonymous: false, exported: false, typ: core.Handler, tag: ""}, {prop: "dom", name: "dom", anonymous: false, exported: false, typ: structType$4, tag: ""}, {prop: "memoized", name: "memoized", anonymous: false, exported: false, typ: structType$5, tag: ""}]);
+	tasksViewCtx.init("github.com/dotchain/fuss/todo", [{prop: "Cache", name: "Cache", anonymous: true, exported: true, typ: core.Cache, tag: ""}, {prop: "finalizer", name: "finalizer", anonymous: false, exported: false, typ: funcType, tag: ""}, {prop: "TaskEditStruct", name: "TaskEditStruct", anonymous: true, exported: true, typ: TaskEditStruct, tag: ""}, {prop: "initialized", name: "initialized", anonymous: false, exported: false, typ: $Bool, tag: ""}, {prop: "stateHandler", name: "stateHandler", anonymous: false, exported: false, typ: core.Handler, tag: ""}, {prop: "dom", name: "dom", anonymous: false, exported: false, typ: structType$4, tag: ""}, {prop: "memoized", name: "memoized", anonymous: false, exported: false, typ: structType$5, tag: ""}]);
 	TasksViewStruct.init("github.com/dotchain/fuss/todo", [{prop: "old", name: "old", anonymous: false, exported: false, typ: mapType$2, tag: ""}, {prop: "current", name: "current", anonymous: false, exported: false, typ: mapType$2, tag: ""}]);
 	Task.init("", [{prop: "ID", name: "ID", anonymous: false, exported: true, typ: $String, tag: ""}, {prop: "Done", name: "Done", anonymous: false, exported: true, typ: $Bool, tag: ""}, {prop: "Description", name: "Description", anonymous: false, exported: true, typ: $String, tag: ""}]);
 	Tasks.init(Task);

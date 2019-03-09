@@ -21,11 +21,13 @@ type Tasks []Task
 // to be edited. The current value of the data is available in the
 // Task field (which is a stream and so supports On/Off methods).
 func taskEdit(c *taskEditCtx, styles dom.Styles, task *TaskStream) dom.Element {
+	done := task.DoneSubstream(c.Cache)
+	desc := task.DescriptionSubstream(c.Cache)
 	return c.dom.Elt(
 		"root",
 		dom.Props{Tag: "div", Styles: styles},
-		c.dom.CheckboxEdit("cb", dom.Styles{}, task.DoneSubstream(c.Cache)),
-		c.dom.TextEdit("textedit", dom.Styles{}, task.DescriptionSubstream(c.Cache)),
+		c.dom.CheckboxEdit("cb", dom.Styles{}, done, ""),
+		c.dom.TextEdit("textedit", dom.Styles{}, desc),
 	)
 }
 
@@ -66,11 +68,22 @@ func app(c *appCtx, styles dom.Styles, tasks *TasksStream, doneState *dom.BoolSt
 		notDoneState = dom.NewBoolStream(true)
 	}
 
+	doneLabel, notDoneLabel := "Show Completed", "Show Incomplete"
+	if doneState.Value {
+		doneLabel = "Showing Completed"
+	}
+
+	if notDoneState.Value {
+		notDoneLabel = "Showing Incomplete"
+	}
+
 	return doneState, notDoneState, c.dom.Elt(
 		"root",
 		dom.Props{Tag: "div", Styles: styles},
-		c.dom.CheckboxEdit("done", dom.Styles{}, doneState),
-		c.dom.CheckboxEdit("notDone", dom.Styles{}, notDoneState),
+		c.dom.CheckboxEdit("done", dom.Styles{}, doneState, "done"),
+		c.dom.LabelView("done", dom.Styles{}, doneLabel, "done"),
+		c.dom.CheckboxEdit("notDone", dom.Styles{}, notDoneState, "notDone"),
+		c.dom.LabelView("notDone", dom.Styles{}, notDoneLabel, "notDone"),
 		c.TasksView("tasks", dom.Styles{}, doneState, notDoneState, tasks),
 	)
 }

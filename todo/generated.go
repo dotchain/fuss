@@ -369,6 +369,7 @@ func (s *TasksStream) Substream(cache core.Cache, index int) (entry *TaskStream)
 
 type appCtx struct {
 	core.Cache
+	finalizer func()
 
 	TasksViewStruct
 	initialized  bool
@@ -377,6 +378,7 @@ type appCtx struct {
 	dom struct {
 		dom.CheckboxEditStruct
 		dom.EltStruct
+		dom.LabelViewStruct
 	}
 	memoized struct {
 		doneState    *dom.BoolStream
@@ -431,6 +433,9 @@ func (c *appCtx) refresh(styles dom.Styles, tasks *TasksStream) (result3 dom.Ele
 
 	c.dom.EltStruct.Begin()
 	defer c.dom.EltStruct.End()
+
+	c.dom.LabelViewStruct.Begin()
+	defer c.dom.LabelViewStruct.End()
 	c.memoized.result1, c.memoized.result2, c.memoized.result3 = app(c, styles, tasks, c.memoized.doneState, c.memoized.notDoneState)
 
 	if c.memoized.doneState != c.memoized.result1 {
@@ -456,21 +461,27 @@ func (c *appCtx) refresh(styles dom.Styles, tasks *TasksStream) (result3 dom.Ele
 
 func (c *appCtx) close() {
 	c.Cache.Begin()
-	defer c.Cache.End()
+	c.Cache.End()
 
 	c.TasksViewStruct.Begin()
-	defer c.TasksViewStruct.End()
+	c.TasksViewStruct.End()
 
 	c.dom.CheckboxEditStruct.Begin()
-	defer c.dom.CheckboxEditStruct.End()
+	c.dom.CheckboxEditStruct.End()
 
 	c.dom.EltStruct.Begin()
-	defer c.dom.EltStruct.End()
-	if c.memoized.doneState != nil {
-		c.memoized.doneState.Off(&c.stateHandler)
+	c.dom.EltStruct.End()
+
+	c.dom.LabelViewStruct.Begin()
+	c.dom.LabelViewStruct.End()
+	if c.memoized.result1 != nil {
+		c.memoized.result1.Off(&c.stateHandler)
 	}
-	if c.memoized.notDoneState != nil {
-		c.memoized.notDoneState.Off(&c.stateHandler)
+	if c.memoized.result2 != nil {
+		c.memoized.result2.Off(&c.stateHandler)
+	}
+	if c.finalizer != nil {
+		c.finalizer()
 	}
 }
 
@@ -508,6 +519,7 @@ func (c *AppStruct) App(cKey interface{}, styles dom.Styles, tasks *TasksStream)
 
 type taskEditCtx struct {
 	core.Cache
+	finalizer func()
 
 	initialized  bool
 	stateHandler core.Handler
@@ -567,16 +579,19 @@ func (c *taskEditCtx) refresh(styles dom.Styles, task *TaskStream) (result1 dom.
 
 func (c *taskEditCtx) close() {
 	c.Cache.Begin()
-	defer c.Cache.End()
+	c.Cache.End()
 
 	c.dom.CheckboxEditStruct.Begin()
-	defer c.dom.CheckboxEditStruct.End()
+	c.dom.CheckboxEditStruct.End()
 
 	c.dom.EltStruct.Begin()
-	defer c.dom.EltStruct.End()
+	c.dom.EltStruct.End()
 
 	c.dom.TextEditStruct.Begin()
-	defer c.dom.TextEditStruct.End()
+	c.dom.TextEditStruct.End()
+	if c.finalizer != nil {
+		c.finalizer()
+	}
 }
 
 // TaskEditStruct is a cache for TaskEdit
@@ -614,6 +629,7 @@ func (c *TaskEditStruct) TaskEdit(cKey interface{}, styles dom.Styles, task *Tas
 
 type tasksViewCtx struct {
 	core.Cache
+	finalizer func()
 
 	TaskEditStruct
 	initialized  bool
@@ -679,13 +695,16 @@ func (c *tasksViewCtx) refresh(styles dom.Styles, showDone *dom.BoolStream, show
 
 func (c *tasksViewCtx) close() {
 	c.Cache.Begin()
-	defer c.Cache.End()
+	c.Cache.End()
 
 	c.TaskEditStruct.Begin()
-	defer c.TaskEditStruct.End()
+	c.TaskEditStruct.End()
 
 	c.dom.EltStruct.Begin()
-	defer c.dom.EltStruct.End()
+	c.dom.EltStruct.End()
+	if c.finalizer != nil {
+		c.finalizer()
+	}
 }
 
 // TasksViewStruct is a cache for TasksView

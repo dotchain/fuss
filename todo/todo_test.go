@@ -35,8 +35,14 @@ func Example_renderApp() {
 
 	// Output:
 	// <div>
-	//   <input checked="" type="checkbox"/>
-	//   <input checked="" type="checkbox"/>
+	//   <input checked="" id="done" type="checkbox"/>
+	//   <label for="done">
+	//     Showing Completed
+	//   </label>
+	//   <input checked="" id="notDone" type="checkbox"/>
+	//   <label for="notDone">
+	//     Showing Incomplete
+	//   </label>
 	//   <div>
 	//     <div>
 	//       <input type="checkbox"/>
@@ -49,8 +55,14 @@ func Example_renderApp() {
 	//   </div>
 	// </div>
 	// <div>
-	//   <input type="checkbox"/>
-	//   <input checked="" type="checkbox"/>
+	//   <input id="done" type="checkbox"/>
+	//   <label for="done">
+	//     Show Completed
+	//   </label>
+	//   <input checked="" id="notDone" type="checkbox"/>
+	//   <label for="notDone">
+	//     Showing Incomplete
+	//   </label>
 	//   <div>
 	//     <div>
 	//       <input type="checkbox"/>

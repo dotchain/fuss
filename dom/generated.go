@@ -216,42 +216,47 @@ type cbEditCtx struct {
 
 	memoized struct {
 		checked *BoolStream
+		id      string
 		result1 Element
 		styles  Styles
 	}
 }
 
-func (c *cbEditCtx) areArgsSame(styles Styles, checked *BoolStream) bool {
+func (c *cbEditCtx) areArgsSame(styles Styles, checked *BoolStream, id string) bool {
 
 	if styles != c.memoized.styles {
 		return false
 	}
 
-	return checked == c.memoized.checked
+	if checked != c.memoized.checked {
+		return false
+	}
+
+	return id == c.memoized.id
 
 }
 
-func (c *cbEditCtx) refreshIfNeeded(styles Styles, checked *BoolStream) (result1 Element) {
-	if !c.initialized || !c.areArgsSame(styles, checked) {
-		return c.refresh(styles, checked)
+func (c *cbEditCtx) refreshIfNeeded(styles Styles, checked *BoolStream, id string) (result1 Element) {
+	if !c.initialized || !c.areArgsSame(styles, checked, id) {
+		return c.refresh(styles, checked, id)
 	}
 	return c.memoized.result1
 }
 
-func (c *cbEditCtx) refresh(styles Styles, checked *BoolStream) (result1 Element) {
+func (c *cbEditCtx) refresh(styles Styles, checked *BoolStream, id string) (result1 Element) {
 	c.initialized = true
 	c.stateHandler.Handle = func() {
-		c.refresh(styles, checked)
+		c.refresh(styles, checked, id)
 	}
 
-	c.memoized.styles, c.memoized.checked = styles, checked
+	c.memoized.styles, c.memoized.checked, c.memoized.id = styles, checked, id
 
 	c.Cache.Begin()
 	defer c.Cache.End()
 
 	c.EltStruct.Begin()
 	defer c.EltStruct.End()
-	c.memoized.result1 = checkboxEdit(c, styles, checked)
+	c.memoized.result1 = checkboxEdit(c, styles, checked, id)
 
 	return c.memoized.result1
 }
@@ -287,7 +292,7 @@ func (c *CheckboxEditStruct) End() {
 }
 
 // CheckboxEdit - see the type for details
-func (c *CheckboxEditStruct) CheckboxEdit(cKey interface{}, styles Styles, checked *BoolStream) (result1 Element) {
+func (c *CheckboxEditStruct) CheckboxEdit(cKey interface{}, styles Styles, checked *BoolStream, id string) (result1 Element) {
 	cOld, ok := c.old[cKey]
 	if ok {
 		delete(c.old, cKey)
@@ -295,7 +300,7 @@ func (c *CheckboxEditStruct) CheckboxEdit(cKey interface{}, styles Styles, check
 		cOld = &cbEditCtx{}
 	}
 	c.current[cKey] = cOld
-	return cOld.refreshIfNeeded(styles, checked)
+	return cOld.refreshIfNeeded(styles, checked, id)
 }
 
 type nodeCtx struct {
@@ -414,6 +419,103 @@ func (c *EltStruct) Elt(cKey interface{}, props Props, children ...Element) (res
 	}
 	c.current[cKey] = cOld
 	return cOld.refreshIfNeeded(props, children)
+}
+
+type labelViewCtx struct {
+	core.Cache
+	finalizer func()
+
+	EltStruct
+	initialized  bool
+	stateHandler core.Handler
+
+	memoized struct {
+		inputID string
+		result1 Element
+		styles  Styles
+		text    string
+	}
+}
+
+func (c *labelViewCtx) areArgsSame(styles Styles, text string, inputID string) bool {
+
+	if styles != c.memoized.styles {
+		return false
+	}
+
+	if text != c.memoized.text {
+		return false
+	}
+
+	return inputID == c.memoized.inputID
+
+}
+
+func (c *labelViewCtx) refreshIfNeeded(styles Styles, text string, inputID string) (result1 Element) {
+	if !c.initialized || !c.areArgsSame(styles, text, inputID) {
+		return c.refresh(styles, text, inputID)
+	}
+	return c.memoized.result1
+}
+
+func (c *labelViewCtx) refresh(styles Styles, text string, inputID string) (result1 Element) {
+	c.initialized = true
+	c.stateHandler.Handle = func() {
+		c.refresh(styles, text, inputID)
+	}
+
+	c.memoized.styles, c.memoized.text, c.memoized.inputID = styles, text, inputID
+
+	c.Cache.Begin()
+	defer c.Cache.End()
+
+	c.EltStruct.Begin()
+	defer c.EltStruct.End()
+	c.memoized.result1 = labelView(c, styles, text, inputID)
+
+	return c.memoized.result1
+}
+
+func (c *labelViewCtx) close() {
+	c.Cache.Begin()
+	c.Cache.End()
+
+	c.EltStruct.Begin()
+	c.EltStruct.End()
+	if c.finalizer != nil {
+		c.finalizer()
+	}
+}
+
+// LabelViewStruct is a cache for LabelView
+// LabelView implements a label control.
+type LabelViewStruct struct {
+	old, current map[interface{}]*labelViewCtx
+}
+
+// Begin starts a round
+func (c *LabelViewStruct) Begin() {
+	c.old, c.current = c.current, map[interface{}]*labelViewCtx{}
+}
+
+// End finishes the round cleaning up any unused components
+func (c *LabelViewStruct) End() {
+	for _, ctx := range c.old {
+		ctx.close()
+	}
+	c.old = nil
+}
+
+// LabelView - see the type for details
+func (c *LabelViewStruct) LabelView(cKey interface{}, styles Styles, text string, inputID string) (result1 Element) {
+	cOld, ok := c.old[cKey]
+	if ok {
+		delete(c.old, cKey)
+	} else {
+		cOld = &labelViewCtx{}
+	}
+	c.current[cKey] = cOld
+	return cOld.refreshIfNeeded(styles, text, inputID)
 }
 
 type textEditCtx struct {
