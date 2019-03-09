@@ -16,19 +16,54 @@ import (
 	"strings"
 )
 
+var current driver
+
 func init() {
-	dom.RegisterDriver(Driver{OnChange: map[*html.Node]*dom.EventHandler{}})
+	current = driver{events: map[string]map[*html.Node]*dom.EventHandler{
+		"change": {},
+		"click":  {},
+	}}
+	dom.RegisterDriver(current)
 }
 
-// Driver implements the dom.Driver interface on top of net/html's
+// GetCurrentResources returns the set of resources in use currently.
+// This is meant for testing leaks
+func GetCurrentResources() []string {
+	result := []string{}
+	for k, v := range current.events {
+		for n := range v {
+			var buf bytes.Buffer
+			if err := html.Render(&buf, n); err != nil {
+				panic(err)
+			}
+			result = append(result, k+":"+buf.String())
+		}
+	}
+	return result
+}
+
+// SetValue sets the value for the provided element
+func SetValue(e dom.Element, value string) {
+	e.(element).setValue(value)
+}
+
+// Click clicks the provided element
+func Click(elt dom.Element) {
+	e := elt.(element)
+	if cx, ok := e.d.events["click"][e.Node]; ok {
+		cx.Handle(dom.Event{})
+	}
+}
+
+// driver implements the dom.driver interface on top of net/html's
 // Node type
-type Driver struct {
-	// OnChange tracks all the OnChange handlers registered
-	OnChange map[*html.Node]*dom.EventHandler
+type driver struct {
+	// events tracks all registered handlers
+	events map[string]map[*html.Node]*dom.EventHandler
 }
 
-// NewElement implements the dom.Driver NewElement method
-func (d Driver) NewElement(props dom.Props, children ...dom.Element) dom.Element {
+// NewElement implements the dom.driver NewElement method
+func (d driver) NewElement(props dom.Props, children ...dom.Element) dom.Element {
 	tag := strings.ToLower(props.Tag)
 	if tag == "" {
 		tag = "div"
@@ -52,7 +87,7 @@ func (d Driver) NewElement(props dom.Props, children ...dom.Element) dom.Element
 
 type element struct {
 	*html.Node
-	d *Driver
+	d *driver
 }
 
 func (e element) String() string {
@@ -91,9 +126,11 @@ func (e element) SetProp(key string, value interface{}) {
 	case "TextContent":
 		e.setTextContent(value.(string))
 	case "Styles":
-		e.setStyles(value.(dom.Styles).ToCSS())
+		e.setStringAttribute("style", value.(dom.Styles).ToCSS())
 	case "OnChange":
-		e.onChange(value.(*dom.EventHandler))
+		e.onEvent("change", value.(*dom.EventHandler))
+	case "OnClick":
+		e.onEvent("click", value.(*dom.EventHandler))
 	default:
 		panic("Unknown key: " + key)
 	}
@@ -129,19 +166,11 @@ func (e element) setTextContent(s string) {
 	}
 }
 
-func (e element) setStyles(css string) {
-	e.removeAttribute("style")
-	if css != "" {
-		a := html.Attribute{Key: "style", Val: css}
-		e.Node.Attr = append(e.Node.Attr, a)
-	}
-}
-
-func (e element) onChange(v *dom.EventHandler) {
+func (e element) onEvent(key string, v *dom.EventHandler) {
 	if v == nil {
-		delete(e.d.OnChange, e.Node)
+		delete(e.d.events[key], e.Node)
 	} else {
-		e.d.OnChange[e.Node] = v
+		e.d.events[key][e.Node] = v
 	}
 }
 
@@ -190,7 +219,7 @@ func (e element) Value() string {
 	return ""
 }
 
-func (e element) SetValue(s string) {
+func (e element) setValue(s string) {
 	inputType := ""
 	for _, a := range e.Node.Attr {
 		switch a.Key {
@@ -205,7 +234,7 @@ func (e element) SetValue(s string) {
 		e.SetProp("TextContent", s)
 	}
 
-	if cx, ok := e.d.OnChange[e.Node]; ok {
+	if cx, ok := e.d.events["change"][e.Node]; ok {
 		cx.Handle(dom.Event{})
 	}
 }
@@ -247,5 +276,7 @@ func (e element) InsertChild(index int, elt dom.Element) {
 }
 
 func (e element) Close() {
-	delete(e.d.OnChange, e.Node)
+	for _, v := range e.d.events {
+		delete(v, e.Node)
+	}
 }

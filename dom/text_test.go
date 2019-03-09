@@ -7,6 +7,7 @@ package dom_test
 import (
 	"fmt"
 	"github.com/dotchain/fuss/dom"
+	"github.com/dotchain/fuss/dom/html"
 	"testing"
 )
 
@@ -23,7 +24,7 @@ func TestTextEdit(t *testing.T) {
 		t.Error(x)
 	}
 
-	elt.(setter).SetValue("booya")
+	html.SetValue(elt, "booya")
 	if text.Latest().Value != "booya" {
 		t.Error("SetValue did not take effect")
 	}
