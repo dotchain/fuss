@@ -18,8 +18,12 @@ The main goal is to build a reactive  UX framework which:
 
 ## Examples
 
-A sample TODO MVC app written in this style can be seen in the
-[todo](https://github.com/dotchain/fuss/tree/master/todo) folder.
+A sample TODO MVC app
+[demo](https://dotchain.github.io/fuss/todo/html/index.html) is the
+running version of the code in the
+[todo](https://github.com/dotchain/fuss/tree/master/todo) folder (with
+the actual hosting of it in
+[todo/html](https://github.com/dotchain/fuss/tree/master/todo)
 
 The following walk-through illustrates how this is put together
 
