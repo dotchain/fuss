@@ -5,11 +5,12 @@
 package dom
 
 // CheckboxEdit implements a checkbox control.
-func checkboxEdit(c *cbEditCtx, styles Styles, checked *BoolStream) Element {
+func checkboxEdit(c *cbEditCtx, styles Styles, checked *BoolStream, id string) Element {
 	var result Element
 	result = c.Elt(
 		"root",
 		Props{
+			ID:      id,
 			Tag:     "input",
 			Type:    "checkbox",
 			Checked: checked.Value,

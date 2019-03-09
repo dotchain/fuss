@@ -20,10 +20,10 @@ func TestCheckboxEdit(t *testing.T) {
 	checked := dom.NewBoolStream(true)
 
 	cb.Begin()
-	elt := cb.CheckboxEdit("root", dom.Styles{Color: "red"}, checked)
+	elt := cb.CheckboxEdit("root", dom.Styles{Color: "red"}, checked, "cb")
 	cb.End()
 
-	if x := fmt.Sprint(elt); x != "<input checked=\"\" style=\"color: red\" type=\"checkbox\"/>" {
+	if x := fmt.Sprint(elt); x != "<input checked=\"\" id=\"cb\" style=\"color: red\" type=\"checkbox\"/>" {
 		t.Error(x)
 	}
 

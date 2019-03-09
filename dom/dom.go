@@ -62,12 +62,16 @@ type Props struct {
 	Checked     bool
 	Type        string
 	TextContent string
+	ID          string
+	For         string
 	OnChange    *EventHandler
 }
 
 // ToMap returns the map version of props (useful for diffs)
 func (p Props) ToMap() map[string]interface{} {
 	return map[string]interface{}{
+		"ID":          p.ID,
+		"For":         p.For,
 		"Tag":         p.Tag,
 		"Checked":     p.Checked,
 		"Type":        p.Type,
