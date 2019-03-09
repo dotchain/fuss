@@ -108,11 +108,19 @@ var parseExpected = `
 				{
 					"Name": "x",
 					"Type": "int"
+				},
+				{
+					"Name": "y",
+					"Type": "int"
 				}
 			],
 			"Results": [
 				{
 					"Name": "a",
+					"Type": "int"
+				},
+				{
+					"Name": "b",
 					"Type": "int"
 				}
 			],
