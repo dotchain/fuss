@@ -206,6 +206,111 @@ func (s *TextStream) unwrapValue(v changes.Value) string {
 	return v.(changes.Atomic).Value.(string)
 }
 
+type buttonCtx struct {
+	core.Cache
+	finalizer func()
+
+	EltStruct
+	initialized  bool
+	stateHandler core.Handler
+
+	memoized struct {
+		children []Element
+		onClick  *EventHandler
+		result1  Element
+		styles   Styles
+	}
+}
+
+func (c *buttonCtx) areArgsSame(styles Styles, onClick *EventHandler, children []Element) bool {
+
+	if styles != c.memoized.styles {
+		return false
+	}
+
+	if onClick != c.memoized.onClick {
+		return false
+	}
+
+	if len(children) != len(c.memoized.children) {
+		return false
+	}
+	for childrenIdx := range children {
+		if children[childrenIdx] != c.memoized.children[childrenIdx] {
+			return false
+		}
+	}
+	return true
+
+}
+
+func (c *buttonCtx) refreshIfNeeded(styles Styles, onClick *EventHandler, children []Element) (result1 Element) {
+	if !c.initialized || !c.areArgsSame(styles, onClick, children) {
+		return c.refresh(styles, onClick, children)
+	}
+	return c.memoized.result1
+}
+
+func (c *buttonCtx) refresh(styles Styles, onClick *EventHandler, children []Element) (result1 Element) {
+	c.initialized = true
+	c.stateHandler.Handle = func() {
+		c.refresh(styles, onClick, children)
+	}
+
+	c.memoized.styles, c.memoized.onClick, c.memoized.children = styles, onClick, children
+
+	c.Cache.Begin()
+	defer c.Cache.End()
+
+	c.EltStruct.Begin()
+	defer c.EltStruct.End()
+	c.memoized.result1 = button(c, styles, onClick, children...)
+
+	return c.memoized.result1
+}
+
+func (c *buttonCtx) close() {
+	c.Cache.Begin()
+	c.Cache.End()
+
+	c.EltStruct.Begin()
+	c.EltStruct.End()
+	if c.finalizer != nil {
+		c.finalizer()
+	}
+}
+
+// ButtonStruct is a cache for Button
+// Button implements a button control.
+type ButtonStruct struct {
+	old, current map[interface{}]*buttonCtx
+}
+
+// Begin starts a round
+func (c *ButtonStruct) Begin() {
+	c.old, c.current = c.current, map[interface{}]*buttonCtx{}
+}
+
+// End finishes the round cleaning up any unused components
+func (c *ButtonStruct) End() {
+	for _, ctx := range c.old {
+		ctx.close()
+	}
+	c.old = nil
+}
+
+// Button - see the type for details
+func (c *ButtonStruct) Button(cKey interface{}, styles Styles, onClick *EventHandler, children ...Element) (result1 Element) {
+	cOld, ok := c.old[cKey]
+	if ok {
+		delete(c.old, cKey)
+	} else {
+		cOld = &buttonCtx{}
+	}
+	c.current[cKey] = cOld
+	return cOld.refreshIfNeeded(styles, onClick, children)
+}
+
 type cbEditCtx struct {
 	core.Cache
 	finalizer func()

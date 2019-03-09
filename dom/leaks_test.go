@@ -5,28 +5,13 @@
 package dom_test
 
 import (
-	"bytes"
-	"github.com/dotchain/fuss/dom"
 	"github.com/dotchain/fuss/dom/html"
-	nethtml "golang.org/x/net/html"
 	"testing"
 )
 
 func reportDriverLeaks(t *testing.T) {
-	// get the current driver
-	old := dom.RegisterDriver(nil)
-	dom.RegisterDriver(old)
-
-	resources := old.(html.Driver)
-	if count := len(resources.OnChange); count > 0 {
-		nodes := []interface{}{}
-		for k := range resources.OnChange {
-			var buf bytes.Buffer
-			if err := nethtml.Render(&buf, k); err != nil {
-				panic(err)
-			}
-			nodes = append(nodes, buf.String())
-		}
-		t.Fatal("Leaked", count, "nodes\n", nodes)
+	leaks := html.GetCurrentResources()
+	if n := len(leaks); n > 0 {
+		t.Fatal("Leaked", n, "resources\n", leaks)
 	}
 }

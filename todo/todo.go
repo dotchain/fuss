@@ -5,7 +5,11 @@
 // Package todo demonstrates a simple todo mvc app built with FUSS
 package todo
 
-import "github.com/dotchain/fuss/dom"
+import (
+	"github.com/dotchain/fuss/core"
+	"github.com/dotchain/fuss/dom"
+	"time"
+)
 
 // Task represents an item in the TODO list.
 type Task struct {
@@ -58,6 +62,31 @@ func renderTasks(t Tasks, fn func(int, Task) dom.Element) []dom.Element {
 	return result
 }
 
+type handlerStream struct {
+	*core.Notifier
+	dom.EventHandler
+}
+
+func (h *handlerStream) Latest() *handlerStream {
+	return h
+}
+
+func newTaskButton(c *newTaskCtx, styles dom.Styles, tasks *TasksStream, hState *handlerStream) (*handlerStream, dom.Element) {
+	if hState == nil {
+		hState = &handlerStream{Notifier: &core.Notifier{}}
+		hState.Handle = func(dom.Event) {
+			tasks = tasks.Latest()
+			v := append(Tasks(nil), tasks.Value...)
+			// TODO: better ID generation
+			v = append(v, Task{ID: time.Now().Format("15:04:05.000")})
+			tasks = tasks.Append(nil, v, true)
+		}
+	}
+
+	label := c.dom.LabelView("root", dom.Styles{}, "Add a task", "")
+	return hState, c.dom.Button("root", dom.Styles{}, &hState.EventHandler, label)
+}
+
 // App is a thin wrapper on top of TasksView with checkboxes for ShowDone and ShowUndone
 //
 func app(c *appCtx, styles dom.Styles, tasks *TasksStream, doneState *dom.BoolStream, notDoneState *dom.BoolStream) (*dom.BoolStream, *dom.BoolStream, dom.Element) {
@@ -85,5 +114,6 @@ func app(c *appCtx, styles dom.Styles, tasks *TasksStream, doneState *dom.BoolSt
 		c.dom.CheckboxEdit("notDone", dom.Styles{}, notDoneState, "notDone"),
 		c.dom.LabelView("notDone", dom.Styles{}, notDoneLabel, "notDone"),
 		c.TasksView("tasks", dom.Styles{}, doneState, notDoneState, tasks),
+		c.NewTaskButton("new", dom.Styles{}, tasks),
 	)
 }

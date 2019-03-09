@@ -7,14 +7,10 @@ package todo_test
 import (
 	"fmt"
 	"github.com/dotchain/fuss/dom"
-	_ "github.com/dotchain/fuss/dom/html" // html driver implementation
+	"github.com/dotchain/fuss/dom/html"
 	"github.com/dotchain/fuss/todo"
 	"github.com/yosssi/gohtml"
 )
-
-type setter interface {
-	SetValue(s string)
-}
 
 func Example_renderApp() {
 	tasks := todo.Tasks{
@@ -30,8 +26,15 @@ func Example_renderApp() {
 	fmt.Println(gohtml.Format(fmt.Sprint(root)))
 
 	// set "ShowDone" to false which should filter out the second task
-	root.Children()[0].(setter).SetValue("off")
+	html.SetValue(root.Children()[0], "off")
 	fmt.Println(gohtml.Format(fmt.Sprint(root)))
+
+	cache.Begin()
+	cache.End()
+	leaks := html.GetCurrentResources()
+	if n := len(leaks); n > 0 {
+		fmt.Println("Leaked", n, "resources\n", leaks)
+	}
 
 	// Output:
 	// <div>
@@ -53,6 +56,11 @@ func Example_renderApp() {
 	//       <input type="text" value="second task"/>
 	//     </div>
 	//   </div>
+	//   <button>
+	//     <label>
+	//       Add a task
+	//     </label>
+	//   </button>
 	// </div>
 	// <div>
 	//   <input id="done" type="checkbox"/>
@@ -69,6 +77,11 @@ func Example_renderApp() {
 	//       <input type="text" value="first task"/>
 	//     </div>
 	//   </div>
+	//   <button>
+	//     <label>
+	//       Add a task
+	//     </label>
+	//   </button>
 	// </div>
 }
 
@@ -101,6 +114,13 @@ func Example_renderTasks() {
 	root = cache.TasksView("root", dom.Styles{}, showDone, showNotDone, s)
 	cache.End()
 	fmt.Println(gohtml.Format(fmt.Sprint(root)))
+
+	cache.Begin()
+	cache.End()
+	leaks := html.GetCurrentResources()
+	if n := len(leaks); n > 0 {
+		fmt.Println("Leaked", n, "resources\n", leaks)
+	}
 
 	// Output:
 	// <div>
@@ -143,6 +163,13 @@ func Example_renderTask() {
 	root = cache.TaskEdit("root", dom.Styles{Color: "red"}, task)
 	cache.End()
 	fmt.Println(gohtml.Format(fmt.Sprint(root)))
+
+	cache.Begin()
+	cache.End()
+	leaks := html.GetCurrentResources()
+	if n := len(leaks); n > 0 {
+		fmt.Println("Leaked", n, "resources\n", leaks)
+	}
 
 	// Output:
 	// <div style="color: blue">

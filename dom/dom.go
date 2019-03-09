@@ -65,6 +65,7 @@ type Props struct {
 	ID          string
 	For         string
 	OnChange    *EventHandler
+	OnClick     *EventHandler
 }
 
 // ToMap returns the map version of props (useful for diffs)
@@ -78,6 +79,7 @@ func (p Props) ToMap() map[string]interface{} {
 		"TextContent": p.TextContent,
 		"Styles":      p.Styles,
 		"OnChange":    p.OnChange,
+		"OnClick":     p.OnClick,
 	}
 }
 
@@ -100,6 +102,3 @@ var driver Driver
 
 // Event is not yet implemented
 type Event struct{}
-
-// Change is not yet implemented
-type Change interface{}

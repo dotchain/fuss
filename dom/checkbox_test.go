@@ -7,12 +7,9 @@ package dom_test
 import (
 	"fmt"
 	"github.com/dotchain/fuss/dom"
+	"github.com/dotchain/fuss/dom/html"
 	"testing"
 )
-
-type setter interface {
-	SetValue(v string)
-}
 
 func TestCheckboxEdit(t *testing.T) {
 	var cb dom.CheckboxEditStruct
@@ -27,7 +24,7 @@ func TestCheckboxEdit(t *testing.T) {
 		t.Error(x)
 	}
 
-	elt.(setter).SetValue("off")
+	html.SetValue(elt, "off")
 	if checked.Latest().Value {
 		t.Error("SetValue did not take effect")
 	}

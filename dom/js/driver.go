@@ -13,11 +13,15 @@ import (
 )
 
 func init() {
-	dom.RegisterDriver(driver{OnChange: js.Global.Get("Map").New()})
+	events := map[string]*js.Object{
+		"change": js.Global.Get("Map").New(),
+		"click":  js.Global.Get("Map").New(),
+	}
+	dom.RegisterDriver(driver{events})
 }
 
 type driver struct {
-	OnChange *js.Object
+	events map[string]*js.Object
 }
 
 type cbInfo struct {
@@ -72,24 +76,26 @@ func (e element) SetProp(key string, value interface{}) {
 	case "Styles":
 		e.n.Call("setAttribute", "style", value.(dom.Styles).ToCSS())
 	case "OnChange":
-		e.onChange(value.(*dom.EventHandler))
+		e.onEvent("change", value.(*dom.EventHandler))
+	case "OnClick":
+		e.onEvent("click", value.(*dom.EventHandler))
 	default:
 		panic("Unknown key: " + key)
 	}
 }
 
-func (e element) onChange(h *dom.EventHandler) {
-	info, ok := get(e.d.OnChange, e.n)
+func (e element) onEvent(key string, h *dom.EventHandler) {
+	dict := e.d.events[key]
+	info, ok := get(dict, e.n)
 
 	switch {
 	case !ok && h != nil:
-		listener := listener(e.n, e.d)
-		e.n.Call("addEventListener", "change", js.InternalObject(listener), false)
-		e.d.OnChange.Call("set", e.n, js.InternalObject(&cbInfo{h, listener}))
+		listener := listener(e.n, dict)
+		e.n.Call("addEventListener", key, js.InternalObject(listener), false)
+		dict.Call("set", e.n, js.InternalObject(&cbInfo{h, listener}))
 	case ok && h == nil:
-		e.d.OnChange.Call("delete", e.n)
-		println(e.n, "remove", info.listener)
-		e.n.Call("removeEventListener", "change", js.InternalObject(info.listener))
+		dict.Call("delete", e.n)
+		e.n.Call("removeEventListener", key, js.InternalObject(info.listener))
 	case ok && h != nil:
 		info.EventHandler = h
 	}
@@ -147,7 +153,9 @@ func (e element) InsertChild(index int, elt dom.Element) {
 }
 
 func (e element) Close() {
-	e.onChange(nil)
+	for k := range e.d.events {
+		e.onEvent(k, nil)
+	}
 }
 
 func (e element) DOMNode() *js.Object {
@@ -163,9 +171,9 @@ func get(m *js.Object, key *js.Object) (*cbInfo, bool) {
 	return (*cbInfo)(unsafe.Pointer(jso.Unsafe())), true // nolint
 }
 
-func listener(n *js.Object, d *driver) func(*js.Object) {
+func listener(n *js.Object, dict *js.Object) func(*js.Object) {
 	return func(*js.Object) {
-		if info, ok := get(d.OnChange, n); ok {
+		if info, ok := get(dict, n); ok {
 			info.EventHandler.Handle(dom.Event{})
 		}
 	}
