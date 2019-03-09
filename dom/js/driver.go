@@ -62,11 +62,11 @@ func (e element) SetProp(key string, value interface{}) {
 	case "Checked":
 		e.n.Set("checked", value.(bool))
 	case "Type":
-		e.n.Call("setAttribute", "type", value.(string))
+		e.setAttr("type", value.(string))
 	case "ID":
-		e.n.Set("id", value.(string))
+		e.setAttr("id", value.(string))
 	case "For":
-		e.n.Call("setAttribute", "for", value.(string))
+		e.setAttr("for", value.(string))
 	case "TextContent":
 		if strings.ToLower(e.n.Get("tagName").String()) == "input" {
 			e.n.Set("value", value.(string))
@@ -74,13 +74,21 @@ func (e element) SetProp(key string, value interface{}) {
 			e.n.Set("textContent", value.(string))
 		}
 	case "Styles":
-		e.n.Call("setAttribute", "style", value.(dom.Styles).ToCSS())
+		e.setAttr("style", value.(dom.Styles).ToCSS())
 	case "OnChange":
 		e.onEvent("change", value.(*dom.EventHandler))
 	case "OnClick":
 		e.onEvent("click", value.(*dom.EventHandler))
 	default:
 		panic("Unknown key: " + key)
+	}
+}
+
+func (e element) setAttr(key, val string) {
+	if val != "" {
+		e.n.Call("setAttribute", key, val)
+	} else {
+		e.n.Call("removeAttribute", key)
 	}
 }
 

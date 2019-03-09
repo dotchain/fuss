@@ -6424,13 +6424,13 @@ $packages["github.com/dotchain/fuss/dom/js"] = (function() {
 				e.n.checked = $externalize($assertType(value, $Bool), $Bool);
 				$s = 12; continue;
 			/* } else if (_1 === ("Type")) { */ case 4:
-				e.n.setAttribute($externalize("type", $String), $externalize($assertType(value, $String), $String));
+				$clone(e, element).setAttr("type", $assertType(value, $String));
 				$s = 12; continue;
 			/* } else if (_1 === ("ID")) { */ case 5:
-				e.n.id = $externalize($assertType(value, $String), $String);
+				$clone(e, element).setAttr("id", $assertType(value, $String));
 				$s = 12; continue;
 			/* } else if (_1 === ("For")) { */ case 6:
-				e.n.setAttribute($externalize("for", $String), $externalize($assertType(value, $String), $String));
+				$clone(e, element).setAttr("for", $assertType(value, $String));
 				$s = 12; continue;
 			/* } else if (_1 === ("TextContent")) { */ case 7:
 				_r$2 = strings.ToLower($internalize(e.n.tagName, $String)); /* */ $s = 20; case 20: if($c) { $c = false; _r$2 = _r$2.$blk(); } if (_r$2 && _r$2.$blk !== undefined) { break s; }
@@ -6444,7 +6444,7 @@ $packages["github.com/dotchain/fuss/dom/js"] = (function() {
 				/* } */ case 19:
 				$s = 12; continue;
 			/* } else if (_1 === ("Styles")) { */ case 8:
-				e.n.setAttribute($externalize("style", $String), $externalize($clone($assertType(value, dom.Styles), dom.Styles).ToCSS(), $String));
+				$clone(e, element).setAttr("style", $clone($assertType(value, dom.Styles), dom.Styles).ToCSS());
 				$s = 12; continue;
 			/* } else if (_1 === ("OnChange")) { */ case 9:
 				$clone(e, element).onEvent("change", $assertType(value, ptrType));
@@ -6460,6 +6460,16 @@ $packages["github.com/dotchain/fuss/dom/js"] = (function() {
 		/* */ } return; } if ($f === undefined) { $f = { $blk: element.ptr.prototype.SetProp }; } $f._1 = _1; $f._r = _r; $f._r$1 = _r$1; $f._r$2 = _r$2; $f.e = e; $f.key = key; $f.tag = tag; $f.value = value; $f.$s = $s; $f.$r = $r; return $f;
 	};
 	element.prototype.SetProp = function(key, value) { return this.$val.SetProp(key, value); };
+	element.ptr.prototype.setAttr = function(key, val) {
+		var e, key, val;
+		e = this;
+		if (!(val === "")) {
+			e.n.setAttribute($externalize(key, $String), $externalize(val, $String));
+		} else {
+			e.n.removeAttribute($externalize(key, $String));
+		}
+	};
+	element.prototype.setAttr = function(key, val) { return this.$val.setAttr(key, val); };
 	element.ptr.prototype.onEvent = function(key, h) {
 		var _entry, _tuple, dict, e, h, info, key, listener$1, ok;
 		e = this;
@@ -6603,7 +6613,7 @@ $packages["github.com/dotchain/fuss/dom/js"] = (function() {
 		});
 	};
 	driver.methods = [{prop: "NewElement", name: "NewElement", pkg: "", typ: $funcType([dom.Props, sliceType], [dom.Element], true)}];
-	element.methods = [{prop: "SetProp", name: "SetProp", pkg: "", typ: $funcType([$String, $emptyInterface], [], false)}, {prop: "onEvent", name: "onEvent", pkg: "github.com/dotchain/fuss/dom/js", typ: $funcType([$String, ptrType], [], false)}, {prop: "Value", name: "Value", pkg: "", typ: $funcType([], [$String], false)}, {prop: "SetValue", name: "SetValue", pkg: "", typ: $funcType([$String], [], false)}, {prop: "Children", name: "Children", pkg: "", typ: $funcType([], [sliceType], false)}, {prop: "RemoveChild", name: "RemoveChild", pkg: "", typ: $funcType([$Int], [], false)}, {prop: "InsertChild", name: "InsertChild", pkg: "", typ: $funcType([$Int, dom.Element], [], false)}, {prop: "Close", name: "Close", pkg: "", typ: $funcType([], [], false)}, {prop: "DOMNode", name: "DOMNode", pkg: "", typ: $funcType([], [ptrType$2], false)}];
+	element.methods = [{prop: "SetProp", name: "SetProp", pkg: "", typ: $funcType([$String, $emptyInterface], [], false)}, {prop: "setAttr", name: "setAttr", pkg: "github.com/dotchain/fuss/dom/js", typ: $funcType([$String, $String], [], false)}, {prop: "onEvent", name: "onEvent", pkg: "github.com/dotchain/fuss/dom/js", typ: $funcType([$String, ptrType], [], false)}, {prop: "Value", name: "Value", pkg: "", typ: $funcType([], [$String], false)}, {prop: "SetValue", name: "SetValue", pkg: "", typ: $funcType([$String], [], false)}, {prop: "Children", name: "Children", pkg: "", typ: $funcType([], [sliceType], false)}, {prop: "RemoveChild", name: "RemoveChild", pkg: "", typ: $funcType([$Int], [], false)}, {prop: "InsertChild", name: "InsertChild", pkg: "", typ: $funcType([$Int, dom.Element], [], false)}, {prop: "Close", name: "Close", pkg: "", typ: $funcType([], [], false)}, {prop: "DOMNode", name: "DOMNode", pkg: "", typ: $funcType([], [ptrType$2], false)}];
 	driver.init("github.com/dotchain/fuss/dom/js", [{prop: "events", name: "events", anonymous: false, exported: false, typ: mapType, tag: ""}]);
 	cbInfo.init("github.com/dotchain/fuss/dom/js", [{prop: "EventHandler", name: "EventHandler", anonymous: true, exported: true, typ: ptrType, tag: ""}, {prop: "listener", name: "listener", anonymous: false, exported: false, typ: funcType, tag: ""}]);
 	element.init("github.com/dotchain/fuss/dom/js", [{prop: "n", name: "n", anonymous: false, exported: false, typ: ptrType$2, tag: ""}, {prop: "d", name: "d", anonymous: false, exported: false, typ: ptrType$3, tag: ""}]);
