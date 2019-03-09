@@ -5,6 +5,6 @@
 package dom
 
 // LabelView implements a label control.
-func labelView(c *labelViewCtx, styles Styles, text string, inputID string) Element {
+func labelView(c *labelViewCtx, styles Styles, text, inputID string) Element {
 	return c.Elt("root", Props{Tag: "label", For: inputID, Styles: styles, TextContent: text})
 }

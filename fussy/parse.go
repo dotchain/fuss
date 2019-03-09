@@ -119,18 +119,22 @@ func getContextInfo(decl *ast.FuncDecl) ContextInfo {
 	for _, p := range decl.Type.Params.List {
 		var buf bytes.Buffer
 		must(format.Node(&buf, fset, p.Type))
-		ci.Params = append(ci.Params, ParamInfo{p.Names[0].Name, buf.String()})
+		for _, n := range p.Names {
+			ci.Params = append(ci.Params, ParamInfo{n.Name, buf.String()})
+		}
 	}
 
 	for _, p := range decl.Type.Results.List {
 		var buf bytes.Buffer
 		must(format.Node(&buf, fset, p.Type))
-		name := ""
-		if len(p.Names) > 0 {
-			name = p.Names[0].Name
+		if len(p.Names) == 0 {
+			ci.Results = append(ci.Results, ResultInfo{"", buf.String()})
+			continue
 		}
 
-		ci.Results = append(ci.Results, ResultInfo{name, buf.String()})
+		for _, n := range p.Names {
+			ci.Results = append(ci.Results, ResultInfo{n.Name, buf.String()})
+		}
 	}
 
 	comments := []string{}
