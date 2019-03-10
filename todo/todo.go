@@ -87,9 +87,9 @@ func newTaskButton(c *newTaskCtx, styles dom.Styles, tasks *TasksStream, hState 
 	return hState, c.dom.Button("root", dom.Styles{}, &hState.EventHandler, label)
 }
 
-// App is a thin wrapper on top of TasksView with checkboxes for ShowDone and ShowUndone
+// FilteredTasks is a thin wrapper on top of TasksView with checkboxes for ShowDone and ShowUndone
 //
-func app(c *appCtx, styles dom.Styles, tasks *TasksStream, doneState *dom.BoolStream, notDoneState *dom.BoolStream) (*dom.BoolStream, *dom.BoolStream, dom.Element) {
+func filteredTasks(c *filteredCtx, styles dom.Styles, tasks *TasksStream, doneState *dom.BoolStream, notDoneState *dom.BoolStream) (*dom.BoolStream, *dom.BoolStream, dom.Element) {
 	if doneState == nil {
 		doneState = dom.NewBoolStream(true)
 	}
@@ -116,4 +116,16 @@ func app(c *appCtx, styles dom.Styles, tasks *TasksStream, doneState *dom.BoolSt
 		c.TasksView("tasks", dom.Styles{}, doneState, notDoneState, tasks),
 		c.NewTaskButton("new", dom.Styles{}, tasks),
 	)
+}
+
+// App hosts the todo MVC app
+func app(c *appCtx, tasksState *TasksStream) (*TasksStream, dom.Element) {
+	if tasksState == nil {
+		// TODO: fetch this from the network
+		tasksState = NewTasksStream(Tasks{
+			Task{"one", true, "First task"},
+			Task{"two", false, "Second task"},
+		})
+	}
+	return tasksState, c.FilteredTasks("root", dom.Styles{}, tasksState)
 }

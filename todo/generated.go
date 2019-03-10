@@ -371,6 +371,107 @@ type appCtx struct {
 	core.Cache
 	finalizer func()
 
+	FilteredTasksStruct
+	initialized  bool
+	stateHandler core.Handler
+
+	memoized struct {
+		result1    *TasksStream
+		result2    dom.Element
+		tasksState *TasksStream
+	}
+}
+
+func (c *appCtx) areArgsSame() bool {
+
+	return true
+}
+
+func (c *appCtx) refreshIfNeeded() (result2 dom.Element) {
+	if !c.initialized || !c.areArgsSame() {
+		return c.refresh()
+	}
+	return c.memoized.result2
+}
+
+func (c *appCtx) refresh() (result2 dom.Element) {
+	c.initialized = true
+	c.stateHandler.Handle = func() {
+		c.refresh()
+	}
+
+	if c.memoized.tasksState != nil {
+		c.memoized.tasksState = c.memoized.tasksState.Latest()
+	}
+
+	c.Cache.Begin()
+	defer c.Cache.End()
+
+	c.FilteredTasksStruct.Begin()
+	defer c.FilteredTasksStruct.End()
+	c.memoized.result1, c.memoized.result2 = app(c, c.memoized.tasksState)
+
+	if c.memoized.tasksState != c.memoized.result1 {
+		if c.memoized.tasksState != nil {
+			c.memoized.tasksState.Off(&c.stateHandler)
+		}
+		if c.memoized.result1 != nil {
+			c.memoized.result1.On(&c.stateHandler)
+		}
+		c.memoized.tasksState = c.memoized.result1
+	}
+	return c.memoized.result2
+}
+
+func (c *appCtx) close() {
+	c.Cache.Begin()
+	c.Cache.End()
+
+	c.FilteredTasksStruct.Begin()
+	c.FilteredTasksStruct.End()
+	if c.memoized.result1 != nil {
+		c.memoized.result1.Off(&c.stateHandler)
+	}
+	if c.finalizer != nil {
+		c.finalizer()
+	}
+}
+
+// AppStruct is a cache for App
+// App hosts the todo MVC app
+type AppStruct struct {
+	old, current map[interface{}]*appCtx
+}
+
+// Begin starts a round
+func (c *AppStruct) Begin() {
+	c.old, c.current = c.current, map[interface{}]*appCtx{}
+}
+
+// End finishes the round cleaning up any unused components
+func (c *AppStruct) End() {
+	for _, ctx := range c.old {
+		ctx.close()
+	}
+	c.old = nil
+}
+
+// App - see the type for details
+func (c *AppStruct) App(cKey interface{}) (result2 dom.Element) {
+	cOld, ok := c.old[cKey]
+	if ok {
+		delete(c.old, cKey)
+	} else {
+		cOld = &appCtx{}
+	}
+	c.current[cKey] = cOld
+	return cOld.refreshIfNeeded()
+}
+
+type filteredCtx struct {
+	core.Cache
+	finalizer func()
+
 	NewTaskButtonStruct
 	TasksViewStruct
 	initialized  bool
@@ -392,7 +493,7 @@ type appCtx struct {
 	}
 }
 
-func (c *appCtx) areArgsSame(styles dom.Styles, tasks *TasksStream) bool {
+func (c *filteredCtx) areArgsSame(styles dom.Styles, tasks *TasksStream) bool {
 
 	if styles != c.memoized.styles {
 		return false
@@ -402,14 +503,14 @@ func (c *appCtx) areArgsSame(styles dom.Styles, tasks *TasksStream) bool {
 
 }
 
-func (c *appCtx) refreshIfNeeded(styles dom.Styles, tasks *TasksStream) (result3 dom.Element) {
+func (c *filteredCtx) refreshIfNeeded(styles dom.Styles, tasks *TasksStream) (result3 dom.Element) {
 	if !c.initialized || !c.areArgsSame(styles, tasks) {
 		return c.refresh(styles, tasks)
 	}
 	return c.memoized.result3
 }
 
-func (c *appCtx) refresh(styles dom.Styles, tasks *TasksStream) (result3 dom.Element) {
+func (c *filteredCtx) refresh(styles dom.Styles, tasks *TasksStream) (result3 dom.Element) {
 	c.initialized = true
 	c.stateHandler.Handle = func() {
 		c.refresh(styles, tasks)
@@ -440,7 +541,7 @@ func (c *appCtx) refresh(styles dom.Styles, tasks *TasksStream) (result3 dom.Ele
 
 	c.dom.LabelViewStruct.Begin()
 	defer c.dom.LabelViewStruct.End()
-	c.memoized.result1, c.memoized.result2, c.memoized.result3 = app(c, styles, tasks, c.memoized.doneState, c.memoized.notDoneState)
+	c.memoized.result1, c.memoized.result2, c.memoized.result3 = filteredTasks(c, styles, tasks, c.memoized.doneState, c.memoized.notDoneState)
 
 	if c.memoized.doneState != c.memoized.result1 {
 		if c.memoized.doneState != nil {
@@ -463,7 +564,7 @@ func (c *appCtx) refresh(styles dom.Styles, tasks *TasksStream) (result3 dom.Ele
 	return c.memoized.result3
 }
 
-func (c *appCtx) close() {
+func (c *filteredCtx) close() {
 	c.Cache.Begin()
 	c.Cache.End()
 
@@ -492,33 +593,33 @@ func (c *appCtx) close() {
 	}
 }
 
-// AppStruct is a cache for App
-// App is a thin wrapper on top of TasksView with checkboxes for ShowDone and ShowUndone
+// FilteredTasksStruct is a cache for FilteredTasks
+// FilteredTasks is a thin wrapper on top of TasksView with checkboxes for ShowDone and ShowUndone
 //
-type AppStruct struct {
-	old, current map[interface{}]*appCtx
+type FilteredTasksStruct struct {
+	old, current map[interface{}]*filteredCtx
 }
 
 // Begin starts a round
-func (c *AppStruct) Begin() {
-	c.old, c.current = c.current, map[interface{}]*appCtx{}
+func (c *FilteredTasksStruct) Begin() {
+	c.old, c.current = c.current, map[interface{}]*filteredCtx{}
 }
 
 // End finishes the round cleaning up any unused components
-func (c *AppStruct) End() {
+func (c *FilteredTasksStruct) End() {
 	for _, ctx := range c.old {
 		ctx.close()
 	}
 	c.old = nil
 }
 
-// App - see the type for details
-func (c *AppStruct) App(cKey interface{}, styles dom.Styles, tasks *TasksStream) (result3 dom.Element) {
+// FilteredTasks - see the type for details
+func (c *FilteredTasksStruct) FilteredTasks(cKey interface{}, styles dom.Styles, tasks *TasksStream) (result3 dom.Element) {
 	cOld, ok := c.old[cKey]
 	if ok {
 		delete(c.old, cKey)
 	} else {
-		cOld = &appCtx{}
+		cOld = &filteredCtx{}
 	}
 	c.current[cKey] = cOld
 	return cOld.refreshIfNeeded(styles, tasks)

@@ -12,15 +12,15 @@ import (
 	"github.com/yosssi/gohtml"
 )
 
-func Example_renderApp() {
+func Example_renderFilteredTasks() {
 	tasks := todo.Tasks{
 		{"one", false, "first task"},
 		{"two", true, "second task"},
 	}
-	cache := todo.AppStruct{}
+	cache := todo.FilteredTasksStruct{}
 
 	cache.Begin()
-	root := cache.App("root", dom.Styles{}, todo.NewTasksStream(tasks))
+	root := cache.FilteredTasks("root", dom.Styles{}, todo.NewTasksStream(tasks))
 	cache.End()
 
 	fmt.Println(gohtml.Format(fmt.Sprint(root)))
