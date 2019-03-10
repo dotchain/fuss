@@ -15,6 +15,7 @@ func main() {
 	output := "generated.go"
 	files := []string{"dom.go", "elt.go", "checkbox.go", "text.go", "label.go", "button.go"}
 	info := fussy.ParseFiles(files, output)
+	info.Generator = "github.com/dotchain/fuss/dom/codegen.go"
 	info.Streams = []fussy.StreamInfo{
 		{StreamType: "BoolStream", ValueType: "bool"},
 		{StreamType: "TextStream", ValueType: "string"},

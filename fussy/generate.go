@@ -16,10 +16,12 @@ import (
 
 // Info contains all the info needed to generate code
 type Info struct {
-	Package  string
-	Imports  [][2]string
-	Streams  []StreamInfo
-	Contexts []ContextInfo
+	// Generator indicates the raw code which generates this
+	Generator string
+	Package   string
+	Imports   [][2]string
+	Streams   []StreamInfo
+	Contexts  []ContextInfo
 }
 
 // StreamInfo holds the information to generate a single stream type
