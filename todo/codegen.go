@@ -15,6 +15,7 @@ func main() {
 	output := "generated.go"
 	files := []string{"todo.go"}
 	info := fussy.ParseFiles(files, output)
+	info.Generator = "github.com/dotchain/fuss/todo/codegen.go"
 	info.Streams = []fussy.StreamInfo{
 		{
 			StreamType: "TaskStream",

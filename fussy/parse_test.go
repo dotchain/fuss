@@ -26,6 +26,7 @@ func TestParse(t *testing.T) {
 
 var parseExpected = `
 {
+	"Generator": "",
 	"Package": "datum",
 	"Imports": [
 		[
