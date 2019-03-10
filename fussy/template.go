@@ -52,6 +52,7 @@ func ({{$c.Name}} {{$c.Type}}) areArgsSame({{.NonContextArgsDecl}}) bool {
 		{{if $a.IsLast}}return {{$a.Name}} == {{$c.Name}}.memoized.{{$a.Name}}
 		{{else}}if {{$a.Name}} != {{$c.Name}}.memoized.{{$a.Name}} { return false }
 	{{end}}{{end}}{{end}}{{end}}
+	{{if eq 1 (len .Args)}}return true{{end}}
 }
 
 func ({{$c.Name}} {{$c.Type}}) refreshIfNeeded({{.NonContextArgsDecl}}) ({{.ResultsDecl}}) {
@@ -70,7 +71,7 @@ func ({{$c.Name}} {{$c.Type}}) refresh({{.NonContextArgsDecl}}) ({{.ResultsDecl}
 	if {{$c.Name}}.memoized.{{$sa.Name}} != nil {
 		{{$c.Name}}.memoized.{{$sa.Name}} = {{$c.Name}}.memoized.{{$sa.Name}}.Latest()
 	}{{end}}
-	{{.MemoizedNonContextArgs}} = {{.NonContextArgs}}
+	{{if not (eq .MemoizedNonContextArgs "")}}{{.MemoizedNonContextArgs}} = {{.NonContextArgs}}{{end}}
 
 	{{$c.Name}}.Cache.Begin()
 	defer {{$c.Name}}.Cache.End()

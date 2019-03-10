@@ -166,10 +166,6 @@ func (e element) Close() {
 	}
 }
 
-func (e element) DOMNode() *js.Object {
-	return e.n
-}
-
 func get(m *js.Object, key *js.Object) (*cbInfo, bool) {
 	if ok := m.Call("has", key).Bool(); !ok {
 		return nil, false
@@ -186,3 +182,9 @@ func listener(n *js.Object, dict *js.Object) func(*js.Object) {
 		}
 	}
 }
+
+// QuerySelector returns a DOM node wrapped in the dom.Element interface
+func QuerySelector(s string) dom.Element {
+	return element{js.Global.Get("document").Call("querySelector", s), nil}
+}
+

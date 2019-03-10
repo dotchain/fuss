@@ -2339,164 +2339,6 @@ $packages["runtime"] = (function() {
 	$pkg.$init = $init;
 	return $pkg;
 })();
-$packages["github.com/dotchain/fuss/core"] = (function() {
-	var $pkg = {}, $init, cacheEntry, Cache, Notifier, Handler, arrayType, ptrType, ptrType$1, sliceType, funcType, ptrType$2, ptrType$3, mapType;
-	cacheEntry = $pkg.cacheEntry = $newType(0, $kindStruct, "core.cacheEntry", true, "github.com/dotchain/fuss/core", false, function(stream_, h_, close_) {
-		this.$val = this;
-		if (arguments.length === 0) {
-			this.stream = $ifaceNil;
-			this.h = ptrType$1.nil;
-			this.close = $throwNilPointerError;
-			return;
-		}
-		this.stream = stream_;
-		this.h = h_;
-		this.close = close_;
-	});
-	Cache = $pkg.Cache = $newType(0, $kindStruct, "core.Cache", true, "github.com/dotchain/fuss/core", true, function(old_, current_) {
-		this.$val = this;
-		if (arguments.length === 0) {
-			this.old = false;
-			this.current = false;
-			return;
-		}
-		this.old = old_;
-		this.current = current_;
-	});
-	Notifier = $pkg.Notifier = $newType(0, $kindStruct, "core.Notifier", true, "github.com/dotchain/fuss/core", true, function(handlers_) {
-		this.$val = this;
-		if (arguments.length === 0) {
-			this.handlers = sliceType.nil;
-			return;
-		}
-		this.handlers = handlers_;
-	});
-	Handler = $pkg.Handler = $newType(0, $kindStruct, "core.Handler", true, "github.com/dotchain/fuss/core", true, function(Handle_) {
-		this.$val = this;
-		if (arguments.length === 0) {
-			this.Handle = $throwNilPointerError;
-			return;
-		}
-		this.Handle = Handle_;
-	});
-	arrayType = $arrayType($emptyInterface, 2);
-	ptrType = $ptrType(cacheEntry);
-	ptrType$1 = $ptrType(Handler);
-	sliceType = $sliceType(ptrType$1);
-	funcType = $funcType([], [], false);
-	ptrType$2 = $ptrType(Notifier);
-	ptrType$3 = $ptrType(Cache);
-	mapType = $mapType($emptyInterface, ptrType);
-	Cache.ptr.prototype.Begin = function() {
-		var _tmp, _tmp$1, c;
-		c = this;
-		_tmp = c.current;
-		_tmp$1 = $makeMap($emptyInterface.keyFor, []);
-		c.old = _tmp;
-		c.current = _tmp$1;
-	};
-	Cache.prototype.Begin = function() { return this.$val.Begin(); };
-	Cache.ptr.prototype.End = function() {
-		var _entry, _i, _keys, _ref, c, v, $s, $r;
-		/* */ $s = 0; var $f, $c = false; if (this !== undefined && this.$blk !== undefined) { $f = this; $c = true; _entry = $f._entry; _i = $f._i; _keys = $f._keys; _ref = $f._ref; c = $f.c; v = $f.v; $s = $f.$s; $r = $f.$r; } s: while (true) { switch ($s) { case 0:
-		c = this;
-		_ref = c.old;
-		_i = 0;
-		_keys = $keys(_ref);
-		/* while (true) { */ case 1:
-			/* if (!(_i < _keys.length)) { break; } */ if(!(_i < _keys.length)) { $s = 2; continue; }
-			_entry = _ref[_keys[_i]];
-			if (_entry === undefined) {
-				_i++;
-				/* continue; */ $s = 1; continue;
-			}
-			v = _entry.v;
-			$r = v.close(); /* */ $s = 3; case 3: if($c) { $c = false; $r = $r.$blk(); } if ($r && $r.$blk !== undefined) { break s; }
-			_i++;
-		/* } */ $s = 1; continue; case 2:
-		c.old = false;
-		$s = -1; return;
-		/* */ } return; } if ($f === undefined) { $f = { $blk: Cache.ptr.prototype.End }; } $f._entry = _entry; $f._i = _i; $f._keys = _keys; $f._ref = _ref; $f.c = c; $f.v = v; $f.$s = $s; $f.$r = $r; return $f;
-	};
-	Cache.prototype.End = function() { return this.$val.End(); };
-	Cache.ptr.prototype.GetSubstream = function(n, key) {
-		var _entry, _tuple, c, key, n, ok, v;
-		c = this;
-		key = new arrayType($toNativeArray($kindInterface, [n, key]));
-		_tuple = (_entry = c.old[$emptyInterface.keyFor(key)], _entry !== undefined ? [_entry.v, true] : [ptrType.nil, false]);
-		v = _tuple[0];
-		ok = _tuple[1];
-		if (ok) {
-			return [v.stream, v.h, true];
-		}
-		return [$ifaceNil, ptrType$1.nil, false];
-	};
-	Cache.prototype.GetSubstream = function(n, key) { return this.$val.GetSubstream(n, key); };
-	Cache.ptr.prototype.SetSubstream = function(n, key, v, h, close) {
-		var _key, c, close, h, key, n, v;
-		c = this;
-		key = new arrayType($toNativeArray($kindInterface, [n, key]));
-		_key = key; (c.current || $throwRuntimeError("assignment to entry in nil map"))[$emptyInterface.keyFor(_key)] = { k: _key, v: new cacheEntry.ptr(v, h, close) };
-		delete c.old[$emptyInterface.keyFor(key)];
-	};
-	Cache.prototype.SetSubstream = function(n, key, v, h, close) { return this.$val.SetSubstream(n, key, v, h, close); };
-	Notifier.ptr.prototype.On = function(h) {
-		var h, n;
-		n = this;
-		n.handlers = $append(n.handlers, h);
-	};
-	Notifier.prototype.On = function(h) { return this.$val.On(h); };
-	Notifier.ptr.prototype.Off = function(h) {
-		var _i, _ref, h, handlers, hh, kk, n;
-		n = this;
-		_ref = n.handlers;
-		_i = 0;
-		while (true) {
-			if (!(_i < _ref.$length)) { break; }
-			kk = _i;
-			hh = ((_i < 0 || _i >= _ref.$length) ? ($throwRuntimeError("index out of range"), undefined) : _ref.$array[_ref.$offset + _i]);
-			if (!(hh === h)) {
-				_i++;
-				continue;
-			}
-			handlers = $makeSlice(sliceType, (n.handlers.$length - 1 >> 0));
-			$copySlice(handlers, $subslice(n.handlers, 0, kk));
-			$copySlice($subslice(handlers, kk), $subslice(n.handlers, (kk + 1 >> 0)));
-			n.handlers = handlers;
-			_i++;
-		}
-	};
-	Notifier.prototype.Off = function(h) { return this.$val.Off(h); };
-	Notifier.ptr.prototype.Notify = function() {
-		var _i, _ref, h, n, $s, $r;
-		/* */ $s = 0; var $f, $c = false; if (this !== undefined && this.$blk !== undefined) { $f = this; $c = true; _i = $f._i; _ref = $f._ref; h = $f.h; n = $f.n; $s = $f.$s; $r = $f.$r; } s: while (true) { switch ($s) { case 0:
-		n = this;
-		_ref = n.handlers;
-		_i = 0;
-		/* while (true) { */ case 1:
-			/* if (!(_i < _ref.$length)) { break; } */ if(!(_i < _ref.$length)) { $s = 2; continue; }
-			h = ((_i < 0 || _i >= _ref.$length) ? ($throwRuntimeError("index out of range"), undefined) : _ref.$array[_ref.$offset + _i]);
-			$r = h.Handle(); /* */ $s = 3; case 3: if($c) { $c = false; $r = $r.$blk(); } if ($r && $r.$blk !== undefined) { break s; }
-			_i++;
-		/* } */ $s = 1; continue; case 2:
-		$s = -1; return;
-		/* */ } return; } if ($f === undefined) { $f = { $blk: Notifier.ptr.prototype.Notify }; } $f._i = _i; $f._ref = _ref; $f.h = h; $f.n = n; $f.$s = $s; $f.$r = $r; return $f;
-	};
-	Notifier.prototype.Notify = function() { return this.$val.Notify(); };
-	ptrType$3.methods = [{prop: "Begin", name: "Begin", pkg: "", typ: $funcType([], [], false)}, {prop: "End", name: "End", pkg: "", typ: $funcType([], [], false)}, {prop: "GetSubstream", name: "GetSubstream", pkg: "", typ: $funcType([ptrType$2, $emptyInterface], [$emptyInterface, ptrType$1, $Bool], false)}, {prop: "SetSubstream", name: "SetSubstream", pkg: "", typ: $funcType([ptrType$2, $emptyInterface, $emptyInterface, ptrType$1, funcType], [], false)}];
-	ptrType$2.methods = [{prop: "On", name: "On", pkg: "", typ: $funcType([ptrType$1], [], false)}, {prop: "Off", name: "Off", pkg: "", typ: $funcType([ptrType$1], [], false)}, {prop: "Notify", name: "Notify", pkg: "", typ: $funcType([], [], false)}];
-	cacheEntry.init("github.com/dotchain/fuss/core", [{prop: "stream", name: "stream", anonymous: false, exported: false, typ: $emptyInterface, tag: ""}, {prop: "h", name: "h", anonymous: false, exported: false, typ: ptrType$1, tag: ""}, {prop: "close", name: "close", anonymous: false, exported: false, typ: funcType, tag: ""}]);
-	Cache.init("github.com/dotchain/fuss/core", [{prop: "old", name: "old", anonymous: false, exported: false, typ: mapType, tag: ""}, {prop: "current", name: "current", anonymous: false, exported: false, typ: mapType, tag: ""}]);
-	Notifier.init("github.com/dotchain/fuss/core", [{prop: "handlers", name: "handlers", anonymous: false, exported: false, typ: sliceType, tag: ""}]);
-	Handler.init("", [{prop: "Handle", name: "Handle", anonymous: false, exported: true, typ: funcType, tag: ""}]);
-	$init = function() {
-		$pkg.$init = function() {};
-		/* */ var $f, $c = false, $s = 0, $r; if (this !== undefined && this.$blk !== undefined) { $f = this; $c = true; $s = $f.$s; $r = $f.$r; } s: while (true) { switch ($s) { case 0:
-		/* */ } return; } if ($f === undefined) { $f = { $blk: $init }; } $f.$s = $s; $f.$r = $r; return $f;
-	};
-	$pkg.$init = $init;
-	return $pkg;
-})();
 $packages["github.com/dotchain/dot/changes"] = (function() {
 	var $pkg = {}, $init, Atomic, Change, Custom, Value, Collection, ChangeSet, Context, empty, Move, PathChange, Replace, Splice, sliceType, ptrType, ptrType$1, sliceType$1, ptrType$2, sliceType$2, change, swap, movesToChange;
 	Atomic = $pkg.Atomic = $newType(0, $kindStruct, "changes.Atomic", true, "github.com/dotchain/dot/changes", true, function(Value_) {
@@ -3980,6 +3822,164 @@ $packages["github.com/dotchain/dot/changes"] = (function() {
 		$pkg.$init = function() {};
 		/* */ var $f, $c = false, $s = 0, $r; if (this !== undefined && this.$blk !== undefined) { $f = this; $c = true; $s = $f.$s; $r = $f.$r; } s: while (true) { switch ($s) { case 0:
 		$pkg.Nil = new empty.ptr();
+		/* */ } return; } if ($f === undefined) { $f = { $blk: $init }; } $f.$s = $s; $f.$r = $r; return $f;
+	};
+	$pkg.$init = $init;
+	return $pkg;
+})();
+$packages["github.com/dotchain/fuss/core"] = (function() {
+	var $pkg = {}, $init, cacheEntry, Cache, Notifier, Handler, arrayType, ptrType, ptrType$1, sliceType, funcType, ptrType$2, ptrType$3, mapType;
+	cacheEntry = $pkg.cacheEntry = $newType(0, $kindStruct, "core.cacheEntry", true, "github.com/dotchain/fuss/core", false, function(stream_, h_, close_) {
+		this.$val = this;
+		if (arguments.length === 0) {
+			this.stream = $ifaceNil;
+			this.h = ptrType$1.nil;
+			this.close = $throwNilPointerError;
+			return;
+		}
+		this.stream = stream_;
+		this.h = h_;
+		this.close = close_;
+	});
+	Cache = $pkg.Cache = $newType(0, $kindStruct, "core.Cache", true, "github.com/dotchain/fuss/core", true, function(old_, current_) {
+		this.$val = this;
+		if (arguments.length === 0) {
+			this.old = false;
+			this.current = false;
+			return;
+		}
+		this.old = old_;
+		this.current = current_;
+	});
+	Notifier = $pkg.Notifier = $newType(0, $kindStruct, "core.Notifier", true, "github.com/dotchain/fuss/core", true, function(handlers_) {
+		this.$val = this;
+		if (arguments.length === 0) {
+			this.handlers = sliceType.nil;
+			return;
+		}
+		this.handlers = handlers_;
+	});
+	Handler = $pkg.Handler = $newType(0, $kindStruct, "core.Handler", true, "github.com/dotchain/fuss/core", true, function(Handle_) {
+		this.$val = this;
+		if (arguments.length === 0) {
+			this.Handle = $throwNilPointerError;
+			return;
+		}
+		this.Handle = Handle_;
+	});
+	arrayType = $arrayType($emptyInterface, 2);
+	ptrType = $ptrType(cacheEntry);
+	ptrType$1 = $ptrType(Handler);
+	sliceType = $sliceType(ptrType$1);
+	funcType = $funcType([], [], false);
+	ptrType$2 = $ptrType(Notifier);
+	ptrType$3 = $ptrType(Cache);
+	mapType = $mapType($emptyInterface, ptrType);
+	Cache.ptr.prototype.Begin = function() {
+		var _tmp, _tmp$1, c;
+		c = this;
+		_tmp = c.current;
+		_tmp$1 = $makeMap($emptyInterface.keyFor, []);
+		c.old = _tmp;
+		c.current = _tmp$1;
+	};
+	Cache.prototype.Begin = function() { return this.$val.Begin(); };
+	Cache.ptr.prototype.End = function() {
+		var _entry, _i, _keys, _ref, c, v, $s, $r;
+		/* */ $s = 0; var $f, $c = false; if (this !== undefined && this.$blk !== undefined) { $f = this; $c = true; _entry = $f._entry; _i = $f._i; _keys = $f._keys; _ref = $f._ref; c = $f.c; v = $f.v; $s = $f.$s; $r = $f.$r; } s: while (true) { switch ($s) { case 0:
+		c = this;
+		_ref = c.old;
+		_i = 0;
+		_keys = $keys(_ref);
+		/* while (true) { */ case 1:
+			/* if (!(_i < _keys.length)) { break; } */ if(!(_i < _keys.length)) { $s = 2; continue; }
+			_entry = _ref[_keys[_i]];
+			if (_entry === undefined) {
+				_i++;
+				/* continue; */ $s = 1; continue;
+			}
+			v = _entry.v;
+			$r = v.close(); /* */ $s = 3; case 3: if($c) { $c = false; $r = $r.$blk(); } if ($r && $r.$blk !== undefined) { break s; }
+			_i++;
+		/* } */ $s = 1; continue; case 2:
+		c.old = false;
+		$s = -1; return;
+		/* */ } return; } if ($f === undefined) { $f = { $blk: Cache.ptr.prototype.End }; } $f._entry = _entry; $f._i = _i; $f._keys = _keys; $f._ref = _ref; $f.c = c; $f.v = v; $f.$s = $s; $f.$r = $r; return $f;
+	};
+	Cache.prototype.End = function() { return this.$val.End(); };
+	Cache.ptr.prototype.GetSubstream = function(n, key) {
+		var _entry, _tuple, c, key, n, ok, v;
+		c = this;
+		key = new arrayType($toNativeArray($kindInterface, [n, key]));
+		_tuple = (_entry = c.old[$emptyInterface.keyFor(key)], _entry !== undefined ? [_entry.v, true] : [ptrType.nil, false]);
+		v = _tuple[0];
+		ok = _tuple[1];
+		if (ok) {
+			return [v.stream, v.h, true];
+		}
+		return [$ifaceNil, ptrType$1.nil, false];
+	};
+	Cache.prototype.GetSubstream = function(n, key) { return this.$val.GetSubstream(n, key); };
+	Cache.ptr.prototype.SetSubstream = function(n, key, v, h, close) {
+		var _key, c, close, h, key, n, v;
+		c = this;
+		key = new arrayType($toNativeArray($kindInterface, [n, key]));
+		_key = key; (c.current || $throwRuntimeError("assignment to entry in nil map"))[$emptyInterface.keyFor(_key)] = { k: _key, v: new cacheEntry.ptr(v, h, close) };
+		delete c.old[$emptyInterface.keyFor(key)];
+	};
+	Cache.prototype.SetSubstream = function(n, key, v, h, close) { return this.$val.SetSubstream(n, key, v, h, close); };
+	Notifier.ptr.prototype.On = function(h) {
+		var h, n;
+		n = this;
+		n.handlers = $append(n.handlers, h);
+	};
+	Notifier.prototype.On = function(h) { return this.$val.On(h); };
+	Notifier.ptr.prototype.Off = function(h) {
+		var _i, _ref, h, handlers, hh, kk, n;
+		n = this;
+		_ref = n.handlers;
+		_i = 0;
+		while (true) {
+			if (!(_i < _ref.$length)) { break; }
+			kk = _i;
+			hh = ((_i < 0 || _i >= _ref.$length) ? ($throwRuntimeError("index out of range"), undefined) : _ref.$array[_ref.$offset + _i]);
+			if (!(hh === h)) {
+				_i++;
+				continue;
+			}
+			handlers = $makeSlice(sliceType, (n.handlers.$length - 1 >> 0));
+			$copySlice(handlers, $subslice(n.handlers, 0, kk));
+			$copySlice($subslice(handlers, kk), $subslice(n.handlers, (kk + 1 >> 0)));
+			n.handlers = handlers;
+			_i++;
+		}
+	};
+	Notifier.prototype.Off = function(h) { return this.$val.Off(h); };
+	Notifier.ptr.prototype.Notify = function() {
+		var _i, _ref, h, n, $s, $r;
+		/* */ $s = 0; var $f, $c = false; if (this !== undefined && this.$blk !== undefined) { $f = this; $c = true; _i = $f._i; _ref = $f._ref; h = $f.h; n = $f.n; $s = $f.$s; $r = $f.$r; } s: while (true) { switch ($s) { case 0:
+		n = this;
+		_ref = n.handlers;
+		_i = 0;
+		/* while (true) { */ case 1:
+			/* if (!(_i < _ref.$length)) { break; } */ if(!(_i < _ref.$length)) { $s = 2; continue; }
+			h = ((_i < 0 || _i >= _ref.$length) ? ($throwRuntimeError("index out of range"), undefined) : _ref.$array[_ref.$offset + _i]);
+			$r = h.Handle(); /* */ $s = 3; case 3: if($c) { $c = false; $r = $r.$blk(); } if ($r && $r.$blk !== undefined) { break s; }
+			_i++;
+		/* } */ $s = 1; continue; case 2:
+		$s = -1; return;
+		/* */ } return; } if ($f === undefined) { $f = { $blk: Notifier.ptr.prototype.Notify }; } $f._i = _i; $f._ref = _ref; $f.h = h; $f.n = n; $f.$s = $s; $f.$r = $r; return $f;
+	};
+	Notifier.prototype.Notify = function() { return this.$val.Notify(); };
+	ptrType$3.methods = [{prop: "Begin", name: "Begin", pkg: "", typ: $funcType([], [], false)}, {prop: "End", name: "End", pkg: "", typ: $funcType([], [], false)}, {prop: "GetSubstream", name: "GetSubstream", pkg: "", typ: $funcType([ptrType$2, $emptyInterface], [$emptyInterface, ptrType$1, $Bool], false)}, {prop: "SetSubstream", name: "SetSubstream", pkg: "", typ: $funcType([ptrType$2, $emptyInterface, $emptyInterface, ptrType$1, funcType], [], false)}];
+	ptrType$2.methods = [{prop: "On", name: "On", pkg: "", typ: $funcType([ptrType$1], [], false)}, {prop: "Off", name: "Off", pkg: "", typ: $funcType([ptrType$1], [], false)}, {prop: "Notify", name: "Notify", pkg: "", typ: $funcType([], [], false)}];
+	cacheEntry.init("github.com/dotchain/fuss/core", [{prop: "stream", name: "stream", anonymous: false, exported: false, typ: $emptyInterface, tag: ""}, {prop: "h", name: "h", anonymous: false, exported: false, typ: ptrType$1, tag: ""}, {prop: "close", name: "close", anonymous: false, exported: false, typ: funcType, tag: ""}]);
+	Cache.init("github.com/dotchain/fuss/core", [{prop: "old", name: "old", anonymous: false, exported: false, typ: mapType, tag: ""}, {prop: "current", name: "current", anonymous: false, exported: false, typ: mapType, tag: ""}]);
+	Notifier.init("github.com/dotchain/fuss/core", [{prop: "handlers", name: "handlers", anonymous: false, exported: false, typ: sliceType, tag: ""}]);
+	Handler.init("", [{prop: "Handle", name: "Handle", anonymous: false, exported: true, typ: funcType, tag: ""}]);
+	$init = function() {
+		$pkg.$init = function() {};
+		/* */ var $f, $c = false, $s = 0, $r; if (this !== undefined && this.$blk !== undefined) { $f = this; $c = true; $s = $f.$s; $r = $f.$r; } s: while (true) { switch ($s) { case 0:
 		/* */ } return; } if ($f === undefined) { $f = { $blk: $init }; } $f.$s = $s; $f.$r = $r; return $f;
 	};
 	$pkg.$init = $init;
@@ -6309,7 +6309,7 @@ $packages["strings"] = (function() {
 	return $pkg;
 })();
 $packages["github.com/dotchain/fuss/dom/js"] = (function() {
-	var $pkg = {}, $init, dom, js, strings, driver, cbInfo, element, ptrType, sliceType, ptrType$1, ptrType$2, mapType, funcType, ptrType$3, init, get, listener;
+	var $pkg = {}, $init, dom, js, strings, driver, cbInfo, element, ptrType, sliceType, ptrType$1, ptrType$2, ptrType$3, mapType, funcType, init, get, listener, QuerySelector;
 	dom = $packages["github.com/dotchain/fuss/dom"];
 	js = $packages["github.com/gopherjs/gopherjs/js"];
 	strings = $packages["strings"];
@@ -6335,7 +6335,7 @@ $packages["github.com/dotchain/fuss/dom/js"] = (function() {
 		this.$val = this;
 		if (arguments.length === 0) {
 			this.n = null;
-			this.d = ptrType$3.nil;
+			this.d = ptrType$2.nil;
 			return;
 		}
 		this.n = n_;
@@ -6344,10 +6344,10 @@ $packages["github.com/dotchain/fuss/dom/js"] = (function() {
 	ptrType = $ptrType(dom.EventHandler);
 	sliceType = $sliceType(dom.Element);
 	ptrType$1 = $ptrType(cbInfo);
-	ptrType$2 = $ptrType(js.Object);
-	mapType = $mapType($String, ptrType$2);
-	funcType = $funcType([ptrType$2], [], false);
-	ptrType$3 = $ptrType(driver);
+	ptrType$2 = $ptrType(driver);
+	ptrType$3 = $ptrType(js.Object);
+	mapType = $mapType($String, ptrType$3);
+	funcType = $funcType([ptrType$3], [], false);
 	init = function() {
 		var events, x;
 		events = $makeMap($String.keyFor, [{ k: "change", v: new ($global.Map)() }, { k: "click", v: new ($global.Map)() }]);
@@ -6580,12 +6580,6 @@ $packages["github.com/dotchain/fuss/dom/js"] = (function() {
 		}
 	};
 	element.prototype.Close = function() { return this.$val.Close(); };
-	element.ptr.prototype.DOMNode = function() {
-		var e;
-		e = this;
-		return e.n;
-	};
-	element.prototype.DOMNode = function() { return this.$val.DOMNode(); };
 	get = function(m, key) {
 		var jso, key, m, ok;
 		ok = !!(m.has(key));
@@ -6612,11 +6606,16 @@ $packages["github.com/dotchain/fuss/dom/js"] = (function() {
 			/* */ } return; } if ($f === undefined) { $f = { $blk: $b }; } $f._tuple = _tuple; $f.info = info; $f.ok = ok; $f.param = param; $f.$s = $s; $f.$r = $r; return $f;
 		});
 	};
+	QuerySelector = function(s) {
+		var s, x;
+		return (x = new element.ptr($global.document.querySelector($externalize(s, $String)), ptrType$2.nil), new x.constructor.elem(x));
+	};
+	$pkg.QuerySelector = QuerySelector;
 	driver.methods = [{prop: "NewElement", name: "NewElement", pkg: "", typ: $funcType([dom.Props, sliceType], [dom.Element], true)}];
-	element.methods = [{prop: "SetProp", name: "SetProp", pkg: "", typ: $funcType([$String, $emptyInterface], [], false)}, {prop: "setAttr", name: "setAttr", pkg: "github.com/dotchain/fuss/dom/js", typ: $funcType([$String, $String], [], false)}, {prop: "onEvent", name: "onEvent", pkg: "github.com/dotchain/fuss/dom/js", typ: $funcType([$String, ptrType], [], false)}, {prop: "Value", name: "Value", pkg: "", typ: $funcType([], [$String], false)}, {prop: "SetValue", name: "SetValue", pkg: "", typ: $funcType([$String], [], false)}, {prop: "Children", name: "Children", pkg: "", typ: $funcType([], [sliceType], false)}, {prop: "RemoveChild", name: "RemoveChild", pkg: "", typ: $funcType([$Int], [], false)}, {prop: "InsertChild", name: "InsertChild", pkg: "", typ: $funcType([$Int, dom.Element], [], false)}, {prop: "Close", name: "Close", pkg: "", typ: $funcType([], [], false)}, {prop: "DOMNode", name: "DOMNode", pkg: "", typ: $funcType([], [ptrType$2], false)}];
+	element.methods = [{prop: "SetProp", name: "SetProp", pkg: "", typ: $funcType([$String, $emptyInterface], [], false)}, {prop: "setAttr", name: "setAttr", pkg: "github.com/dotchain/fuss/dom/js", typ: $funcType([$String, $String], [], false)}, {prop: "onEvent", name: "onEvent", pkg: "github.com/dotchain/fuss/dom/js", typ: $funcType([$String, ptrType], [], false)}, {prop: "Value", name: "Value", pkg: "", typ: $funcType([], [$String], false)}, {prop: "SetValue", name: "SetValue", pkg: "", typ: $funcType([$String], [], false)}, {prop: "Children", name: "Children", pkg: "", typ: $funcType([], [sliceType], false)}, {prop: "RemoveChild", name: "RemoveChild", pkg: "", typ: $funcType([$Int], [], false)}, {prop: "InsertChild", name: "InsertChild", pkg: "", typ: $funcType([$Int, dom.Element], [], false)}, {prop: "Close", name: "Close", pkg: "", typ: $funcType([], [], false)}];
 	driver.init("github.com/dotchain/fuss/dom/js", [{prop: "events", name: "events", anonymous: false, exported: false, typ: mapType, tag: ""}]);
 	cbInfo.init("github.com/dotchain/fuss/dom/js", [{prop: "EventHandler", name: "EventHandler", anonymous: true, exported: true, typ: ptrType, tag: ""}, {prop: "listener", name: "listener", anonymous: false, exported: false, typ: funcType, tag: ""}]);
-	element.init("github.com/dotchain/fuss/dom/js", [{prop: "n", name: "n", anonymous: false, exported: false, typ: ptrType$2, tag: ""}, {prop: "d", name: "d", anonymous: false, exported: false, typ: ptrType$3, tag: ""}]);
+	element.init("github.com/dotchain/fuss/dom/js", [{prop: "n", name: "n", anonymous: false, exported: false, typ: ptrType$3, tag: ""}, {prop: "d", name: "d", anonymous: false, exported: false, typ: ptrType$2, tag: ""}]);
 	$init = function() {
 		$pkg.$init = function() {};
 		/* */ var $f, $c = false, $s = 0, $r; if (this !== undefined && this.$blk !== undefined) { $f = this; $c = true; $s = $f.$s; $r = $f.$r; } s: while (true) { switch ($s) { case 0:
@@ -10027,7 +10026,7 @@ $packages["time"] = (function() {
 	return $pkg;
 })();
 $packages["github.com/dotchain/fuss/todo"] = (function() {
-	var $pkg = {}, $init, changes, refs, core, dom, time, TaskStream, TasksStream, appCtx, AppStruct, newTaskCtx, NewTaskButtonStruct, taskEditCtx, TaskEditStruct, tasksViewCtx, TasksViewStruct, Task, Tasks, handlerStream, ptrType, sliceType, ptrType$1, ptrType$2, sliceType$1, ptrType$3, ptrType$4, ptrType$5, ptrType$6, sliceType$2, ptrType$7, structType, structType$1, ptrType$8, ptrType$9, structType$2, structType$3, ptrType$10, structType$4, structType$5, ptrType$11, structType$6, structType$7, ptrType$12, sliceType$3, funcType, ptrType$13, mapType, ptrType$14, mapType$1, ptrType$15, mapType$2, ptrType$16, mapType$3, NewTaskStream, NewTasksStream, taskEdit, tasksView, renderTasks, newTaskButton, app;
+	var $pkg = {}, $init, changes, refs, core, dom, time, TaskStream, TasksStream, appCtx, AppStruct, filteredCtx, FilteredTasksStruct, newTaskCtx, NewTaskButtonStruct, taskEditCtx, TaskEditStruct, tasksViewCtx, TasksViewStruct, Task, Tasks, handlerStream, ptrType, sliceType, ptrType$1, ptrType$2, sliceType$1, ptrType$3, ptrType$4, ptrType$5, ptrType$6, sliceType$2, ptrType$7, structType, ptrType$8, structType$1, structType$2, ptrType$9, ptrType$10, structType$3, structType$4, ptrType$11, structType$5, structType$6, ptrType$12, structType$7, structType$8, ptrType$13, sliceType$3, funcType, ptrType$14, mapType, ptrType$15, mapType$1, ptrType$16, mapType$2, ptrType$17, mapType$3, ptrType$18, mapType$4, NewTaskStream, NewTasksStream, taskEdit, tasksView, renderTasks, newTaskButton, filteredTasks, app;
 	changes = $packages["github.com/dotchain/dot/changes"];
 	refs = $packages["github.com/dotchain/dot/refs"];
 	core = $packages["github.com/dotchain/fuss/core"];
@@ -10061,7 +10060,35 @@ $packages["github.com/dotchain/fuss/todo"] = (function() {
 		this.Change = Change_;
 		this.Next = Next_;
 	});
-	appCtx = $pkg.appCtx = $newType(0, $kindStruct, "todo.appCtx", true, "github.com/dotchain/fuss/todo", false, function(Cache_, finalizer_, NewTaskButtonStruct_, TasksViewStruct_, initialized_, stateHandler_, dom_, memoized_) {
+	appCtx = $pkg.appCtx = $newType(0, $kindStruct, "todo.appCtx", true, "github.com/dotchain/fuss/todo", false, function(Cache_, finalizer_, FilteredTasksStruct_, initialized_, stateHandler_, memoized_) {
+		this.$val = this;
+		if (arguments.length === 0) {
+			this.Cache = new core.Cache.ptr(false, false);
+			this.finalizer = $throwNilPointerError;
+			this.FilteredTasksStruct = new FilteredTasksStruct.ptr(false, false);
+			this.initialized = false;
+			this.stateHandler = new core.Handler.ptr($throwNilPointerError);
+			this.memoized = new structType.ptr(ptrType$6.nil, $ifaceNil, ptrType$6.nil);
+			return;
+		}
+		this.Cache = Cache_;
+		this.finalizer = finalizer_;
+		this.FilteredTasksStruct = FilteredTasksStruct_;
+		this.initialized = initialized_;
+		this.stateHandler = stateHandler_;
+		this.memoized = memoized_;
+	});
+	AppStruct = $pkg.AppStruct = $newType(0, $kindStruct, "todo.AppStruct", true, "github.com/dotchain/fuss/todo", true, function(old_, current_) {
+		this.$val = this;
+		if (arguments.length === 0) {
+			this.old = false;
+			this.current = false;
+			return;
+		}
+		this.old = old_;
+		this.current = current_;
+	});
+	filteredCtx = $pkg.filteredCtx = $newType(0, $kindStruct, "todo.filteredCtx", true, "github.com/dotchain/fuss/todo", false, function(Cache_, finalizer_, NewTaskButtonStruct_, TasksViewStruct_, initialized_, stateHandler_, dom_, memoized_) {
 		this.$val = this;
 		if (arguments.length === 0) {
 			this.Cache = new core.Cache.ptr(false, false);
@@ -10070,8 +10097,8 @@ $packages["github.com/dotchain/fuss/todo"] = (function() {
 			this.TasksViewStruct = new TasksViewStruct.ptr(false, false);
 			this.initialized = false;
 			this.stateHandler = new core.Handler.ptr($throwNilPointerError);
-			this.dom = new structType.ptr(new dom.CheckboxEditStruct.ptr(false, false), new dom.EltStruct.ptr(false, false), new dom.LabelViewStruct.ptr(false, false));
-			this.memoized = new structType$1.ptr(ptrType$3.nil, ptrType$3.nil, ptrType$3.nil, ptrType$3.nil, $ifaceNil, new dom.Styles.ptr(""), ptrType$6.nil);
+			this.dom = new structType$1.ptr(new dom.CheckboxEditStruct.ptr(false, false), new dom.EltStruct.ptr(false, false), new dom.LabelViewStruct.ptr(false, false));
+			this.memoized = new structType$2.ptr(ptrType$3.nil, ptrType$3.nil, ptrType$3.nil, ptrType$3.nil, $ifaceNil, new dom.Styles.ptr(""), ptrType$6.nil);
 			return;
 		}
 		this.Cache = Cache_;
@@ -10083,7 +10110,7 @@ $packages["github.com/dotchain/fuss/todo"] = (function() {
 		this.dom = dom_;
 		this.memoized = memoized_;
 	});
-	AppStruct = $pkg.AppStruct = $newType(0, $kindStruct, "todo.AppStruct", true, "github.com/dotchain/fuss/todo", true, function(old_, current_) {
+	FilteredTasksStruct = $pkg.FilteredTasksStruct = $newType(0, $kindStruct, "todo.FilteredTasksStruct", true, "github.com/dotchain/fuss/todo", true, function(old_, current_) {
 		this.$val = this;
 		if (arguments.length === 0) {
 			this.old = false;
@@ -10100,8 +10127,8 @@ $packages["github.com/dotchain/fuss/todo"] = (function() {
 			this.finalizer = $throwNilPointerError;
 			this.initialized = false;
 			this.stateHandler = new core.Handler.ptr($throwNilPointerError);
-			this.dom = new structType$2.ptr(new dom.ButtonStruct.ptr(false, false), new dom.LabelViewStruct.ptr(false, false));
-			this.memoized = new structType$3.ptr(ptrType$8.nil, ptrType$8.nil, $ifaceNil, new dom.Styles.ptr(""), ptrType$6.nil);
+			this.dom = new structType$3.ptr(new dom.ButtonStruct.ptr(false, false), new dom.LabelViewStruct.ptr(false, false));
+			this.memoized = new structType$4.ptr(ptrType$9.nil, ptrType$9.nil, $ifaceNil, new dom.Styles.ptr(""), ptrType$6.nil);
 			return;
 		}
 		this.Cache = Cache_;
@@ -10128,8 +10155,8 @@ $packages["github.com/dotchain/fuss/todo"] = (function() {
 			this.finalizer = $throwNilPointerError;
 			this.initialized = false;
 			this.stateHandler = new core.Handler.ptr($throwNilPointerError);
-			this.dom = new structType$4.ptr(new dom.CheckboxEditStruct.ptr(false, false), new dom.EltStruct.ptr(false, false), new dom.TextEditStruct.ptr(false, false));
-			this.memoized = new structType$5.ptr($ifaceNil, new dom.Styles.ptr(""), ptrType$1.nil);
+			this.dom = new structType$5.ptr(new dom.CheckboxEditStruct.ptr(false, false), new dom.EltStruct.ptr(false, false), new dom.TextEditStruct.ptr(false, false));
+			this.memoized = new structType$6.ptr($ifaceNil, new dom.Styles.ptr(""), ptrType$1.nil);
 			return;
 		}
 		this.Cache = Cache_;
@@ -10157,8 +10184,8 @@ $packages["github.com/dotchain/fuss/todo"] = (function() {
 			this.TaskEditStruct = new TaskEditStruct.ptr(false, false);
 			this.initialized = false;
 			this.stateHandler = new core.Handler.ptr($throwNilPointerError);
-			this.dom = new structType$6.ptr(new dom.EltStruct.ptr(false, false));
-			this.memoized = new structType$7.ptr($ifaceNil, ptrType$3.nil, ptrType$3.nil, new dom.Styles.ptr(""), ptrType$6.nil);
+			this.dom = new structType$7.ptr(new dom.EltStruct.ptr(false, false));
+			this.memoized = new structType$8.ptr($ifaceNil, ptrType$3.nil, ptrType$3.nil, new dom.Styles.ptr(""), ptrType$6.nil);
 			return;
 		}
 		this.Cache = Cache_;
@@ -10213,29 +10240,33 @@ $packages["github.com/dotchain/fuss/todo"] = (function() {
 	ptrType$6 = $ptrType(TasksStream);
 	sliceType$2 = $sliceType(Task);
 	ptrType$7 = $ptrType(appCtx);
-	structType = $structType("", [{prop: "CheckboxEditStruct", name: "CheckboxEditStruct", anonymous: true, exported: true, typ: dom.CheckboxEditStruct, tag: ""}, {prop: "EltStruct", name: "EltStruct", anonymous: true, exported: true, typ: dom.EltStruct, tag: ""}, {prop: "LabelViewStruct", name: "LabelViewStruct", anonymous: true, exported: true, typ: dom.LabelViewStruct, tag: ""}]);
-	structType$1 = $structType("github.com/dotchain/fuss/todo", [{prop: "doneState", name: "doneState", anonymous: false, exported: false, typ: ptrType$3, tag: ""}, {prop: "notDoneState", name: "notDoneState", anonymous: false, exported: false, typ: ptrType$3, tag: ""}, {prop: "result1", name: "result1", anonymous: false, exported: false, typ: ptrType$3, tag: ""}, {prop: "result2", name: "result2", anonymous: false, exported: false, typ: ptrType$3, tag: ""}, {prop: "result3", name: "result3", anonymous: false, exported: false, typ: dom.Element, tag: ""}, {prop: "styles", name: "styles", anonymous: false, exported: false, typ: dom.Styles, tag: ""}, {prop: "tasks", name: "tasks", anonymous: false, exported: false, typ: ptrType$6, tag: ""}]);
-	ptrType$8 = $ptrType(handlerStream);
-	ptrType$9 = $ptrType(newTaskCtx);
-	structType$2 = $structType("", [{prop: "ButtonStruct", name: "ButtonStruct", anonymous: true, exported: true, typ: dom.ButtonStruct, tag: ""}, {prop: "LabelViewStruct", name: "LabelViewStruct", anonymous: true, exported: true, typ: dom.LabelViewStruct, tag: ""}]);
-	structType$3 = $structType("github.com/dotchain/fuss/todo", [{prop: "hState", name: "hState", anonymous: false, exported: false, typ: ptrType$8, tag: ""}, {prop: "result1", name: "result1", anonymous: false, exported: false, typ: ptrType$8, tag: ""}, {prop: "result2", name: "result2", anonymous: false, exported: false, typ: dom.Element, tag: ""}, {prop: "styles", name: "styles", anonymous: false, exported: false, typ: dom.Styles, tag: ""}, {prop: "tasks", name: "tasks", anonymous: false, exported: false, typ: ptrType$6, tag: ""}]);
-	ptrType$10 = $ptrType(taskEditCtx);
-	structType$4 = $structType("", [{prop: "CheckboxEditStruct", name: "CheckboxEditStruct", anonymous: true, exported: true, typ: dom.CheckboxEditStruct, tag: ""}, {prop: "EltStruct", name: "EltStruct", anonymous: true, exported: true, typ: dom.EltStruct, tag: ""}, {prop: "TextEditStruct", name: "TextEditStruct", anonymous: true, exported: true, typ: dom.TextEditStruct, tag: ""}]);
-	structType$5 = $structType("github.com/dotchain/fuss/todo", [{prop: "result1", name: "result1", anonymous: false, exported: false, typ: dom.Element, tag: ""}, {prop: "styles", name: "styles", anonymous: false, exported: false, typ: dom.Styles, tag: ""}, {prop: "task", name: "task", anonymous: false, exported: false, typ: ptrType$1, tag: ""}]);
-	ptrType$11 = $ptrType(tasksViewCtx);
-	structType$6 = $structType("", [{prop: "EltStruct", name: "EltStruct", anonymous: true, exported: true, typ: dom.EltStruct, tag: ""}]);
-	structType$7 = $structType("github.com/dotchain/fuss/todo", [{prop: "result1", name: "result1", anonymous: false, exported: false, typ: dom.Element, tag: ""}, {prop: "showDone", name: "showDone", anonymous: false, exported: false, typ: ptrType$3, tag: ""}, {prop: "showNotDone", name: "showNotDone", anonymous: false, exported: false, typ: ptrType$3, tag: ""}, {prop: "styles", name: "styles", anonymous: false, exported: false, typ: dom.Styles, tag: ""}, {prop: "tasks", name: "tasks", anonymous: false, exported: false, typ: ptrType$6, tag: ""}]);
-	ptrType$12 = $ptrType(dom.EventHandler);
+	structType = $structType("github.com/dotchain/fuss/todo", [{prop: "result1", name: "result1", anonymous: false, exported: false, typ: ptrType$6, tag: ""}, {prop: "result2", name: "result2", anonymous: false, exported: false, typ: dom.Element, tag: ""}, {prop: "tasksState", name: "tasksState", anonymous: false, exported: false, typ: ptrType$6, tag: ""}]);
+	ptrType$8 = $ptrType(filteredCtx);
+	structType$1 = $structType("", [{prop: "CheckboxEditStruct", name: "CheckboxEditStruct", anonymous: true, exported: true, typ: dom.CheckboxEditStruct, tag: ""}, {prop: "EltStruct", name: "EltStruct", anonymous: true, exported: true, typ: dom.EltStruct, tag: ""}, {prop: "LabelViewStruct", name: "LabelViewStruct", anonymous: true, exported: true, typ: dom.LabelViewStruct, tag: ""}]);
+	structType$2 = $structType("github.com/dotchain/fuss/todo", [{prop: "doneState", name: "doneState", anonymous: false, exported: false, typ: ptrType$3, tag: ""}, {prop: "notDoneState", name: "notDoneState", anonymous: false, exported: false, typ: ptrType$3, tag: ""}, {prop: "result1", name: "result1", anonymous: false, exported: false, typ: ptrType$3, tag: ""}, {prop: "result2", name: "result2", anonymous: false, exported: false, typ: ptrType$3, tag: ""}, {prop: "result3", name: "result3", anonymous: false, exported: false, typ: dom.Element, tag: ""}, {prop: "styles", name: "styles", anonymous: false, exported: false, typ: dom.Styles, tag: ""}, {prop: "tasks", name: "tasks", anonymous: false, exported: false, typ: ptrType$6, tag: ""}]);
+	ptrType$9 = $ptrType(handlerStream);
+	ptrType$10 = $ptrType(newTaskCtx);
+	structType$3 = $structType("", [{prop: "ButtonStruct", name: "ButtonStruct", anonymous: true, exported: true, typ: dom.ButtonStruct, tag: ""}, {prop: "LabelViewStruct", name: "LabelViewStruct", anonymous: true, exported: true, typ: dom.LabelViewStruct, tag: ""}]);
+	structType$4 = $structType("github.com/dotchain/fuss/todo", [{prop: "hState", name: "hState", anonymous: false, exported: false, typ: ptrType$9, tag: ""}, {prop: "result1", name: "result1", anonymous: false, exported: false, typ: ptrType$9, tag: ""}, {prop: "result2", name: "result2", anonymous: false, exported: false, typ: dom.Element, tag: ""}, {prop: "styles", name: "styles", anonymous: false, exported: false, typ: dom.Styles, tag: ""}, {prop: "tasks", name: "tasks", anonymous: false, exported: false, typ: ptrType$6, tag: ""}]);
+	ptrType$11 = $ptrType(taskEditCtx);
+	structType$5 = $structType("", [{prop: "CheckboxEditStruct", name: "CheckboxEditStruct", anonymous: true, exported: true, typ: dom.CheckboxEditStruct, tag: ""}, {prop: "EltStruct", name: "EltStruct", anonymous: true, exported: true, typ: dom.EltStruct, tag: ""}, {prop: "TextEditStruct", name: "TextEditStruct", anonymous: true, exported: true, typ: dom.TextEditStruct, tag: ""}]);
+	structType$6 = $structType("github.com/dotchain/fuss/todo", [{prop: "result1", name: "result1", anonymous: false, exported: false, typ: dom.Element, tag: ""}, {prop: "styles", name: "styles", anonymous: false, exported: false, typ: dom.Styles, tag: ""}, {prop: "task", name: "task", anonymous: false, exported: false, typ: ptrType$1, tag: ""}]);
+	ptrType$12 = $ptrType(tasksViewCtx);
+	structType$7 = $structType("", [{prop: "EltStruct", name: "EltStruct", anonymous: true, exported: true, typ: dom.EltStruct, tag: ""}]);
+	structType$8 = $structType("github.com/dotchain/fuss/todo", [{prop: "result1", name: "result1", anonymous: false, exported: false, typ: dom.Element, tag: ""}, {prop: "showDone", name: "showDone", anonymous: false, exported: false, typ: ptrType$3, tag: ""}, {prop: "showNotDone", name: "showNotDone", anonymous: false, exported: false, typ: ptrType$3, tag: ""}, {prop: "styles", name: "styles", anonymous: false, exported: false, typ: dom.Styles, tag: ""}, {prop: "tasks", name: "tasks", anonymous: false, exported: false, typ: ptrType$6, tag: ""}]);
+	ptrType$13 = $ptrType(dom.EventHandler);
 	sliceType$3 = $sliceType(dom.Element);
 	funcType = $funcType([], [], false);
-	ptrType$13 = $ptrType(AppStruct);
+	ptrType$14 = $ptrType(AppStruct);
 	mapType = $mapType($emptyInterface, ptrType$7);
-	ptrType$14 = $ptrType(NewTaskButtonStruct);
-	mapType$1 = $mapType($emptyInterface, ptrType$9);
-	ptrType$15 = $ptrType(TaskEditStruct);
+	ptrType$15 = $ptrType(FilteredTasksStruct);
+	mapType$1 = $mapType($emptyInterface, ptrType$8);
+	ptrType$16 = $ptrType(NewTaskButtonStruct);
 	mapType$2 = $mapType($emptyInterface, ptrType$10);
-	ptrType$16 = $ptrType(TasksViewStruct);
+	ptrType$17 = $ptrType(TaskEditStruct);
 	mapType$3 = $mapType($emptyInterface, ptrType$11);
+	ptrType$18 = $ptrType(TasksViewStruct);
+	mapType$4 = $mapType($emptyInterface, ptrType$12);
 	NewTaskStream = function(value) {
 		var value;
 		return new TaskStream.ptr(new core.Notifier.ptr(sliceType.nil), $clone(value, Task), $ifaceNil, ptrType$1.nil);
@@ -10701,7 +10732,142 @@ $packages["github.com/dotchain/fuss/todo"] = (function() {
 		/* */ } return; } if ($f === undefined) { $f = { $blk: TasksStream.ptr.prototype.Substream }; } $f._tmp = _tmp; $f._tmp$1 = _tmp$1; $f._tmp$2 = _tmp$2; $f._tmp$3 = _tmp$3; $f._tmp$4 = _tmp$4; $f._tuple = _tuple; $f.cache = cache; $f.close = close; $f.entry = entry; $f.f = f; $f.h = h; $f.handler = handler; $f.index = index; $f.merging = merging; $f.n = n; $f.n2 = n2; $f.ok = ok; $f.parent = parent; $f.path = path; $f.s = s; $f.x = x; $f.$s = $s; $f.$r = $r; return $f;
 	};
 	TasksStream.prototype.Substream = function(cache, index) { return this.$val.Substream(cache, index); };
-	appCtx.ptr.prototype.areArgsSame = function(styles, tasks) {
+	appCtx.ptr.prototype.areArgsSame = function() {
+		var c;
+		c = this;
+		return true;
+	};
+	appCtx.prototype.areArgsSame = function() { return this.$val.areArgsSame(); };
+	appCtx.ptr.prototype.refreshIfNeeded = function() {
+		var _r, c, result2, $s, $r;
+		/* */ $s = 0; var $f, $c = false; if (this !== undefined && this.$blk !== undefined) { $f = this; $c = true; _r = $f._r; c = $f.c; result2 = $f.result2; $s = $f.$s; $r = $f.$r; } s: while (true) { switch ($s) { case 0:
+		result2 = $ifaceNil;
+		c = this;
+		/* */ if (!c.initialized || !c.areArgsSame()) { $s = 1; continue; }
+		/* */ $s = 2; continue;
+		/* if (!c.initialized || !c.areArgsSame()) { */ case 1:
+			_r = c.refresh(); /* */ $s = 3; case 3: if($c) { $c = false; _r = _r.$blk(); } if (_r && _r.$blk !== undefined) { break s; }
+			result2 = _r;
+			$s = -1; return result2;
+		/* } */ case 2:
+		result2 = c.memoized.result2;
+		$s = -1; return result2;
+		/* */ } return; } if ($f === undefined) { $f = { $blk: appCtx.ptr.prototype.refreshIfNeeded }; } $f._r = _r; $f.c = c; $f.result2 = result2; $f.$s = $s; $f.$r = $r; return $f;
+	};
+	appCtx.prototype.refreshIfNeeded = function() { return this.$val.refreshIfNeeded(); };
+	appCtx.ptr.prototype.refresh = function() {
+		var _r, _tuple, c, result2, $s, $deferred, $r;
+		/* */ $s = 0; var $f, $c = false; if (this !== undefined && this.$blk !== undefined) { $f = this; $c = true; _r = $f._r; _tuple = $f._tuple; c = $f.c; result2 = $f.result2; $s = $f.$s; $deferred = $f.$deferred; $r = $f.$r; } var $err = null; try { s: while (true) { switch ($s) { case 0: $deferred = []; $deferred.index = $curGoroutine.deferStack.length; $curGoroutine.deferStack.push($deferred);
+		c = [c];
+		result2 = $ifaceNil;
+		c[0] = this;
+		c[0].initialized = true;
+		c[0].stateHandler.Handle = (function(c) { return function $b() {
+			var _r, $s, $r;
+			/* */ $s = 0; var $f, $c = false; if (this !== undefined && this.$blk !== undefined) { $f = this; $c = true; _r = $f._r; $s = $f.$s; $r = $f.$r; } s: while (true) { switch ($s) { case 0:
+			_r = c[0].refresh(); /* */ $s = 1; case 1: if($c) { $c = false; _r = _r.$blk(); } if (_r && _r.$blk !== undefined) { break s; }
+			_r;
+			$s = -1; return;
+			/* */ } return; } if ($f === undefined) { $f = { $blk: $b }; } $f._r = _r; $f.$s = $s; $f.$r = $r; return $f;
+		}; })(c);
+		if (!(c[0].memoized.tasksState === ptrType$6.nil)) {
+			c[0].memoized.tasksState = c[0].memoized.tasksState.Latest();
+		}
+		c[0].Cache.Begin();
+		$deferred.push([$methodVal(c[0].Cache, "End"), []]);
+		c[0].FilteredTasksStruct.Begin();
+		$deferred.push([$methodVal(c[0].FilteredTasksStruct, "End"), []]);
+		_r = app(c[0], c[0].memoized.tasksState); /* */ $s = 1; case 1: if($c) { $c = false; _r = _r.$blk(); } if (_r && _r.$blk !== undefined) { break s; }
+		_tuple = _r;
+		c[0].memoized.result1 = _tuple[0];
+		c[0].memoized.result2 = _tuple[1];
+		if (!(c[0].memoized.tasksState === c[0].memoized.result1)) {
+			if (!(c[0].memoized.tasksState === ptrType$6.nil)) {
+				c[0].memoized.tasksState.Notifier.Off(c[0].stateHandler);
+			}
+			if (!(c[0].memoized.result1 === ptrType$6.nil)) {
+				c[0].memoized.result1.Notifier.On(c[0].stateHandler);
+			}
+			c[0].memoized.tasksState = c[0].memoized.result1;
+		}
+		result2 = c[0].memoized.result2;
+		$s = -1; return result2;
+		/* */ } return; } } catch(err) { $err = err; $s = -1; } finally { $callDeferred($deferred, $err); if (!$curGoroutine.asleep) { return  result2; } if($curGoroutine.asleep) { if ($f === undefined) { $f = { $blk: appCtx.ptr.prototype.refresh }; } $f._r = _r; $f._tuple = _tuple; $f.c = c; $f.result2 = result2; $f.$s = $s; $f.$deferred = $deferred; $f.$r = $r; return $f; } }
+	};
+	appCtx.prototype.refresh = function() { return this.$val.refresh(); };
+	appCtx.ptr.prototype.close = function() {
+		var c, $s, $r;
+		/* */ $s = 0; var $f, $c = false; if (this !== undefined && this.$blk !== undefined) { $f = this; $c = true; c = $f.c; $s = $f.$s; $r = $f.$r; } s: while (true) { switch ($s) { case 0:
+		c = this;
+		c.Cache.Begin();
+		$r = c.Cache.End(); /* */ $s = 1; case 1: if($c) { $c = false; $r = $r.$blk(); } if ($r && $r.$blk !== undefined) { break s; }
+		c.FilteredTasksStruct.Begin();
+		$r = c.FilteredTasksStruct.End(); /* */ $s = 2; case 2: if($c) { $c = false; $r = $r.$blk(); } if ($r && $r.$blk !== undefined) { break s; }
+		if (!(c.memoized.result1 === ptrType$6.nil)) {
+			c.memoized.result1.Notifier.Off(c.stateHandler);
+		}
+		/* */ if (!(c.finalizer === $throwNilPointerError)) { $s = 3; continue; }
+		/* */ $s = 4; continue;
+		/* if (!(c.finalizer === $throwNilPointerError)) { */ case 3:
+			$r = c.finalizer(); /* */ $s = 5; case 5: if($c) { $c = false; $r = $r.$blk(); } if ($r && $r.$blk !== undefined) { break s; }
+		/* } */ case 4:
+		$s = -1; return;
+		/* */ } return; } if ($f === undefined) { $f = { $blk: appCtx.ptr.prototype.close }; } $f.c = c; $f.$s = $s; $f.$r = $r; return $f;
+	};
+	appCtx.prototype.close = function() { return this.$val.close(); };
+	AppStruct.ptr.prototype.Begin = function() {
+		var _tmp, _tmp$1, c;
+		c = this;
+		_tmp = c.current;
+		_tmp$1 = $makeMap($emptyInterface.keyFor, []);
+		c.old = _tmp;
+		c.current = _tmp$1;
+	};
+	AppStruct.prototype.Begin = function() { return this.$val.Begin(); };
+	AppStruct.ptr.prototype.End = function() {
+		var _entry, _i, _keys, _ref, c, ctx, $s, $r;
+		/* */ $s = 0; var $f, $c = false; if (this !== undefined && this.$blk !== undefined) { $f = this; $c = true; _entry = $f._entry; _i = $f._i; _keys = $f._keys; _ref = $f._ref; c = $f.c; ctx = $f.ctx; $s = $f.$s; $r = $f.$r; } s: while (true) { switch ($s) { case 0:
+		c = this;
+		_ref = c.old;
+		_i = 0;
+		_keys = $keys(_ref);
+		/* while (true) { */ case 1:
+			/* if (!(_i < _keys.length)) { break; } */ if(!(_i < _keys.length)) { $s = 2; continue; }
+			_entry = _ref[_keys[_i]];
+			if (_entry === undefined) {
+				_i++;
+				/* continue; */ $s = 1; continue;
+			}
+			ctx = _entry.v;
+			$r = ctx.close(); /* */ $s = 3; case 3: if($c) { $c = false; $r = $r.$blk(); } if ($r && $r.$blk !== undefined) { break s; }
+			_i++;
+		/* } */ $s = 1; continue; case 2:
+		c.old = false;
+		$s = -1; return;
+		/* */ } return; } if ($f === undefined) { $f = { $blk: AppStruct.ptr.prototype.End }; } $f._entry = _entry; $f._i = _i; $f._keys = _keys; $f._ref = _ref; $f.c = c; $f.ctx = ctx; $f.$s = $s; $f.$r = $r; return $f;
+	};
+	AppStruct.prototype.End = function() { return this.$val.End(); };
+	AppStruct.ptr.prototype.App = function(cKey) {
+		var _entry, _key, _r, _tuple, c, cKey, cOld, ok, result2, $s, $r;
+		/* */ $s = 0; var $f, $c = false; if (this !== undefined && this.$blk !== undefined) { $f = this; $c = true; _entry = $f._entry; _key = $f._key; _r = $f._r; _tuple = $f._tuple; c = $f.c; cKey = $f.cKey; cOld = $f.cOld; ok = $f.ok; result2 = $f.result2; $s = $f.$s; $r = $f.$r; } s: while (true) { switch ($s) { case 0:
+		result2 = $ifaceNil;
+		c = this;
+		_tuple = (_entry = c.old[$emptyInterface.keyFor(cKey)], _entry !== undefined ? [_entry.v, true] : [ptrType$7.nil, false]);
+		cOld = _tuple[0];
+		ok = _tuple[1];
+		if (ok) {
+			delete c.old[$emptyInterface.keyFor(cKey)];
+		} else {
+			cOld = new appCtx.ptr(new core.Cache.ptr(false, false), $throwNilPointerError, new FilteredTasksStruct.ptr(false, false), false, new core.Handler.ptr($throwNilPointerError), new structType.ptr(ptrType$6.nil, $ifaceNil, ptrType$6.nil));
+		}
+		_key = cKey; (c.current || $throwRuntimeError("assignment to entry in nil map"))[$emptyInterface.keyFor(_key)] = { k: _key, v: cOld };
+		_r = cOld.refreshIfNeeded(); /* */ $s = 1; case 1: if($c) { $c = false; _r = _r.$blk(); } if (_r && _r.$blk !== undefined) { break s; }
+		result2 = _r;
+		$s = -1; return result2;
+		/* */ } return; } if ($f === undefined) { $f = { $blk: AppStruct.ptr.prototype.App }; } $f._entry = _entry; $f._key = _key; $f._r = _r; $f._tuple = _tuple; $f.c = c; $f.cKey = cKey; $f.cOld = cOld; $f.ok = ok; $f.result2 = result2; $f.$s = $s; $f.$r = $r; return $f;
+	};
+	AppStruct.prototype.App = function(cKey) { return this.$val.App(cKey); };
+	filteredCtx.ptr.prototype.areArgsSame = function(styles, tasks) {
 		var c, styles, tasks;
 		c = this;
 		if (!($equal(styles, c.memoized.styles, dom.Styles))) {
@@ -10709,8 +10875,8 @@ $packages["github.com/dotchain/fuss/todo"] = (function() {
 		}
 		return tasks === c.memoized.tasks;
 	};
-	appCtx.prototype.areArgsSame = function(styles, tasks) { return this.$val.areArgsSame(styles, tasks); };
-	appCtx.ptr.prototype.refreshIfNeeded = function(styles, tasks) {
+	filteredCtx.prototype.areArgsSame = function(styles, tasks) { return this.$val.areArgsSame(styles, tasks); };
+	filteredCtx.ptr.prototype.refreshIfNeeded = function(styles, tasks) {
 		var _r, c, result3, styles, tasks, $s, $r;
 		/* */ $s = 0; var $f, $c = false; if (this !== undefined && this.$blk !== undefined) { $f = this; $c = true; _r = $f._r; c = $f.c; result3 = $f.result3; styles = $f.styles; tasks = $f.tasks; $s = $f.$s; $r = $f.$r; } s: while (true) { switch ($s) { case 0:
 		result3 = $ifaceNil;
@@ -10724,10 +10890,10 @@ $packages["github.com/dotchain/fuss/todo"] = (function() {
 		/* } */ case 2:
 		result3 = c.memoized.result3;
 		$s = -1; return result3;
-		/* */ } return; } if ($f === undefined) { $f = { $blk: appCtx.ptr.prototype.refreshIfNeeded }; } $f._r = _r; $f.c = c; $f.result3 = result3; $f.styles = styles; $f.tasks = tasks; $f.$s = $s; $f.$r = $r; return $f;
+		/* */ } return; } if ($f === undefined) { $f = { $blk: filteredCtx.ptr.prototype.refreshIfNeeded }; } $f._r = _r; $f.c = c; $f.result3 = result3; $f.styles = styles; $f.tasks = tasks; $f.$s = $s; $f.$r = $r; return $f;
 	};
-	appCtx.prototype.refreshIfNeeded = function(styles, tasks) { return this.$val.refreshIfNeeded(styles, tasks); };
-	appCtx.ptr.prototype.refresh = function(styles, tasks) {
+	filteredCtx.prototype.refreshIfNeeded = function(styles, tasks) { return this.$val.refreshIfNeeded(styles, tasks); };
+	filteredCtx.ptr.prototype.refresh = function(styles, tasks) {
 		var _r, _tmp, _tmp$1, _tuple, c, result3, styles, tasks, $s, $deferred, $r;
 		/* */ $s = 0; var $f, $c = false; if (this !== undefined && this.$blk !== undefined) { $f = this; $c = true; _r = $f._r; _tmp = $f._tmp; _tmp$1 = $f._tmp$1; _tuple = $f._tuple; c = $f.c; result3 = $f.result3; styles = $f.styles; tasks = $f.tasks; $s = $f.$s; $deferred = $f.$deferred; $r = $f.$r; } var $err = null; try { s: while (true) { switch ($s) { case 0: $deferred = []; $deferred.index = $curGoroutine.deferStack.length; $curGoroutine.deferStack.push($deferred);
 		c = [c];
@@ -10766,7 +10932,7 @@ $packages["github.com/dotchain/fuss/todo"] = (function() {
 		$deferred.push([$methodVal(c[0].dom.EltStruct, "End"), []]);
 		c[0].dom.LabelViewStruct.Begin();
 		$deferred.push([$methodVal(c[0].dom.LabelViewStruct, "End"), []]);
-		_r = app(c[0], $clone(styles[0], dom.Styles), tasks[0], c[0].memoized.doneState, c[0].memoized.notDoneState); /* */ $s = 1; case 1: if($c) { $c = false; _r = _r.$blk(); } if (_r && _r.$blk !== undefined) { break s; }
+		_r = filteredTasks(c[0], $clone(styles[0], dom.Styles), tasks[0], c[0].memoized.doneState, c[0].memoized.notDoneState); /* */ $s = 1; case 1: if($c) { $c = false; _r = _r.$blk(); } if (_r && _r.$blk !== undefined) { break s; }
 		_tuple = _r;
 		c[0].memoized.result1 = _tuple[0];
 		c[0].memoized.result2 = _tuple[1];
@@ -10791,10 +10957,10 @@ $packages["github.com/dotchain/fuss/todo"] = (function() {
 		}
 		result3 = c[0].memoized.result3;
 		$s = -1; return result3;
-		/* */ } return; } } catch(err) { $err = err; $s = -1; } finally { $callDeferred($deferred, $err); if (!$curGoroutine.asleep) { return  result3; } if($curGoroutine.asleep) { if ($f === undefined) { $f = { $blk: appCtx.ptr.prototype.refresh }; } $f._r = _r; $f._tmp = _tmp; $f._tmp$1 = _tmp$1; $f._tuple = _tuple; $f.c = c; $f.result3 = result3; $f.styles = styles; $f.tasks = tasks; $f.$s = $s; $f.$deferred = $deferred; $f.$r = $r; return $f; } }
+		/* */ } return; } } catch(err) { $err = err; $s = -1; } finally { $callDeferred($deferred, $err); if (!$curGoroutine.asleep) { return  result3; } if($curGoroutine.asleep) { if ($f === undefined) { $f = { $blk: filteredCtx.ptr.prototype.refresh }; } $f._r = _r; $f._tmp = _tmp; $f._tmp$1 = _tmp$1; $f._tuple = _tuple; $f.c = c; $f.result3 = result3; $f.styles = styles; $f.tasks = tasks; $f.$s = $s; $f.$deferred = $deferred; $f.$r = $r; return $f; } }
 	};
-	appCtx.prototype.refresh = function(styles, tasks) { return this.$val.refresh(styles, tasks); };
-	appCtx.ptr.prototype.close = function() {
+	filteredCtx.prototype.refresh = function(styles, tasks) { return this.$val.refresh(styles, tasks); };
+	filteredCtx.ptr.prototype.close = function() {
 		var c, $s, $r;
 		/* */ $s = 0; var $f, $c = false; if (this !== undefined && this.$blk !== undefined) { $f = this; $c = true; c = $f.c; $s = $f.$s; $r = $f.$r; } s: while (true) { switch ($s) { case 0:
 		c = this;
@@ -10822,10 +10988,10 @@ $packages["github.com/dotchain/fuss/todo"] = (function() {
 			$r = c.finalizer(); /* */ $s = 9; case 9: if($c) { $c = false; $r = $r.$blk(); } if ($r && $r.$blk !== undefined) { break s; }
 		/* } */ case 8:
 		$s = -1; return;
-		/* */ } return; } if ($f === undefined) { $f = { $blk: appCtx.ptr.prototype.close }; } $f.c = c; $f.$s = $s; $f.$r = $r; return $f;
+		/* */ } return; } if ($f === undefined) { $f = { $blk: filteredCtx.ptr.prototype.close }; } $f.c = c; $f.$s = $s; $f.$r = $r; return $f;
 	};
-	appCtx.prototype.close = function() { return this.$val.close(); };
-	AppStruct.ptr.prototype.Begin = function() {
+	filteredCtx.prototype.close = function() { return this.$val.close(); };
+	FilteredTasksStruct.ptr.prototype.Begin = function() {
 		var _tmp, _tmp$1, c;
 		c = this;
 		_tmp = c.current;
@@ -10833,8 +10999,8 @@ $packages["github.com/dotchain/fuss/todo"] = (function() {
 		c.old = _tmp;
 		c.current = _tmp$1;
 	};
-	AppStruct.prototype.Begin = function() { return this.$val.Begin(); };
-	AppStruct.ptr.prototype.End = function() {
+	FilteredTasksStruct.prototype.Begin = function() { return this.$val.Begin(); };
+	FilteredTasksStruct.ptr.prototype.End = function() {
 		var _entry, _i, _keys, _ref, c, ctx, $s, $r;
 		/* */ $s = 0; var $f, $c = false; if (this !== undefined && this.$blk !== undefined) { $f = this; $c = true; _entry = $f._entry; _i = $f._i; _keys = $f._keys; _ref = $f._ref; c = $f.c; ctx = $f.ctx; $s = $f.$s; $r = $f.$r; } s: while (true) { switch ($s) { case 0:
 		c = this;
@@ -10854,29 +11020,29 @@ $packages["github.com/dotchain/fuss/todo"] = (function() {
 		/* } */ $s = 1; continue; case 2:
 		c.old = false;
 		$s = -1; return;
-		/* */ } return; } if ($f === undefined) { $f = { $blk: AppStruct.ptr.prototype.End }; } $f._entry = _entry; $f._i = _i; $f._keys = _keys; $f._ref = _ref; $f.c = c; $f.ctx = ctx; $f.$s = $s; $f.$r = $r; return $f;
+		/* */ } return; } if ($f === undefined) { $f = { $blk: FilteredTasksStruct.ptr.prototype.End }; } $f._entry = _entry; $f._i = _i; $f._keys = _keys; $f._ref = _ref; $f.c = c; $f.ctx = ctx; $f.$s = $s; $f.$r = $r; return $f;
 	};
-	AppStruct.prototype.End = function() { return this.$val.End(); };
-	AppStruct.ptr.prototype.App = function(cKey, styles, tasks) {
+	FilteredTasksStruct.prototype.End = function() { return this.$val.End(); };
+	FilteredTasksStruct.ptr.prototype.FilteredTasks = function(cKey, styles, tasks) {
 		var _entry, _key, _r, _tuple, c, cKey, cOld, ok, result3, styles, tasks, $s, $r;
 		/* */ $s = 0; var $f, $c = false; if (this !== undefined && this.$blk !== undefined) { $f = this; $c = true; _entry = $f._entry; _key = $f._key; _r = $f._r; _tuple = $f._tuple; c = $f.c; cKey = $f.cKey; cOld = $f.cOld; ok = $f.ok; result3 = $f.result3; styles = $f.styles; tasks = $f.tasks; $s = $f.$s; $r = $f.$r; } s: while (true) { switch ($s) { case 0:
 		result3 = $ifaceNil;
 		c = this;
-		_tuple = (_entry = c.old[$emptyInterface.keyFor(cKey)], _entry !== undefined ? [_entry.v, true] : [ptrType$7.nil, false]);
+		_tuple = (_entry = c.old[$emptyInterface.keyFor(cKey)], _entry !== undefined ? [_entry.v, true] : [ptrType$8.nil, false]);
 		cOld = _tuple[0];
 		ok = _tuple[1];
 		if (ok) {
 			delete c.old[$emptyInterface.keyFor(cKey)];
 		} else {
-			cOld = new appCtx.ptr(new core.Cache.ptr(false, false), $throwNilPointerError, new NewTaskButtonStruct.ptr(false, false), new TasksViewStruct.ptr(false, false), false, new core.Handler.ptr($throwNilPointerError), new structType.ptr(new dom.CheckboxEditStruct.ptr(false, false), new dom.EltStruct.ptr(false, false), new dom.LabelViewStruct.ptr(false, false)), new structType$1.ptr(ptrType$3.nil, ptrType$3.nil, ptrType$3.nil, ptrType$3.nil, $ifaceNil, new dom.Styles.ptr(""), ptrType$6.nil));
+			cOld = new filteredCtx.ptr(new core.Cache.ptr(false, false), $throwNilPointerError, new NewTaskButtonStruct.ptr(false, false), new TasksViewStruct.ptr(false, false), false, new core.Handler.ptr($throwNilPointerError), new structType$1.ptr(new dom.CheckboxEditStruct.ptr(false, false), new dom.EltStruct.ptr(false, false), new dom.LabelViewStruct.ptr(false, false)), new structType$2.ptr(ptrType$3.nil, ptrType$3.nil, ptrType$3.nil, ptrType$3.nil, $ifaceNil, new dom.Styles.ptr(""), ptrType$6.nil));
 		}
 		_key = cKey; (c.current || $throwRuntimeError("assignment to entry in nil map"))[$emptyInterface.keyFor(_key)] = { k: _key, v: cOld };
 		_r = cOld.refreshIfNeeded($clone(styles, dom.Styles), tasks); /* */ $s = 1; case 1: if($c) { $c = false; _r = _r.$blk(); } if (_r && _r.$blk !== undefined) { break s; }
 		result3 = _r;
 		$s = -1; return result3;
-		/* */ } return; } if ($f === undefined) { $f = { $blk: AppStruct.ptr.prototype.App }; } $f._entry = _entry; $f._key = _key; $f._r = _r; $f._tuple = _tuple; $f.c = c; $f.cKey = cKey; $f.cOld = cOld; $f.ok = ok; $f.result3 = result3; $f.styles = styles; $f.tasks = tasks; $f.$s = $s; $f.$r = $r; return $f;
+		/* */ } return; } if ($f === undefined) { $f = { $blk: FilteredTasksStruct.ptr.prototype.FilteredTasks }; } $f._entry = _entry; $f._key = _key; $f._r = _r; $f._tuple = _tuple; $f.c = c; $f.cKey = cKey; $f.cOld = cOld; $f.ok = ok; $f.result3 = result3; $f.styles = styles; $f.tasks = tasks; $f.$s = $s; $f.$r = $r; return $f;
 	};
-	AppStruct.prototype.App = function(cKey, styles, tasks) { return this.$val.App(cKey, styles, tasks); };
+	FilteredTasksStruct.prototype.FilteredTasks = function(cKey, styles, tasks) { return this.$val.FilteredTasks(cKey, styles, tasks); };
 	newTaskCtx.ptr.prototype.areArgsSame = function(styles, tasks) {
 		var c, styles, tasks;
 		c = this;
@@ -10920,7 +11086,7 @@ $packages["github.com/dotchain/fuss/todo"] = (function() {
 			$s = -1; return;
 			/* */ } return; } if ($f === undefined) { $f = { $blk: $b }; } $f._r = _r; $f.$s = $s; $f.$r = $r; return $f;
 		}; })(c, styles, tasks);
-		if (!(c[0].memoized.hState === ptrType$8.nil)) {
+		if (!(c[0].memoized.hState === ptrType$9.nil)) {
 			c[0].memoized.hState = c[0].memoized.hState.Latest();
 		}
 		_tmp = $clone(styles[0], dom.Styles);
@@ -10938,10 +11104,10 @@ $packages["github.com/dotchain/fuss/todo"] = (function() {
 		c[0].memoized.result1 = _tuple[0];
 		c[0].memoized.result2 = _tuple[1];
 		if (!(c[0].memoized.hState === c[0].memoized.result1)) {
-			if (!(c[0].memoized.hState === ptrType$8.nil)) {
+			if (!(c[0].memoized.hState === ptrType$9.nil)) {
 				c[0].memoized.hState.Notifier.Off(c[0].stateHandler);
 			}
-			if (!(c[0].memoized.result1 === ptrType$8.nil)) {
+			if (!(c[0].memoized.result1 === ptrType$9.nil)) {
 				c[0].memoized.result1.Notifier.On(c[0].stateHandler);
 			}
 			c[0].memoized.hState = c[0].memoized.result1;
@@ -10961,7 +11127,7 @@ $packages["github.com/dotchain/fuss/todo"] = (function() {
 		$r = c.dom.ButtonStruct.End(); /* */ $s = 2; case 2: if($c) { $c = false; $r = $r.$blk(); } if ($r && $r.$blk !== undefined) { break s; }
 		c.dom.LabelViewStruct.Begin();
 		$r = c.dom.LabelViewStruct.End(); /* */ $s = 3; case 3: if($c) { $c = false; $r = $r.$blk(); } if ($r && $r.$blk !== undefined) { break s; }
-		if (!(c.memoized.result1 === ptrType$8.nil)) {
+		if (!(c.memoized.result1 === ptrType$9.nil)) {
 			c.memoized.result1.Notifier.Off(c.stateHandler);
 		}
 		/* */ if (!(c.finalizer === $throwNilPointerError)) { $s = 4; continue; }
@@ -11010,13 +11176,13 @@ $packages["github.com/dotchain/fuss/todo"] = (function() {
 		/* */ $s = 0; var $f, $c = false; if (this !== undefined && this.$blk !== undefined) { $f = this; $c = true; _entry = $f._entry; _key = $f._key; _r = $f._r; _tuple = $f._tuple; c = $f.c; cKey = $f.cKey; cOld = $f.cOld; ok = $f.ok; result2 = $f.result2; styles = $f.styles; tasks = $f.tasks; $s = $f.$s; $r = $f.$r; } s: while (true) { switch ($s) { case 0:
 		result2 = $ifaceNil;
 		c = this;
-		_tuple = (_entry = c.old[$emptyInterface.keyFor(cKey)], _entry !== undefined ? [_entry.v, true] : [ptrType$9.nil, false]);
+		_tuple = (_entry = c.old[$emptyInterface.keyFor(cKey)], _entry !== undefined ? [_entry.v, true] : [ptrType$10.nil, false]);
 		cOld = _tuple[0];
 		ok = _tuple[1];
 		if (ok) {
 			delete c.old[$emptyInterface.keyFor(cKey)];
 		} else {
-			cOld = new newTaskCtx.ptr(new core.Cache.ptr(false, false), $throwNilPointerError, false, new core.Handler.ptr($throwNilPointerError), new structType$2.ptr(new dom.ButtonStruct.ptr(false, false), new dom.LabelViewStruct.ptr(false, false)), new structType$3.ptr(ptrType$8.nil, ptrType$8.nil, $ifaceNil, new dom.Styles.ptr(""), ptrType$6.nil));
+			cOld = new newTaskCtx.ptr(new core.Cache.ptr(false, false), $throwNilPointerError, false, new core.Handler.ptr($throwNilPointerError), new structType$3.ptr(new dom.ButtonStruct.ptr(false, false), new dom.LabelViewStruct.ptr(false, false)), new structType$4.ptr(ptrType$9.nil, ptrType$9.nil, $ifaceNil, new dom.Styles.ptr(""), ptrType$6.nil));
 		}
 		_key = cKey; (c.current || $throwRuntimeError("assignment to entry in nil map"))[$emptyInterface.keyFor(_key)] = { k: _key, v: cOld };
 		_r = cOld.refreshIfNeeded($clone(styles, dom.Styles), tasks); /* */ $s = 1; case 1: if($c) { $c = false; _r = _r.$blk(); } if (_r && _r.$blk !== undefined) { break s; }
@@ -11145,13 +11311,13 @@ $packages["github.com/dotchain/fuss/todo"] = (function() {
 		/* */ $s = 0; var $f, $c = false; if (this !== undefined && this.$blk !== undefined) { $f = this; $c = true; _entry = $f._entry; _key = $f._key; _r = $f._r; _tuple = $f._tuple; c = $f.c; cKey = $f.cKey; cOld = $f.cOld; ok = $f.ok; result1 = $f.result1; styles = $f.styles; task = $f.task; $s = $f.$s; $r = $f.$r; } s: while (true) { switch ($s) { case 0:
 		result1 = $ifaceNil;
 		c = this;
-		_tuple = (_entry = c.old[$emptyInterface.keyFor(cKey)], _entry !== undefined ? [_entry.v, true] : [ptrType$10.nil, false]);
+		_tuple = (_entry = c.old[$emptyInterface.keyFor(cKey)], _entry !== undefined ? [_entry.v, true] : [ptrType$11.nil, false]);
 		cOld = _tuple[0];
 		ok = _tuple[1];
 		if (ok) {
 			delete c.old[$emptyInterface.keyFor(cKey)];
 		} else {
-			cOld = new taskEditCtx.ptr(new core.Cache.ptr(false, false), $throwNilPointerError, false, new core.Handler.ptr($throwNilPointerError), new structType$4.ptr(new dom.CheckboxEditStruct.ptr(false, false), new dom.EltStruct.ptr(false, false), new dom.TextEditStruct.ptr(false, false)), new structType$5.ptr($ifaceNil, new dom.Styles.ptr(""), ptrType$1.nil));
+			cOld = new taskEditCtx.ptr(new core.Cache.ptr(false, false), $throwNilPointerError, false, new core.Handler.ptr($throwNilPointerError), new structType$5.ptr(new dom.CheckboxEditStruct.ptr(false, false), new dom.EltStruct.ptr(false, false), new dom.TextEditStruct.ptr(false, false)), new structType$6.ptr($ifaceNil, new dom.Styles.ptr(""), ptrType$1.nil));
 		}
 		_key = cKey; (c.current || $throwRuntimeError("assignment to entry in nil map"))[$emptyInterface.keyFor(_key)] = { k: _key, v: cOld };
 		_r = cOld.refreshIfNeeded($clone(styles, dom.Styles), task); /* */ $s = 1; case 1: if($c) { $c = false; _r = _r.$blk(); } if (_r && _r.$blk !== undefined) { break s; }
@@ -11288,13 +11454,13 @@ $packages["github.com/dotchain/fuss/todo"] = (function() {
 		/* */ $s = 0; var $f, $c = false; if (this !== undefined && this.$blk !== undefined) { $f = this; $c = true; _entry = $f._entry; _key = $f._key; _r = $f._r; _tuple = $f._tuple; c = $f.c; cKey = $f.cKey; cOld = $f.cOld; ok = $f.ok; result1 = $f.result1; showDone = $f.showDone; showNotDone = $f.showNotDone; styles = $f.styles; tasks = $f.tasks; $s = $f.$s; $r = $f.$r; } s: while (true) { switch ($s) { case 0:
 		result1 = $ifaceNil;
 		c = this;
-		_tuple = (_entry = c.old[$emptyInterface.keyFor(cKey)], _entry !== undefined ? [_entry.v, true] : [ptrType$11.nil, false]);
+		_tuple = (_entry = c.old[$emptyInterface.keyFor(cKey)], _entry !== undefined ? [_entry.v, true] : [ptrType$12.nil, false]);
 		cOld = _tuple[0];
 		ok = _tuple[1];
 		if (ok) {
 			delete c.old[$emptyInterface.keyFor(cKey)];
 		} else {
-			cOld = new tasksViewCtx.ptr(new core.Cache.ptr(false, false), $throwNilPointerError, new TaskEditStruct.ptr(false, false), false, new core.Handler.ptr($throwNilPointerError), new structType$6.ptr(new dom.EltStruct.ptr(false, false)), new structType$7.ptr($ifaceNil, ptrType$3.nil, ptrType$3.nil, new dom.Styles.ptr(""), ptrType$6.nil));
+			cOld = new tasksViewCtx.ptr(new core.Cache.ptr(false, false), $throwNilPointerError, new TaskEditStruct.ptr(false, false), false, new core.Handler.ptr($throwNilPointerError), new structType$7.ptr(new dom.EltStruct.ptr(false, false)), new structType$8.ptr($ifaceNil, ptrType$3.nil, ptrType$3.nil, new dom.Styles.ptr(""), ptrType$6.nil));
 		}
 		_key = cKey; (c.current || $throwRuntimeError("assignment to entry in nil map"))[$emptyInterface.keyFor(_key)] = { k: _key, v: cOld };
 		_r = cOld.refreshIfNeeded($clone(styles, dom.Styles), showDone, showNotDone, tasks); /* */ $s = 1; case 1: if($c) { $c = false; _r = _r.$blk(); } if (_r && _r.$blk !== undefined) { break s; }
@@ -11310,7 +11476,7 @@ $packages["github.com/dotchain/fuss/todo"] = (function() {
 		done = _r;
 		_r$1 = task.DescriptionSubstream($clone(c.Cache, core.Cache)); /* */ $s = 2; case 2: if($c) { $c = false; _r$1 = _r$1.$blk(); } if (_r$1 && _r$1.$blk !== undefined) { break s; }
 		desc = _r$1;
-		_arg = new dom.Props.ptr($clone(styles, dom.Styles), "div", false, "", "", "", "", ptrType$12.nil, ptrType$12.nil);
+		_arg = new dom.Props.ptr($clone(styles, dom.Styles), "div", false, "", "", "", "", ptrType$13.nil, ptrType$13.nil);
 		_r$2 = c.dom.CheckboxEditStruct.CheckboxEdit(new $String("cb"), new dom.Styles.ptr(""), done, ""); /* */ $s = 3; case 3: if($c) { $c = false; _r$2 = _r$2.$blk(); } if (_r$2 && _r$2.$blk !== undefined) { break s; }
 		_arg$1 = _r$2;
 		_r$3 = c.dom.TextEditStruct.TextEdit(new $String("textedit"), new dom.Styles.ptr(""), desc); /* */ $s = 4; case 4: if($c) { $c = false; _r$3 = _r$3.$blk(); } if (_r$3 && _r$3.$blk !== undefined) { break s; }
@@ -11326,7 +11492,7 @@ $packages["github.com/dotchain/fuss/todo"] = (function() {
 		showDone = [showDone];
 		showNotDone = [showNotDone];
 		tasks = [tasks];
-		_arg = new dom.Props.ptr($clone(styles, dom.Styles), "div", false, "", "", "", "", ptrType$12.nil, ptrType$12.nil);
+		_arg = new dom.Props.ptr($clone(styles, dom.Styles), "div", false, "", "", "", "", ptrType$13.nil, ptrType$13.nil);
 		_r = renderTasks(tasks[0].Value, (function(c, showDone, showNotDone, tasks) { return function $b(index, t) {
 			var _arg$1, _arg$2, _arg$3, _r, _r$1, index, t, $s, $r;
 			/* */ $s = 0; var $f, $c = false; if (this !== undefined && this.$blk !== undefined) { $f = this; $c = true; _arg$1 = $f._arg$1; _arg$2 = $f._arg$2; _arg$3 = $f._arg$3; _r = $f._r; _r$1 = $f._r$1; index = $f.index; t = $f.t; $s = $f.$s; $r = $f.$r; } s: while (true) { switch ($s) { case 0:
@@ -11373,9 +11539,9 @@ $packages["github.com/dotchain/fuss/todo"] = (function() {
 		var _r, _r$1, c, hState, label, styles, tasks, $s, $r;
 		/* */ $s = 0; var $f, $c = false; if (this !== undefined && this.$blk !== undefined) { $f = this; $c = true; _r = $f._r; _r$1 = $f._r$1; c = $f.c; hState = $f.hState; label = $f.label; styles = $f.styles; tasks = $f.tasks; $s = $f.$s; $r = $f.$r; } s: while (true) { switch ($s) { case 0:
 		tasks = [tasks];
-		/* */ if (hState === ptrType$8.nil) { $s = 1; continue; }
+		/* */ if (hState === ptrType$9.nil) { $s = 1; continue; }
 		/* */ $s = 2; continue;
-		/* if (hState === ptrType$8.nil) { */ case 1:
+		/* if (hState === ptrType$9.nil) { */ case 1:
 			hState = new handlerStream.ptr(new core.Notifier.ptr(sliceType.nil), new dom.EventHandler.ptr($throwNilPointerError));
 			hState.EventHandler.Handle = (function(tasks) { return function $b(param) {
 				var _r, _r$1, param, v, x, $s, $r;
@@ -11396,7 +11562,7 @@ $packages["github.com/dotchain/fuss/todo"] = (function() {
 		$s = -1; return [hState, _r$1];
 		/* */ } return; } if ($f === undefined) { $f = { $blk: newTaskButton }; } $f._r = _r; $f._r$1 = _r$1; $f.c = c; $f.hState = hState; $f.label = label; $f.styles = styles; $f.tasks = tasks; $f.$s = $s; $f.$r = $r; return $f;
 	};
-	app = function(c, styles, tasks, doneState, notDoneState) {
+	filteredTasks = function(c, styles, tasks, doneState, notDoneState) {
 		var _arg, _arg$1, _arg$2, _arg$3, _arg$4, _arg$5, _arg$6, _r, _r$1, _r$2, _r$3, _r$4, _r$5, _r$6, _tmp, _tmp$1, c, doneLabel, doneState, notDoneLabel, notDoneState, styles, tasks, $s, $r;
 		/* */ $s = 0; var $f, $c = false; if (this !== undefined && this.$blk !== undefined) { $f = this; $c = true; _arg = $f._arg; _arg$1 = $f._arg$1; _arg$2 = $f._arg$2; _arg$3 = $f._arg$3; _arg$4 = $f._arg$4; _arg$5 = $f._arg$5; _arg$6 = $f._arg$6; _r = $f._r; _r$1 = $f._r$1; _r$2 = $f._r$2; _r$3 = $f._r$3; _r$4 = $f._r$4; _r$5 = $f._r$5; _r$6 = $f._r$6; _tmp = $f._tmp; _tmp$1 = $f._tmp$1; c = $f.c; doneLabel = $f.doneLabel; doneState = $f.doneState; notDoneLabel = $f.notDoneLabel; notDoneState = $f.notDoneState; styles = $f.styles; tasks = $f.tasks; $s = $f.$s; $r = $f.$r; } s: while (true) { switch ($s) { case 0:
 		if (doneState === ptrType$3.nil) {
@@ -11415,7 +11581,7 @@ $packages["github.com/dotchain/fuss/todo"] = (function() {
 		if (notDoneState.Value) {
 			notDoneLabel = "Showing Incomplete";
 		}
-		_arg = new dom.Props.ptr($clone(styles, dom.Styles), "div", false, "", "", "", "", ptrType$12.nil, ptrType$12.nil);
+		_arg = new dom.Props.ptr($clone(styles, dom.Styles), "div", false, "", "", "", "", ptrType$13.nil, ptrType$13.nil);
 		_r = c.dom.CheckboxEditStruct.CheckboxEdit(new $String("done"), new dom.Styles.ptr(""), doneState, "done"); /* */ $s = 1; case 1: if($c) { $c = false; _r = _r.$blk(); } if (_r && _r.$blk !== undefined) { break s; }
 		_arg$1 = _r;
 		_r$1 = c.dom.LabelViewStruct.LabelView(new $String("done"), new dom.Styles.ptr(""), doneLabel, "done"); /* */ $s = 2; case 2: if($c) { $c = false; _r$1 = _r$1.$blk(); } if (_r$1 && _r$1.$blk !== undefined) { break s; }
@@ -11430,29 +11596,43 @@ $packages["github.com/dotchain/fuss/todo"] = (function() {
 		_arg$6 = _r$5;
 		_r$6 = c.dom.EltStruct.Elt(new $String("root"), _arg, new sliceType$3([_arg$1, _arg$2, _arg$3, _arg$4, _arg$5, _arg$6])); /* */ $s = 7; case 7: if($c) { $c = false; _r$6 = _r$6.$blk(); } if (_r$6 && _r$6.$blk !== undefined) { break s; }
 		$s = -1; return [doneState, notDoneState, _r$6];
-		/* */ } return; } if ($f === undefined) { $f = { $blk: app }; } $f._arg = _arg; $f._arg$1 = _arg$1; $f._arg$2 = _arg$2; $f._arg$3 = _arg$3; $f._arg$4 = _arg$4; $f._arg$5 = _arg$5; $f._arg$6 = _arg$6; $f._r = _r; $f._r$1 = _r$1; $f._r$2 = _r$2; $f._r$3 = _r$3; $f._r$4 = _r$4; $f._r$5 = _r$5; $f._r$6 = _r$6; $f._tmp = _tmp; $f._tmp$1 = _tmp$1; $f.c = c; $f.doneLabel = doneLabel; $f.doneState = doneState; $f.notDoneLabel = notDoneLabel; $f.notDoneState = notDoneState; $f.styles = styles; $f.tasks = tasks; $f.$s = $s; $f.$r = $r; return $f;
+		/* */ } return; } if ($f === undefined) { $f = { $blk: filteredTasks }; } $f._arg = _arg; $f._arg$1 = _arg$1; $f._arg$2 = _arg$2; $f._arg$3 = _arg$3; $f._arg$4 = _arg$4; $f._arg$5 = _arg$5; $f._arg$6 = _arg$6; $f._r = _r; $f._r$1 = _r$1; $f._r$2 = _r$2; $f._r$3 = _r$3; $f._r$4 = _r$4; $f._r$5 = _r$5; $f._r$6 = _r$6; $f._tmp = _tmp; $f._tmp$1 = _tmp$1; $f.c = c; $f.doneLabel = doneLabel; $f.doneState = doneState; $f.notDoneLabel = notDoneLabel; $f.notDoneState = notDoneState; $f.styles = styles; $f.tasks = tasks; $f.$s = $s; $f.$r = $r; return $f;
+	};
+	app = function(c, tasksState) {
+		var _r, c, tasksState, $s, $r;
+		/* */ $s = 0; var $f, $c = false; if (this !== undefined && this.$blk !== undefined) { $f = this; $c = true; _r = $f._r; c = $f.c; tasksState = $f.tasksState; $s = $f.$s; $r = $f.$r; } s: while (true) { switch ($s) { case 0:
+		if (tasksState === ptrType$6.nil) {
+			tasksState = NewTasksStream(new Tasks([new Task.ptr("one", true, "First task"), new Task.ptr("two", false, "Second task")]));
+		}
+		_r = c.FilteredTasksStruct.FilteredTasks(new $String("root"), new dom.Styles.ptr(""), tasksState); /* */ $s = 1; case 1: if($c) { $c = false; _r = _r.$blk(); } if (_r && _r.$blk !== undefined) { break s; }
+		$s = -1; return [tasksState, _r];
+		/* */ } return; } if ($f === undefined) { $f = { $blk: app }; } $f._r = _r; $f.c = c; $f.tasksState = tasksState; $f.$s = $s; $f.$r = $r; return $f;
 	};
 	ptrType$1.methods = [{prop: "Latest", name: "Latest", pkg: "", typ: $funcType([], [ptrType$1], false)}, {prop: "Append", name: "Append", pkg: "", typ: $funcType([changes.Change, Task, $Bool], [ptrType$1], false)}, {prop: "wrapValue", name: "wrapValue", pkg: "github.com/dotchain/fuss/todo", typ: $funcType([$emptyInterface], [changes.Value], false)}, {prop: "unwrapValue", name: "unwrapValue", pkg: "github.com/dotchain/fuss/todo", typ: $funcType([changes.Value], [Task], false)}, {prop: "SetDone", name: "SetDone", pkg: "", typ: $funcType([$Bool], [ptrType$1], false)}, {prop: "DoneSubstream", name: "DoneSubstream", pkg: "", typ: $funcType([core.Cache], [ptrType$3], false)}, {prop: "SetDescription", name: "SetDescription", pkg: "", typ: $funcType([$String], [ptrType$1], false)}, {prop: "DescriptionSubstream", name: "DescriptionSubstream", pkg: "", typ: $funcType([core.Cache], [ptrType$5], false)}];
 	ptrType$6.methods = [{prop: "Latest", name: "Latest", pkg: "", typ: $funcType([], [ptrType$6], false)}, {prop: "Append", name: "Append", pkg: "", typ: $funcType([changes.Change, Tasks, $Bool], [ptrType$6], false)}, {prop: "wrapValue", name: "wrapValue", pkg: "github.com/dotchain/fuss/todo", typ: $funcType([$emptyInterface], [changes.Value], false)}, {prop: "unwrapValue", name: "unwrapValue", pkg: "github.com/dotchain/fuss/todo", typ: $funcType([changes.Value], [Tasks], false)}, {prop: "Substream", name: "Substream", pkg: "", typ: $funcType([core.Cache, $Int], [ptrType$1], false)}];
-	ptrType$7.methods = [{prop: "areArgsSame", name: "areArgsSame", pkg: "github.com/dotchain/fuss/todo", typ: $funcType([dom.Styles, ptrType$6], [$Bool], false)}, {prop: "refreshIfNeeded", name: "refreshIfNeeded", pkg: "github.com/dotchain/fuss/todo", typ: $funcType([dom.Styles, ptrType$6], [dom.Element], false)}, {prop: "refresh", name: "refresh", pkg: "github.com/dotchain/fuss/todo", typ: $funcType([dom.Styles, ptrType$6], [dom.Element], false)}, {prop: "close", name: "close", pkg: "github.com/dotchain/fuss/todo", typ: $funcType([], [], false)}];
-	ptrType$13.methods = [{prop: "Begin", name: "Begin", pkg: "", typ: $funcType([], [], false)}, {prop: "End", name: "End", pkg: "", typ: $funcType([], [], false)}, {prop: "App", name: "App", pkg: "", typ: $funcType([$emptyInterface, dom.Styles, ptrType$6], [dom.Element], false)}];
-	ptrType$9.methods = [{prop: "areArgsSame", name: "areArgsSame", pkg: "github.com/dotchain/fuss/todo", typ: $funcType([dom.Styles, ptrType$6], [$Bool], false)}, {prop: "refreshIfNeeded", name: "refreshIfNeeded", pkg: "github.com/dotchain/fuss/todo", typ: $funcType([dom.Styles, ptrType$6], [dom.Element], false)}, {prop: "refresh", name: "refresh", pkg: "github.com/dotchain/fuss/todo", typ: $funcType([dom.Styles, ptrType$6], [dom.Element], false)}, {prop: "close", name: "close", pkg: "github.com/dotchain/fuss/todo", typ: $funcType([], [], false)}];
-	ptrType$14.methods = [{prop: "Begin", name: "Begin", pkg: "", typ: $funcType([], [], false)}, {prop: "End", name: "End", pkg: "", typ: $funcType([], [], false)}, {prop: "NewTaskButton", name: "NewTaskButton", pkg: "", typ: $funcType([$emptyInterface, dom.Styles, ptrType$6], [dom.Element], false)}];
-	ptrType$10.methods = [{prop: "areArgsSame", name: "areArgsSame", pkg: "github.com/dotchain/fuss/todo", typ: $funcType([dom.Styles, ptrType$1], [$Bool], false)}, {prop: "refreshIfNeeded", name: "refreshIfNeeded", pkg: "github.com/dotchain/fuss/todo", typ: $funcType([dom.Styles, ptrType$1], [dom.Element], false)}, {prop: "refresh", name: "refresh", pkg: "github.com/dotchain/fuss/todo", typ: $funcType([dom.Styles, ptrType$1], [dom.Element], false)}, {prop: "close", name: "close", pkg: "github.com/dotchain/fuss/todo", typ: $funcType([], [], false)}];
-	ptrType$15.methods = [{prop: "Begin", name: "Begin", pkg: "", typ: $funcType([], [], false)}, {prop: "End", name: "End", pkg: "", typ: $funcType([], [], false)}, {prop: "TaskEdit", name: "TaskEdit", pkg: "", typ: $funcType([$emptyInterface, dom.Styles, ptrType$1], [dom.Element], false)}];
-	ptrType$11.methods = [{prop: "areArgsSame", name: "areArgsSame", pkg: "github.com/dotchain/fuss/todo", typ: $funcType([dom.Styles, ptrType$3, ptrType$3, ptrType$6], [$Bool], false)}, {prop: "refreshIfNeeded", name: "refreshIfNeeded", pkg: "github.com/dotchain/fuss/todo", typ: $funcType([dom.Styles, ptrType$3, ptrType$3, ptrType$6], [dom.Element], false)}, {prop: "refresh", name: "refresh", pkg: "github.com/dotchain/fuss/todo", typ: $funcType([dom.Styles, ptrType$3, ptrType$3, ptrType$6], [dom.Element], false)}, {prop: "close", name: "close", pkg: "github.com/dotchain/fuss/todo", typ: $funcType([], [], false)}];
-	ptrType$16.methods = [{prop: "Begin", name: "Begin", pkg: "", typ: $funcType([], [], false)}, {prop: "End", name: "End", pkg: "", typ: $funcType([], [], false)}, {prop: "TasksView", name: "TasksView", pkg: "", typ: $funcType([$emptyInterface, dom.Styles, ptrType$3, ptrType$3, ptrType$6], [dom.Element], false)}];
-	ptrType$8.methods = [{prop: "Latest", name: "Latest", pkg: "", typ: $funcType([], [ptrType$8], false)}];
+	ptrType$7.methods = [{prop: "areArgsSame", name: "areArgsSame", pkg: "github.com/dotchain/fuss/todo", typ: $funcType([], [$Bool], false)}, {prop: "refreshIfNeeded", name: "refreshIfNeeded", pkg: "github.com/dotchain/fuss/todo", typ: $funcType([], [dom.Element], false)}, {prop: "refresh", name: "refresh", pkg: "github.com/dotchain/fuss/todo", typ: $funcType([], [dom.Element], false)}, {prop: "close", name: "close", pkg: "github.com/dotchain/fuss/todo", typ: $funcType([], [], false)}];
+	ptrType$14.methods = [{prop: "Begin", name: "Begin", pkg: "", typ: $funcType([], [], false)}, {prop: "End", name: "End", pkg: "", typ: $funcType([], [], false)}, {prop: "App", name: "App", pkg: "", typ: $funcType([$emptyInterface], [dom.Element], false)}];
+	ptrType$8.methods = [{prop: "areArgsSame", name: "areArgsSame", pkg: "github.com/dotchain/fuss/todo", typ: $funcType([dom.Styles, ptrType$6], [$Bool], false)}, {prop: "refreshIfNeeded", name: "refreshIfNeeded", pkg: "github.com/dotchain/fuss/todo", typ: $funcType([dom.Styles, ptrType$6], [dom.Element], false)}, {prop: "refresh", name: "refresh", pkg: "github.com/dotchain/fuss/todo", typ: $funcType([dom.Styles, ptrType$6], [dom.Element], false)}, {prop: "close", name: "close", pkg: "github.com/dotchain/fuss/todo", typ: $funcType([], [], false)}];
+	ptrType$15.methods = [{prop: "Begin", name: "Begin", pkg: "", typ: $funcType([], [], false)}, {prop: "End", name: "End", pkg: "", typ: $funcType([], [], false)}, {prop: "FilteredTasks", name: "FilteredTasks", pkg: "", typ: $funcType([$emptyInterface, dom.Styles, ptrType$6], [dom.Element], false)}];
+	ptrType$10.methods = [{prop: "areArgsSame", name: "areArgsSame", pkg: "github.com/dotchain/fuss/todo", typ: $funcType([dom.Styles, ptrType$6], [$Bool], false)}, {prop: "refreshIfNeeded", name: "refreshIfNeeded", pkg: "github.com/dotchain/fuss/todo", typ: $funcType([dom.Styles, ptrType$6], [dom.Element], false)}, {prop: "refresh", name: "refresh", pkg: "github.com/dotchain/fuss/todo", typ: $funcType([dom.Styles, ptrType$6], [dom.Element], false)}, {prop: "close", name: "close", pkg: "github.com/dotchain/fuss/todo", typ: $funcType([], [], false)}];
+	ptrType$16.methods = [{prop: "Begin", name: "Begin", pkg: "", typ: $funcType([], [], false)}, {prop: "End", name: "End", pkg: "", typ: $funcType([], [], false)}, {prop: "NewTaskButton", name: "NewTaskButton", pkg: "", typ: $funcType([$emptyInterface, dom.Styles, ptrType$6], [dom.Element], false)}];
+	ptrType$11.methods = [{prop: "areArgsSame", name: "areArgsSame", pkg: "github.com/dotchain/fuss/todo", typ: $funcType([dom.Styles, ptrType$1], [$Bool], false)}, {prop: "refreshIfNeeded", name: "refreshIfNeeded", pkg: "github.com/dotchain/fuss/todo", typ: $funcType([dom.Styles, ptrType$1], [dom.Element], false)}, {prop: "refresh", name: "refresh", pkg: "github.com/dotchain/fuss/todo", typ: $funcType([dom.Styles, ptrType$1], [dom.Element], false)}, {prop: "close", name: "close", pkg: "github.com/dotchain/fuss/todo", typ: $funcType([], [], false)}];
+	ptrType$17.methods = [{prop: "Begin", name: "Begin", pkg: "", typ: $funcType([], [], false)}, {prop: "End", name: "End", pkg: "", typ: $funcType([], [], false)}, {prop: "TaskEdit", name: "TaskEdit", pkg: "", typ: $funcType([$emptyInterface, dom.Styles, ptrType$1], [dom.Element], false)}];
+	ptrType$12.methods = [{prop: "areArgsSame", name: "areArgsSame", pkg: "github.com/dotchain/fuss/todo", typ: $funcType([dom.Styles, ptrType$3, ptrType$3, ptrType$6], [$Bool], false)}, {prop: "refreshIfNeeded", name: "refreshIfNeeded", pkg: "github.com/dotchain/fuss/todo", typ: $funcType([dom.Styles, ptrType$3, ptrType$3, ptrType$6], [dom.Element], false)}, {prop: "refresh", name: "refresh", pkg: "github.com/dotchain/fuss/todo", typ: $funcType([dom.Styles, ptrType$3, ptrType$3, ptrType$6], [dom.Element], false)}, {prop: "close", name: "close", pkg: "github.com/dotchain/fuss/todo", typ: $funcType([], [], false)}];
+	ptrType$18.methods = [{prop: "Begin", name: "Begin", pkg: "", typ: $funcType([], [], false)}, {prop: "End", name: "End", pkg: "", typ: $funcType([], [], false)}, {prop: "TasksView", name: "TasksView", pkg: "", typ: $funcType([$emptyInterface, dom.Styles, ptrType$3, ptrType$3, ptrType$6], [dom.Element], false)}];
+	ptrType$9.methods = [{prop: "Latest", name: "Latest", pkg: "", typ: $funcType([], [ptrType$9], false)}];
 	TaskStream.init("", [{prop: "Notifier", name: "Notifier", anonymous: true, exported: true, typ: ptrType$2, tag: ""}, {prop: "Value", name: "Value", anonymous: false, exported: true, typ: Task, tag: ""}, {prop: "Change", name: "Change", anonymous: false, exported: true, typ: changes.Change, tag: ""}, {prop: "Next", name: "Next", anonymous: false, exported: true, typ: ptrType$1, tag: ""}]);
 	TasksStream.init("", [{prop: "Notifier", name: "Notifier", anonymous: true, exported: true, typ: ptrType$2, tag: ""}, {prop: "Value", name: "Value", anonymous: false, exported: true, typ: Tasks, tag: ""}, {prop: "Change", name: "Change", anonymous: false, exported: true, typ: changes.Change, tag: ""}, {prop: "Next", name: "Next", anonymous: false, exported: true, typ: ptrType$6, tag: ""}]);
-	appCtx.init("github.com/dotchain/fuss/todo", [{prop: "Cache", name: "Cache", anonymous: true, exported: true, typ: core.Cache, tag: ""}, {prop: "finalizer", name: "finalizer", anonymous: false, exported: false, typ: funcType, tag: ""}, {prop: "NewTaskButtonStruct", name: "NewTaskButtonStruct", anonymous: true, exported: true, typ: NewTaskButtonStruct, tag: ""}, {prop: "TasksViewStruct", name: "TasksViewStruct", anonymous: true, exported: true, typ: TasksViewStruct, tag: ""}, {prop: "initialized", name: "initialized", anonymous: false, exported: false, typ: $Bool, tag: ""}, {prop: "stateHandler", name: "stateHandler", anonymous: false, exported: false, typ: core.Handler, tag: ""}, {prop: "dom", name: "dom", anonymous: false, exported: false, typ: structType, tag: ""}, {prop: "memoized", name: "memoized", anonymous: false, exported: false, typ: structType$1, tag: ""}]);
+	appCtx.init("github.com/dotchain/fuss/todo", [{prop: "Cache", name: "Cache", anonymous: true, exported: true, typ: core.Cache, tag: ""}, {prop: "finalizer", name: "finalizer", anonymous: false, exported: false, typ: funcType, tag: ""}, {prop: "FilteredTasksStruct", name: "FilteredTasksStruct", anonymous: true, exported: true, typ: FilteredTasksStruct, tag: ""}, {prop: "initialized", name: "initialized", anonymous: false, exported: false, typ: $Bool, tag: ""}, {prop: "stateHandler", name: "stateHandler", anonymous: false, exported: false, typ: core.Handler, tag: ""}, {prop: "memoized", name: "memoized", anonymous: false, exported: false, typ: structType, tag: ""}]);
 	AppStruct.init("github.com/dotchain/fuss/todo", [{prop: "old", name: "old", anonymous: false, exported: false, typ: mapType, tag: ""}, {prop: "current", name: "current", anonymous: false, exported: false, typ: mapType, tag: ""}]);
-	newTaskCtx.init("github.com/dotchain/fuss/todo", [{prop: "Cache", name: "Cache", anonymous: true, exported: true, typ: core.Cache, tag: ""}, {prop: "finalizer", name: "finalizer", anonymous: false, exported: false, typ: funcType, tag: ""}, {prop: "initialized", name: "initialized", anonymous: false, exported: false, typ: $Bool, tag: ""}, {prop: "stateHandler", name: "stateHandler", anonymous: false, exported: false, typ: core.Handler, tag: ""}, {prop: "dom", name: "dom", anonymous: false, exported: false, typ: structType$2, tag: ""}, {prop: "memoized", name: "memoized", anonymous: false, exported: false, typ: structType$3, tag: ""}]);
-	NewTaskButtonStruct.init("github.com/dotchain/fuss/todo", [{prop: "old", name: "old", anonymous: false, exported: false, typ: mapType$1, tag: ""}, {prop: "current", name: "current", anonymous: false, exported: false, typ: mapType$1, tag: ""}]);
-	taskEditCtx.init("github.com/dotchain/fuss/todo", [{prop: "Cache", name: "Cache", anonymous: true, exported: true, typ: core.Cache, tag: ""}, {prop: "finalizer", name: "finalizer", anonymous: false, exported: false, typ: funcType, tag: ""}, {prop: "initialized", name: "initialized", anonymous: false, exported: false, typ: $Bool, tag: ""}, {prop: "stateHandler", name: "stateHandler", anonymous: false, exported: false, typ: core.Handler, tag: ""}, {prop: "dom", name: "dom", anonymous: false, exported: false, typ: structType$4, tag: ""}, {prop: "memoized", name: "memoized", anonymous: false, exported: false, typ: structType$5, tag: ""}]);
-	TaskEditStruct.init("github.com/dotchain/fuss/todo", [{prop: "old", name: "old", anonymous: false, exported: false, typ: mapType$2, tag: ""}, {prop: "current", name: "current", anonymous: false, exported: false, typ: mapType$2, tag: ""}]);
-	tasksViewCtx.init("github.com/dotchain/fuss/todo", [{prop: "Cache", name: "Cache", anonymous: true, exported: true, typ: core.Cache, tag: ""}, {prop: "finalizer", name: "finalizer", anonymous: false, exported: false, typ: funcType, tag: ""}, {prop: "TaskEditStruct", name: "TaskEditStruct", anonymous: true, exported: true, typ: TaskEditStruct, tag: ""}, {prop: "initialized", name: "initialized", anonymous: false, exported: false, typ: $Bool, tag: ""}, {prop: "stateHandler", name: "stateHandler", anonymous: false, exported: false, typ: core.Handler, tag: ""}, {prop: "dom", name: "dom", anonymous: false, exported: false, typ: structType$6, tag: ""}, {prop: "memoized", name: "memoized", anonymous: false, exported: false, typ: structType$7, tag: ""}]);
-	TasksViewStruct.init("github.com/dotchain/fuss/todo", [{prop: "old", name: "old", anonymous: false, exported: false, typ: mapType$3, tag: ""}, {prop: "current", name: "current", anonymous: false, exported: false, typ: mapType$3, tag: ""}]);
+	filteredCtx.init("github.com/dotchain/fuss/todo", [{prop: "Cache", name: "Cache", anonymous: true, exported: true, typ: core.Cache, tag: ""}, {prop: "finalizer", name: "finalizer", anonymous: false, exported: false, typ: funcType, tag: ""}, {prop: "NewTaskButtonStruct", name: "NewTaskButtonStruct", anonymous: true, exported: true, typ: NewTaskButtonStruct, tag: ""}, {prop: "TasksViewStruct", name: "TasksViewStruct", anonymous: true, exported: true, typ: TasksViewStruct, tag: ""}, {prop: "initialized", name: "initialized", anonymous: false, exported: false, typ: $Bool, tag: ""}, {prop: "stateHandler", name: "stateHandler", anonymous: false, exported: false, typ: core.Handler, tag: ""}, {prop: "dom", name: "dom", anonymous: false, exported: false, typ: structType$1, tag: ""}, {prop: "memoized", name: "memoized", anonymous: false, exported: false, typ: structType$2, tag: ""}]);
+	FilteredTasksStruct.init("github.com/dotchain/fuss/todo", [{prop: "old", name: "old", anonymous: false, exported: false, typ: mapType$1, tag: ""}, {prop: "current", name: "current", anonymous: false, exported: false, typ: mapType$1, tag: ""}]);
+	newTaskCtx.init("github.com/dotchain/fuss/todo", [{prop: "Cache", name: "Cache", anonymous: true, exported: true, typ: core.Cache, tag: ""}, {prop: "finalizer", name: "finalizer", anonymous: false, exported: false, typ: funcType, tag: ""}, {prop: "initialized", name: "initialized", anonymous: false, exported: false, typ: $Bool, tag: ""}, {prop: "stateHandler", name: "stateHandler", anonymous: false, exported: false, typ: core.Handler, tag: ""}, {prop: "dom", name: "dom", anonymous: false, exported: false, typ: structType$3, tag: ""}, {prop: "memoized", name: "memoized", anonymous: false, exported: false, typ: structType$4, tag: ""}]);
+	NewTaskButtonStruct.init("github.com/dotchain/fuss/todo", [{prop: "old", name: "old", anonymous: false, exported: false, typ: mapType$2, tag: ""}, {prop: "current", name: "current", anonymous: false, exported: false, typ: mapType$2, tag: ""}]);
+	taskEditCtx.init("github.com/dotchain/fuss/todo", [{prop: "Cache", name: "Cache", anonymous: true, exported: true, typ: core.Cache, tag: ""}, {prop: "finalizer", name: "finalizer", anonymous: false, exported: false, typ: funcType, tag: ""}, {prop: "initialized", name: "initialized", anonymous: false, exported: false, typ: $Bool, tag: ""}, {prop: "stateHandler", name: "stateHandler", anonymous: false, exported: false, typ: core.Handler, tag: ""}, {prop: "dom", name: "dom", anonymous: false, exported: false, typ: structType$5, tag: ""}, {prop: "memoized", name: "memoized", anonymous: false, exported: false, typ: structType$6, tag: ""}]);
+	TaskEditStruct.init("github.com/dotchain/fuss/todo", [{prop: "old", name: "old", anonymous: false, exported: false, typ: mapType$3, tag: ""}, {prop: "current", name: "current", anonymous: false, exported: false, typ: mapType$3, tag: ""}]);
+	tasksViewCtx.init("github.com/dotchain/fuss/todo", [{prop: "Cache", name: "Cache", anonymous: true, exported: true, typ: core.Cache, tag: ""}, {prop: "finalizer", name: "finalizer", anonymous: false, exported: false, typ: funcType, tag: ""}, {prop: "TaskEditStruct", name: "TaskEditStruct", anonymous: true, exported: true, typ: TaskEditStruct, tag: ""}, {prop: "initialized", name: "initialized", anonymous: false, exported: false, typ: $Bool, tag: ""}, {prop: "stateHandler", name: "stateHandler", anonymous: false, exported: false, typ: core.Handler, tag: ""}, {prop: "dom", name: "dom", anonymous: false, exported: false, typ: structType$7, tag: ""}, {prop: "memoized", name: "memoized", anonymous: false, exported: false, typ: structType$8, tag: ""}]);
+	TasksViewStruct.init("github.com/dotchain/fuss/todo", [{prop: "old", name: "old", anonymous: false, exported: false, typ: mapType$4, tag: ""}, {prop: "current", name: "current", anonymous: false, exported: false, typ: mapType$4, tag: ""}]);
 	Task.init("", [{prop: "ID", name: "ID", anonymous: false, exported: true, typ: $String, tag: ""}, {prop: "Done", name: "Done", anonymous: false, exported: true, typ: $Bool, tag: ""}, {prop: "Description", name: "Description", anonymous: false, exported: true, typ: $String, tag: ""}]);
 	Tasks.init(Task);
 	handlerStream.init("", [{prop: "Notifier", name: "Notifier", anonymous: true, exported: true, typ: ptrType$2, tag: ""}, {prop: "EventHandler", name: "EventHandler", anonymous: true, exported: true, typ: dom.EventHandler, tag: ""}]);
@@ -11470,57 +11650,32 @@ $packages["github.com/dotchain/fuss/todo"] = (function() {
 	return $pkg;
 })();
 $packages["main"] = (function() {
-	var $pkg = {}, $init, core, dom, js, todo, js$1, dn, ptrType, main;
-	core = $packages["github.com/dotchain/fuss/core"];
-	dom = $packages["github.com/dotchain/fuss/dom"];
+	var $pkg = {}, $init, js, todo, main;
 	js = $packages["github.com/dotchain/fuss/dom/js"];
 	todo = $packages["github.com/dotchain/fuss/todo"];
-	js$1 = $packages["github.com/gopherjs/gopherjs/js"];
-	dn = $pkg.dn = $newType(8, $kindInterface, "main.dn", true, "main", false, null);
-	ptrType = $ptrType(js$1.Object);
 	main = function() {
-		var _r, _r$1, app, container, root, s, $s, $r;
-		/* */ $s = 0; var $f, $c = false; if (this !== undefined && this.$blk !== undefined) { $f = this; $c = true; _r = $f._r; _r$1 = $f._r$1; app = $f.app; container = $f.container; root = $f.root; s = $f.s; $s = $f.$s; $r = $f.$r; } s: while (true) { switch ($s) { case 0:
-		app = [app];
-		s = [s];
-		container = $global.document.querySelector($externalize("#container", $String));
-		s[0] = todo.NewTasksStream(new todo.Tasks([new todo.Task.ptr("one", true, "First task"), new todo.Task.ptr("two", false, "Second task")]));
-		app[0] = new todo.AppStruct.ptr(false, false);
-		app[0].Begin();
-		_r = app[0].App(new $String("root"), new dom.Styles.ptr(""), s[0]); /* */ $s = 1; case 1: if($c) { $c = false; _r = _r.$blk(); } if (_r && _r.$blk !== undefined) { break s; }
+		var _r, app, root, $s, $r;
+		/* */ $s = 0; var $f, $c = false; if (this !== undefined && this.$blk !== undefined) { $f = this; $c = true; _r = $f._r; app = $f.app; root = $f.root; $s = $f.$s; $r = $f.$r; } s: while (true) { switch ($s) { case 0:
+		app = new todo.AppStruct.ptr(false, false);
+		app.Begin();
+		_r = app.App(new $String("root")); /* */ $s = 1; case 1: if($c) { $c = false; _r = _r.$blk(); } if (_r && _r.$blk !== undefined) { break s; }
 		root = _r;
-		$r = app[0].End(); /* */ $s = 2; case 2: if($c) { $c = false; $r = $r.$blk(); } if ($r && $r.$blk !== undefined) { break s; }
-		_r$1 = $assertType(root, dn).DOMNode(); /* */ $s = 3; case 3: if($c) { $c = false; _r$1 = _r$1.$blk(); } if (_r$1 && _r$1.$blk !== undefined) { break s; }
-		container.appendChild(_r$1);
-		s[0].Notifier.On(new core.Handler.ptr((function(app, s) { return function $b() {
-			var _r$2, $s, $r;
-			/* */ $s = 0; var $f, $c = false; if (this !== undefined && this.$blk !== undefined) { $f = this; $c = true; _r$2 = $f._r$2; $s = $f.$s; $r = $f.$r; } s: while (true) { switch ($s) { case 0:
-			s[0] = s[0].Latest();
-			app[0].Begin();
-			_r$2 = app[0].App(new $String("root"), new dom.Styles.ptr(""), s[0]); /* */ $s = 1; case 1: if($c) { $c = false; _r$2 = _r$2.$blk(); } if (_r$2 && _r$2.$blk !== undefined) { break s; }
-			_r$2;
-			$r = app[0].End(); /* */ $s = 2; case 2: if($c) { $c = false; $r = $r.$blk(); } if ($r && $r.$blk !== undefined) { break s; }
-			$s = -1; return;
-			/* */ } return; } if ($f === undefined) { $f = { $blk: $b }; } $f._r$2 = _r$2; $f.$s = $s; $f.$r = $r; return $f;
-		}; })(app, s)));
+		$r = app.End(); /* */ $s = 2; case 2: if($c) { $c = false; $r = $r.$blk(); } if ($r && $r.$blk !== undefined) { break s; }
+		$r = js.QuerySelector("#container").InsertChild(0, root); /* */ $s = 3; case 3: if($c) { $c = false; $r = $r.$blk(); } if ($r && $r.$blk !== undefined) { break s; }
 		$s = -1; return;
-		/* */ } return; } if ($f === undefined) { $f = { $blk: main }; } $f._r = _r; $f._r$1 = _r$1; $f.app = app; $f.container = container; $f.root = root; $f.s = s; $f.$s = $s; $f.$r = $r; return $f;
+		/* */ } return; } if ($f === undefined) { $f = { $blk: main }; } $f._r = _r; $f.app = app; $f.root = root; $f.$s = $s; $f.$r = $r; return $f;
 	};
-	dn.init([{prop: "DOMNode", name: "DOMNode", pkg: "", typ: $funcType([], [ptrType], false)}]);
 	$init = function() {
 		$pkg.$init = function() {};
 		/* */ var $f, $c = false, $s = 0, $r; if (this !== undefined && this.$blk !== undefined) { $f = this; $c = true; $s = $f.$s; $r = $f.$r; } s: while (true) { switch ($s) { case 0:
-		$r = core.$init(); /* */ $s = 1; case 1: if($c) { $c = false; $r = $r.$blk(); } if ($r && $r.$blk !== undefined) { break s; }
-		$r = dom.$init(); /* */ $s = 2; case 2: if($c) { $c = false; $r = $r.$blk(); } if ($r && $r.$blk !== undefined) { break s; }
-		$r = js.$init(); /* */ $s = 3; case 3: if($c) { $c = false; $r = $r.$blk(); } if ($r && $r.$blk !== undefined) { break s; }
-		$r = todo.$init(); /* */ $s = 4; case 4: if($c) { $c = false; $r = $r.$blk(); } if ($r && $r.$blk !== undefined) { break s; }
-		$r = js$1.$init(); /* */ $s = 5; case 5: if($c) { $c = false; $r = $r.$blk(); } if ($r && $r.$blk !== undefined) { break s; }
-		/* */ if ($pkg === $mainPkg) { $s = 6; continue; }
-		/* */ $s = 7; continue;
-		/* if ($pkg === $mainPkg) { */ case 6:
-			$r = main(); /* */ $s = 8; case 8: if($c) { $c = false; $r = $r.$blk(); } if ($r && $r.$blk !== undefined) { break s; }
+		$r = js.$init(); /* */ $s = 1; case 1: if($c) { $c = false; $r = $r.$blk(); } if ($r && $r.$blk !== undefined) { break s; }
+		$r = todo.$init(); /* */ $s = 2; case 2: if($c) { $c = false; $r = $r.$blk(); } if ($r && $r.$blk !== undefined) { break s; }
+		/* */ if ($pkg === $mainPkg) { $s = 3; continue; }
+		/* */ $s = 4; continue;
+		/* if ($pkg === $mainPkg) { */ case 3:
+			$r = main(); /* */ $s = 5; case 5: if($c) { $c = false; $r = $r.$blk(); } if ($r && $r.$blk !== undefined) { break s; }
 			$mainFinished = true;
-		/* } */ case 7:
+		/* } */ case 4:
 		/* */ } return; } if ($f === undefined) { $f = { $blk: $init }; } $f.$s = $s; $f.$r = $r; return $f;
 	};
 	$pkg.$init = $init;
