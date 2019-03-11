@@ -24,7 +24,7 @@ func ParseDir(dir string, skipName string) Info {
 
 	files := []string{}
 	for _, entry := range entries {
-		if n := entry.Name(); strings.HasSuffix(n, ".go") {
+		if n := entry.Name(); strings.HasSuffix(n, ".go") && !strings.HasSuffix(n, "_test.go") {
 			files = append(files, path.Join(dir, n))
 		}
 	}

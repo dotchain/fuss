@@ -9,13 +9,15 @@ package main
 import (
 	"github.com/dotchain/fuss/fussy"
 	"io/ioutil"
+	"path"
+	"runtime"
 )
 
 func main() {
 	output := "generated.go"
-	files := []string{"todo.go"}
-	info := fussy.ParseFiles(files, output)
-	info.Generator = "github.com/dotchain/fuss/todo/codegen.go"
+	_, self, _, _ := runtime.Caller(0)
+	info := fussy.ParseDir(path.Dir(self), output)
+	info.Generator = self
 	info.Streams = []fussy.StreamInfo{
 		{
 			StreamType: "TaskStream",
