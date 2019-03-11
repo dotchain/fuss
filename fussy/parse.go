@@ -10,10 +10,26 @@ import (
 	"go/format"
 	"go/parser"
 	"go/token"
+	"io/ioutil"
 	"path"
 	"sort"
 	"strings"
 )
+
+// ParseDir is similar to ParseFiles except it looks for all *.go
+// files in the provided directory automatically.
+func ParseDir(dir string, skipName string) Info {
+	entries, err := ioutil.ReadDir(dir)
+	must(err)
+
+	files := []string{}
+	for _, entry := range entries {
+		if n := entry.Name(); strings.HasSuffix(n, ".go") && !strings.HasSuffix(n, "_test.go") {
+			files = append(files, path.Join(dir, n))
+		}
+	}
+	return ParseFiles(files, skipName)
+}
 
 // ParseFiles parses the files and returns info suitable for generating code.
 func ParseFiles(files []string, skipName string) Info {
