@@ -128,24 +128,27 @@ func (s Styles) String() string {
 	}
 
 	if dir := s.FlexDirection.String(); dir != "" {
-		flex := func(i int) string {
-			switch {
-			case i < 0:
-				return "0"
-			case i == 0:
-				return ""
-			default:
-				return strconv.FormatInt(int64(i), 10)
-			}
-		}
-
 		entries = append(entries, [][2]string{
 			{"display", "flex"},
 			{"flex-direction", dir},
-			{"flex-grow", flex(s.FlexGrow)},
-			{"flex-shrink", flex(s.FlexShrink)},
 		}...)
 	}
+
+	flex := func(i int) string {
+		switch {
+		case i < 0:
+			return "0"
+		case i == 0:
+			return ""
+		default:
+			return strconv.FormatInt(int64(i), 10)
+		}
+	}
+
+	entries = append(entries, [][2]string{
+		{"flex-grow", flex(s.FlexGrow)},
+		{"flex-shrink", flex(s.FlexShrink)},
+	}...)
 
 	result := ""
 	for _, pair := range entries {

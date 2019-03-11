@@ -23,6 +23,8 @@ func TestStringify(t *testing.T) {
 		"column-reverse": dom.ColumnReverse,
 		"color: red":     dom.Styles{Color: "red"},
 		"width: 5%":      dom.Styles{Width: dom.Size{Percent: 5}},
+		"flex-grow: 5":   dom.Styles{FlexGrow: 5},
+		"flex-shrink: 0": dom.Styles{FlexShrink: dom.FlexNone},
 
 		"width: 5%; height: 2em": dom.Styles{
 			Width:  dom.Size{Percent: 5},
@@ -31,7 +33,6 @@ func TestStringify(t *testing.T) {
 
 		"overflow-x: auto": dom.Styles{OverflowX: "auto"},
 		"overflow-y: auto": dom.Styles{OverflowY: "auto"},
-		"":                 dom.Styles{FlexGrow: 5},
 
 		"display: flex; flex-direction: row; flex-shrink: 0": dom.Styles{
 			FlexDirection: dom.Row,

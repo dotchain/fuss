@@ -527,6 +527,106 @@ func (c *EltStruct) Elt(cKey interface{}, props Props, children ...Element) (res
 	return cOld.refreshIfNeeded(props, children)
 }
 
+type fixedCtx struct {
+	core.Cache
+	finalizer func()
+
+	EltStruct
+	initialized  bool
+	stateHandler core.Handler
+
+	memoized struct {
+		cells   []Element
+		result1 Element
+		styles  Styles
+	}
+}
+
+func (c *fixedCtx) areArgsSame(styles Styles, cells []Element) bool {
+
+	if styles != c.memoized.styles {
+		return false
+	}
+
+	if len(cells) != len(c.memoized.cells) {
+		return false
+	}
+	for cellsIdx := range cells {
+		if cells[cellsIdx] != c.memoized.cells[cellsIdx] {
+			return false
+		}
+	}
+	return true
+
+}
+
+func (c *fixedCtx) refreshIfNeeded(styles Styles, cells []Element) (result1 Element) {
+	if !c.initialized || !c.areArgsSame(styles, cells) {
+		return c.refresh(styles, cells)
+	}
+	return c.memoized.result1
+}
+
+func (c *fixedCtx) refresh(styles Styles, cells []Element) (result1 Element) {
+	c.initialized = true
+	c.stateHandler.Handle = func() {
+		c.refresh(styles, cells)
+	}
+
+	c.memoized.styles, c.memoized.cells = styles, cells
+
+	c.Cache.Begin()
+	defer c.Cache.End()
+
+	c.EltStruct.Begin()
+	defer c.EltStruct.End()
+	c.memoized.result1 = fixed(c, styles, cells...)
+
+	return c.memoized.result1
+}
+
+func (c *fixedCtx) close() {
+	c.Cache.Begin()
+	c.Cache.End()
+
+	c.EltStruct.Begin()
+	c.EltStruct.End()
+	if c.finalizer != nil {
+		c.finalizer()
+	}
+}
+
+// FixedStruct is a cache for Fixed
+// Fixed implements a non-shrinkable container
+type FixedStruct struct {
+	old, current map[interface{}]*fixedCtx
+}
+
+// Begin starts a round
+func (c *FixedStruct) Begin() {
+	c.old, c.current = c.current, map[interface{}]*fixedCtx{}
+}
+
+// End finishes the round cleaning up any unused components
+func (c *FixedStruct) End() {
+	for _, ctx := range c.old {
+		ctx.close()
+	}
+	c.old = nil
+}
+
+// Fixed - see the type for details
+func (c *FixedStruct) Fixed(cKey interface{}, styles Styles, cells ...Element) (result1 Element) {
+	cOld, ok := c.old[cKey]
+	if ok {
+		delete(c.old, cKey)
+	} else {
+		cOld = &fixedCtx{}
+	}
+	c.current[cKey] = cOld
+	return cOld.refreshIfNeeded(styles, cells)
+}
+
 type labelViewCtx struct {
 	core.Cache
 	finalizer func()
@@ -724,6 +824,106 @@ func (c *RunStruct) Run(cKey interface{}, styles Styles, cells ...Element) (resu
 	return cOld.refreshIfNeeded(styles, cells)
 }
 
+type stretchCtx struct {
+	core.Cache
+	finalizer func()
+
+	EltStruct
+	initialized  bool
+	stateHandler core.Handler
+
+	memoized struct {
+		cells   []Element
+		result1 Element
+		styles  Styles
+	}
+}
+
+func (c *stretchCtx) areArgsSame(styles Styles, cells []Element) bool {
+
+	if styles != c.memoized.styles {
+		return false
+	}
+
+	if len(cells) != len(c.memoized.cells) {
+		return false
+	}
+	for cellsIdx := range cells {
+		if cells[cellsIdx] != c.memoized.cells[cellsIdx] {
+			return false
+		}
+	}
+	return true
+
+}
+
+func (c *stretchCtx) refreshIfNeeded(styles Styles, cells []Element) (result1 Element) {
+	if !c.initialized || !c.areArgsSame(styles, cells) {
+		return c.refresh(styles, cells)
+	}
+	return c.memoized.result1
+}
+
+func (c *stretchCtx) refresh(styles Styles, cells []Element) (result1 Element) {
+	c.initialized = true
+	c.stateHandler.Handle = func() {
+		c.refresh(styles, cells)
+	}
+
+	c.memoized.styles, c.memoized.cells = styles, cells
+
+	c.Cache.Begin()
+	defer c.Cache.End()
+
+	c.EltStruct.Begin()
+	defer c.EltStruct.End()
+	c.memoized.result1 = stretch(c, styles, cells...)
+
+	return c.memoized.result1
+}
+
+func (c *stretchCtx) close() {
+	c.Cache.Begin()
+	c.Cache.End()
+
+	c.EltStruct.Begin()
+	c.EltStruct.End()
+	if c.finalizer != nil {
+		c.finalizer()
+	}
+}
+
+// StretchStruct is a cache for Stretch
+// Stretch implements a stretchable container
+type StretchStruct struct {
+	old, current map[interface{}]*stretchCtx
+}
+
+// Begin starts a round
+func (c *StretchStruct) Begin() {
+	c.old, c.current = c.current, map[interface{}]*stretchCtx{}
+}
+
+// End finishes the round cleaning up any unused components
+func (c *StretchStruct) End() {
+	for _, ctx := range c.old {
+		ctx.close()
+	}
+	c.old = nil
+}
+
+// Stretch - see the type for details
+func (c *StretchStruct) Stretch(cKey interface{}, styles Styles, cells ...Element) (result1 Element) {
+	cOld, ok := c.old[cKey]
+	if ok {
+		delete(c.old, cKey)
+	} else {
+		cOld = &stretchCtx{}
+	}
+	c.current[cKey] = cOld
+	return cOld.refreshIfNeeded(styles, cells)
+}
+
 type textEditCtx struct {
 	core.Cache
 	finalizer func()
@@ -814,4 +1014,196 @@ func (c *TextEditStruct) TextEdit(cKey interface{}, styles Styles, text *TextStr
 	}
 	c.current[cKey] = cOld
 	return cOld.refreshIfNeeded(styles, text)
+}
+
+type textViewCtx struct {
+	core.Cache
+	finalizer func()
+
+	EltStruct
+	initialized  bool
+	stateHandler core.Handler
+
+	memoized struct {
+		result1 Element
+		styles  Styles
+		text    string
+	}
+}
+
+func (c *textViewCtx) areArgsSame(styles Styles, text string) bool {
+
+	if styles != c.memoized.styles {
+		return false
+	}
+
+	return text == c.memoized.text
+
+}
+
+func (c *textViewCtx) refreshIfNeeded(styles Styles, text string) (result1 Element) {
+	if !c.initialized || !c.areArgsSame(styles, text) {
+		return c.refresh(styles, text)
+	}
+	return c.memoized.result1
+}
+
+func (c *textViewCtx) refresh(styles Styles, text string) (result1 Element) {
+	c.initialized = true
+	c.stateHandler.Handle = func() {
+		c.refresh(styles, text)
+	}
+
+	c.memoized.styles, c.memoized.text = styles, text
+
+	c.Cache.Begin()
+	defer c.Cache.End()
+
+	c.EltStruct.Begin()
+	defer c.EltStruct.End()
+	c.memoized.result1 = textView(c, styles, text)
+
+	return c.memoized.result1
+}
+
+func (c *textViewCtx) close() {
+	c.Cache.Begin()
+	c.Cache.End()
+
+	c.EltStruct.Begin()
+	c.EltStruct.End()
+	if c.finalizer != nil {
+		c.finalizer()
+	}
+}
+
+// TextViewStruct is a cache for TextView
+// TextView implements a text view control.
+type TextViewStruct struct {
+	old, current map[interface{}]*textViewCtx
+}
+
+// Begin starts a round
+func (c *TextViewStruct) Begin() {
+	c.old, c.current = c.current, map[interface{}]*textViewCtx{}
+}
+
+// End finishes the round cleaning up any unused components
+func (c *TextViewStruct) End() {
+	for _, ctx := range c.old {
+		ctx.close()
+	}
+	c.old = nil
+}
+
+// TextView - see the type for details
+func (c *TextViewStruct) TextView(cKey interface{}, styles Styles, text string) (result1 Element) {
+	cOld, ok := c.old[cKey]
+	if ok {
+		delete(c.old, cKey)
+	} else {
+		cOld = &textViewCtx{}
+	}
+	c.current[cKey] = cOld
+	return cOld.refreshIfNeeded(styles, text)
+}
+
+type vrunCtx struct {
+	core.Cache
+	finalizer func()
+
+	EltStruct
+	initialized  bool
+	stateHandler core.Handler
+
+	memoized struct {
+		cells   []Element
+		result1 Element
+		styles  Styles
+	}
+}
+
+func (c *vrunCtx) areArgsSame(styles Styles, cells []Element) bool {
+
+	if styles != c.memoized.styles {
+		return false
+	}
+
+	if len(cells) != len(c.memoized.cells) {
+		return false
+	}
+	for cellsIdx := range cells {
+		if cells[cellsIdx] != c.memoized.cells[cellsIdx] {
+			return false
+		}
+	}
+	return true
+
+}
+
+func (c *vrunCtx) refreshIfNeeded(styles Styles, cells []Element) (result1 Element) {
+	if !c.initialized || !c.areArgsSame(styles, cells) {
+		return c.refresh(styles, cells)
+	}
+	return c.memoized.result1
+}
+
+func (c *vrunCtx) refresh(styles Styles, cells []Element) (result1 Element) {
+	c.initialized = true
+	c.stateHandler.Handle = func() {
+		c.refresh(styles, cells)
+	}
+
+	c.memoized.styles, c.memoized.cells = styles, cells
+
+	c.Cache.Begin()
+	defer c.Cache.End()
+
+	c.EltStruct.Begin()
+	defer c.EltStruct.End()
+	c.memoized.result1 = vrun(c, styles, cells...)
+
+	return c.memoized.result1
+}
+
+func (c *vrunCtx) close() {
+	c.Cache.Begin()
+	c.Cache.End()
+
+	c.EltStruct.Begin()
+	c.EltStruct.End()
+	if c.finalizer != nil {
+		c.finalizer()
+	}
+}
+
+// VRunStruct is a cache for VRun
+// VRun implements a list-like flex "column" component
+type VRunStruct struct {
+	old, current map[interface{}]*vrunCtx
+}
+
+// Begin starts a round
+func (c *VRunStruct) Begin() {
+	c.old, c.current = c.current, map[interface{}]*vrunCtx{}
+}
+
+// End finishes the round cleaning up any unused components
+func (c *VRunStruct) End() {
+	for _, ctx := range c.old {
+		ctx.close()
+	}
+	c.old = nil
+}
+
+// VRun - see the type for details
+func (c *VRunStruct) VRun(cKey interface{}, styles Styles, cells ...Element) (result1 Element) {
+	cOld, ok := c.old[cKey]
+	if ok {
+		delete(c.old, cKey)
+	} else {
+		cOld = &vrunCtx{}
+	}
+	c.current[cKey] = cOld
+	return cOld.refreshIfNeeded(styles, cells)
 }
