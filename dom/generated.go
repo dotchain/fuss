@@ -624,6 +624,106 @@ func (c *LabelViewStruct) LabelView(cKey interface{}, styles Styles, text string
 	return cOld.refreshIfNeeded(styles, text, inputID)
 }
 
+type runCtx struct {
+	core.Cache
+	finalizer func()
+
+	EltStruct
+	initialized  bool
+	stateHandler core.Handler
+
+	memoized struct {
+		cells   []Element
+		result1 Element
+		styles  Styles
+	}
+}
+
+func (c *runCtx) areArgsSame(styles Styles, cells []Element) bool {
+
+	if styles != c.memoized.styles {
+		return false
+	}
+
+	if len(cells) != len(c.memoized.cells) {
+		return false
+	}
+	for cellsIdx := range cells {
+		if cells[cellsIdx] != c.memoized.cells[cellsIdx] {
+			return false
+		}
+	}
+	return true
+
+}
+
+func (c *runCtx) refreshIfNeeded(styles Styles, cells []Element) (result1 Element) {
+	if !c.initialized || !c.areArgsSame(styles, cells) {
+		return c.refresh(styles, cells)
+	}
+	return c.memoized.result1
+}
+
+func (c *runCtx) refresh(styles Styles, cells []Element) (result1 Element) {
+	c.initialized = true
+	c.stateHandler.Handle = func() {
+		c.refresh(styles, cells)
+	}
+
+	c.memoized.styles, c.memoized.cells = styles, cells
+
+	c.Cache.Begin()
+	defer c.Cache.End()
+
+	c.EltStruct.Begin()
+	defer c.EltStruct.End()
+	c.memoized.result1 = run(c, styles, cells...)
+
+	return c.memoized.result1
+}
+
+func (c *runCtx) close() {
+	c.Cache.Begin()
+	c.Cache.End()
+
+	c.EltStruct.Begin()
+	c.EltStruct.End()
+	if c.finalizer != nil {
+		c.finalizer()
+	}
+}
+
+// RunStruct is a cache for Run
+// Run implements a paragraph-like flex "row" component
+type RunStruct struct {
+	old, current map[interface{}]*runCtx
+}
+
+// Begin starts a round
+func (c *RunStruct) Begin() {
+	c.old, c.current = c.current, map[interface{}]*runCtx{}
+}
+
+// End finishes the round cleaning up any unused components
+func (c *RunStruct) End() {
+	for _, ctx := range c.old {
+		ctx.close()
+	}
+	c.old = nil
+}
+
+// Run - see the type for details
+func (c *RunStruct) Run(cKey interface{}, styles Styles, cells ...Element) (result1 Element) {
+	cOld, ok := c.old[cKey]
+	if ok {
+		delete(c.old, cKey)
+	} else {
+		cOld = &runCtx{}
+	}
+	c.current[cKey] = cOld
+	return cOld.refreshIfNeeded(styles, cells)
+}
+
 type textEditCtx struct {
 	core.Cache
 	finalizer func()
