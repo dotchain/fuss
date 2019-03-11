@@ -11,6 +11,23 @@ import (
 	"testing"
 )
 
+func TestTextView(t *testing.T) {
+	var view dom.TextViewStruct
+
+	view.Begin()
+	elt := view.TextView("root", dom.Styles{Color: "red"}, "Hello")
+	view.End()
+
+	if x := fmt.Sprint(elt); x != "<span style=\"color: red\">Hello</span>" {
+		t.Error(x)
+	}
+
+	// cleanup
+	view.Begin()
+	view.End()
+	reportDriverLeaks(t)
+}
+
 func TestTextEdit(t *testing.T) {
 	var edit dom.TextEditStruct
 

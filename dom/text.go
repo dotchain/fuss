@@ -4,6 +4,11 @@
 
 package dom
 
+// TextView implements a text view control.
+func textView(c *textViewCtx, styles Styles, text string) Element {
+	return c.Elt("root", Props{Tag: "span", TextContent: text, Styles: styles})
+}
+
 // TextEdit implements a text edit control.
 func textEdit(c *textEditCtx, styles Styles, text *TextStream) Element {
 	var result Element
