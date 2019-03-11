@@ -39,12 +39,17 @@ func ParseFiles(files []string, skipName string) Info {
 	fset := token.NewFileSet()
 
 	for _, fname := range files {
-		if path.Base(fname) == skipName {
+		if n := path.Base(fname); n == skipName || strings.HasSuffix(n, "_test.go") {
 			continue
 		}
 
 		f, err := parser.ParseFile(fset, fname, nil, parser.ParseComments)
 		must(err)
+
+		if f.Name.Name == "main" {
+			continue
+		}
+
 		ff = append(ff, f)
 		info.Package = f.Name.Name
 	}
