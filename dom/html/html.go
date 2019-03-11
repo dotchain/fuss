@@ -16,10 +16,10 @@ import (
 	"strings"
 )
 
-var current driver
+var current *driver
 
 func init() {
-	current = driver{events: map[string]map[*html.Node]*dom.EventHandler{
+	current = &driver{events: map[string]map[*html.Node]*dom.EventHandler{
 		"change": {},
 		"click":  {},
 	}}
@@ -63,7 +63,7 @@ type driver struct {
 }
 
 // NewElement implements the dom.driver NewElement method
-func (d driver) NewElement(props dom.Props, children ...dom.Element) dom.Element {
+func (d *driver) NewElement(props dom.Props, children ...dom.Element) dom.Element {
 	tag := strings.ToLower(props.Tag)
 	if tag == "" {
 		tag = "div"
@@ -74,7 +74,7 @@ func (d driver) NewElement(props dom.Props, children ...dom.Element) dom.Element
 		DataAtom: a,
 		Data:     a.String(),
 	}
-	elt := element{n, &d}
+	elt := element{n, d}
 	for k, v := range props.ToMap() {
 		elt.SetProp(k, v)
 	}

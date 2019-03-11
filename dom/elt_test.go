@@ -82,3 +82,95 @@ func TestElt(t *testing.T) {
 	e.End()
 	reportDriverLeaks(t)
 }
+
+func TestEltLastChildChanging(t *testing.T) {
+	var e dom.EltStruct
+
+	e.Begin()
+	one := e.Elt("one", dom.Props{})
+	two := e.Elt("two", dom.Props{})
+	three := e.Elt("three", dom.Props{})
+	parent := e.Elt("parent", dom.Props{}, one, two, three)
+	e.End()
+
+	e.Begin()
+	one2 := e.Elt("one", dom.Props{})
+	two2 := e.Elt("two", dom.Props{})
+	three2 := e.Elt("three-new", dom.Props{})
+	parent2 := e.Elt("parent", dom.Props{}, one2, two2, three2)
+	e.End()
+
+	if parent2 != parent || one2 != one || two2 != two || three2 == three {
+		t.Fatal("Failed", parent2 != parent, one2 != one, two2 != two, three2 == three)
+	}
+
+	children := parent2.Children()
+	if children[0] != one || children[1] != two || children[2] == three {
+		t.Fatal("Unexpected children change", children[0] == one2, children[1] != two, children[2] == three)
+	}
+
+	// cleanup
+	e.Begin()
+	e.End()
+	reportDriverLeaks(t)
+}
+
+func TestEltRotateRight(t *testing.T) {
+	var e dom.EltStruct
+
+	e.Begin()
+	one := e.Elt("one", dom.Props{})
+	two := e.Elt("two", dom.Props{})
+	three := e.Elt("three", dom.Props{})
+	parent := e.Elt("parent", dom.Props{}, one, two, three)
+	e.End()
+
+	e.Begin()
+	one = e.Elt("one", dom.Props{})
+	two = e.Elt("two", dom.Props{})
+	three = e.Elt("three", dom.Props{})
+	parent2 := e.Elt("parent", dom.Props{}, three, one, two)
+	e.End()
+
+	children := parent2.Children()
+	c1, c2, c3 := children[0], children[1], children[2]
+
+	if parent2 != parent || c1 != three || c2 != one || c3 != two {
+		t.Fatal("Failed", parent2 != parent, c1 != three, c2 != one, c3 != two)
+	}
+
+	// cleanup
+	e.Begin()
+	e.End()
+	reportDriverLeaks(t)
+}
+
+func TestEltRotateLeft(t *testing.T) {
+	var e dom.EltStruct
+
+	e.Begin()
+	one := e.Elt("one", dom.Props{})
+	two := e.Elt("two", dom.Props{})
+	three := e.Elt("three", dom.Props{})
+	parent := e.Elt("parent", dom.Props{}, one, two, three)
+	e.End()
+
+	e.Begin()
+	one = e.Elt("one", dom.Props{})
+	two = e.Elt("two", dom.Props{})
+	three = e.Elt("three", dom.Props{})
+	parent2 := e.Elt("parent", dom.Props{}, two, three, one)
+	e.End()
+
+	children := parent2.Children()
+	c1, c2, c3 := children[0], children[1], children[2]
+
+	if parent2 != parent || c1 != two || c2 != three || c3 != one {
+		t.Fatal("Failed", parent2 != parent, c1 != two, c2 != three, c3 != one)
+	}
+
+	// cleanup
+	e.Begin()
+	e.End()
+	reportDriverLeaks(t)
+}
