@@ -11,6 +11,7 @@ import (
 	"github.com/dotchain/dot/refs"
 	"github.com/dotchain/fuss/core"
 	"github.com/dotchain/fuss/dom"
+	"github.com/dotchain/fuss/todo/controls"
 )
 
 // TaskStream is a stream of Task values.
@@ -376,6 +377,12 @@ type appCtx struct {
 	initialized  bool
 	stateHandler core.Handler
 
+	controls struct {
+		controls.ChromeStruct
+	}
+	dom struct {
+		dom.TextViewStruct
+	}
 	memoized struct {
 		result1    *TasksStream
 		result2    dom.Element
@@ -410,6 +417,12 @@ func (c *appCtx) refresh() (result2 dom.Element) {
 
 	c.FilteredTasksStruct.Begin()
 	defer c.FilteredTasksStruct.End()
+
+	c.controls.ChromeStruct.Begin()
+	defer c.controls.ChromeStruct.End()
+
+	c.dom.TextViewStruct.Begin()
+	defer c.dom.TextViewStruct.End()
 	c.memoized.result1, c.memoized.result2 = app(c, c.memoized.tasksState)
 
 	if c.memoized.tasksState != c.memoized.result1 {
@@ -430,6 +443,12 @@ func (c *appCtx) close() {
 
 	c.FilteredTasksStruct.Begin()
 	c.FilteredTasksStruct.End()
+
+	c.controls.ChromeStruct.Begin()
+	c.controls.ChromeStruct.End()
+
+	c.dom.TextViewStruct.Begin()
+	c.dom.TextViewStruct.End()
 	if c.memoized.result1 != nil {
 		c.memoized.result1.Off(&c.stateHandler)
 	}
@@ -752,7 +771,7 @@ type taskEditCtx struct {
 
 	dom struct {
 		dom.CheckboxEditStruct
-		dom.EltStruct
+		dom.RunStruct
 		dom.TextEditStruct
 	}
 	memoized struct {
@@ -793,8 +812,8 @@ func (c *taskEditCtx) refresh(styles dom.Styles, task *TaskStream) (result1 dom.
 	c.dom.CheckboxEditStruct.Begin()
 	defer c.dom.CheckboxEditStruct.End()
 
-	c.dom.EltStruct.Begin()
-	defer c.dom.EltStruct.End()
+	c.dom.RunStruct.Begin()
+	defer c.dom.RunStruct.End()
 
 	c.dom.TextEditStruct.Begin()
 	defer c.dom.TextEditStruct.End()
@@ -810,8 +829,8 @@ func (c *taskEditCtx) close() {
 	c.dom.CheckboxEditStruct.Begin()
 	c.dom.CheckboxEditStruct.End()
 
-	c.dom.EltStruct.Begin()
-	c.dom.EltStruct.End()
+	c.dom.RunStruct.Begin()
+	c.dom.RunStruct.End()
 
 	c.dom.TextEditStruct.Begin()
 	c.dom.TextEditStruct.End()

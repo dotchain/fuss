@@ -47,11 +47,11 @@ func Example_renderFilteredTasks() {
 	//     Showing Incomplete
 	//   </label>
 	//   <div>
-	//     <div>
+	//     <div style="display: flex; flex-direction: row">
 	//       <input type="checkbox"/>
 	//       <input type="text" value="first task"/>
 	//     </div>
-	//     <div>
+	//     <div style="display: flex; flex-direction: row">
 	//       <input checked="" type="checkbox"/>
 	//       <input type="text" value="second task"/>
 	//     </div>
@@ -72,7 +72,7 @@ func Example_renderFilteredTasks() {
 	//     Showing Incomplete
 	//   </label>
 	//   <div>
-	//     <div>
+	//     <div style="display: flex; flex-direction: row">
 	//       <input type="checkbox"/>
 	//       <input type="text" value="first task"/>
 	//     </div>
@@ -124,7 +124,7 @@ func Example_renderTasks() {
 
 	// Output:
 	// <div>
-	//   <div>
+	//   <div style="display: flex; flex-direction: row">
 	//     <input checked="" type="checkbox"/>
 	//     <input type="text" value="second task"/>
 	//   </div>
@@ -132,11 +132,11 @@ func Example_renderTasks() {
 	// <div style="color: red">
 	// </div>
 	// <div>
-	//   <div>
+	//   <div style="display: flex; flex-direction: row">
 	//     <input type="checkbox"/>
 	//     <input type="text" value="first task"/>
 	//   </div>
-	//   <div>
+	//   <div style="display: flex; flex-direction: row">
 	//     <input checked="" type="checkbox"/>
 	//     <input type="text" value="second task"/>
 	//   </div>
@@ -172,15 +172,15 @@ func Example_renderTask() {
 	}
 
 	// Output:
-	// <div style="color: blue">
+	// <div style="color: blue; display: flex; flex-direction: row">
 	//   <input type="checkbox"/>
 	//   <input type="text" value="first task"/>
 	// </div>
-	// <div style="color: red">
+	// <div style="color: red; display: flex; flex-direction: row">
 	//   <input type="checkbox"/>
 	//   <input type="text" value="first task"/>
 	// </div>
-	// <div style="color: red">
+	// <div style="color: red; display: flex; flex-direction: row">
 	//   <input checked="" type="checkbox"/>
 	//   <input type="text" value="first task"/>
 	// </div>
