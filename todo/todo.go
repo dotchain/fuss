@@ -8,6 +8,7 @@ package todo
 import (
 	"github.com/dotchain/fuss/core"
 	"github.com/dotchain/fuss/dom"
+	_ "github.com/dotchain/fuss/todo/controls" // requried for codegen
 	"time"
 )
 
@@ -27,9 +28,9 @@ type Tasks []Task
 func taskEdit(c *taskEditCtx, styles dom.Styles, task *TaskStream) dom.Element {
 	done := task.DoneSubstream(c.Cache)
 	desc := task.DescriptionSubstream(c.Cache)
-	return c.dom.Elt(
+	return c.dom.Run(
 		"root",
-		dom.Props{Tag: "div", Styles: styles},
+		styles,
 		c.dom.CheckboxEdit("cb", dom.Styles{}, done, ""),
 		c.dom.TextEdit("textedit", dom.Styles{}, desc),
 	)
@@ -127,5 +128,11 @@ func app(c *appCtx, tasksState *TasksStream) (*TasksStream, dom.Element) {
 			Task{"two", false, "Second task"},
 		})
 	}
-	return tasksState, c.FilteredTasks("root", dom.Styles{}, tasksState)
+	root := c.controls.Chrome(
+		"root",
+		c.dom.TextView("h", dom.Styles{}, "FUSS TODO"),
+		c.FilteredTasks("root", dom.Styles{}, tasksState),
+		c.dom.TextView("h", dom.Styles{}, "footer"),
+	)
+	return tasksState, root
 }

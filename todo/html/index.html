@@ -3,8 +3,13 @@
   <head>
     <title>TODO App demo</title>
     <style>
-      body {
+      html, body, #container {
         font-family: sans-serif;
+        padding: 0;
+        border: 0;
+        margin: 0;
+        width: 100%;
+        height: 100%;
       }
       input[type="text"] {
         font-size: inherit;
@@ -19,6 +24,11 @@
       }
       input, label {
         vertical-align: middle;
+      }
+      #container > div {
+         align-items: center;
+         width: 100%;
+         height: 100%;
       }
     </style>
   </head>
