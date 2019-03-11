@@ -5,6 +5,8 @@
 // Package dom provides basic UX controls in FUSS
 package dom
 
+import "strconv"
+
 // Driver represents the interface to be implemented by drivers. This
 // allows testing in non-browser environments
 type Driver interface {
@@ -41,18 +43,122 @@ type Element interface {
 	Close()
 }
 
-// Styles represents a set of CSS Styles
-type Styles struct {
-	Color string
+// Size represents a string, percent or numeric values. If an explicit
+// zero value is needed, it is best to use the string form
+type Size struct {
+	Raw     string
+	Percent float32
+	Pixels  float32
+	Em      float32
+	En      float32
 }
 
-// ToCSS converts style to "CSS" text
-func (s Styles) ToCSS() string {
-	if s.Color == "" {
-		return ""
+// String converts Size to a string form
+func (s Size) String() string {
+	var f float32
+
+	suffix := ""
+	switch {
+	case s.Percent > 0:
+		f, suffix = s.Percent, "%"
+	case s.Pixels > 0:
+		f, suffix = s.Pixels, "px"
+	case s.Em > 0:
+		f, suffix = s.Em, "em"
+	case s.En > 0:
+		f, suffix = s.En, "en"
 	}
 
-	return "color: " + s.Color
+	if f == 0 {
+		return s.Raw
+	}
+
+	return strconv.FormatFloat(float64(f), 'f', -1, 32) + suffix
+}
+
+// FlexNone should be used for a zero grow/shrink
+const FlexNone = -1
+
+// Direction represents a Row or Column direction
+type Direction int
+
+// All the valid directions
+const (
+	Row Direction = iota + 1
+	Column
+	RowReverse
+	ColumnReverse
+)
+
+// String returns the string version of Direction
+func (d Direction) String() string {
+	switch d {
+	case Row:
+		return "row"
+	case Column:
+		return "column"
+	case RowReverse:
+		return "row-reverse"
+	case ColumnReverse:
+		return "column-reverse"
+	}
+	return ""
+}
+
+// Styles represents a set of CSS Styles
+type Styles struct {
+	Color                string
+	Width, Height        Size
+	OverflowX, OverflowY string
+	FlexDirection        Direction
+
+	// FlexGrow and FlexShrink should not be set to zero.
+	// For actual zero value, use FlexNone instead
+	FlexGrow, FlexShrink int
+}
+
+// String converts style to "CSS" text
+func (s Styles) String() string {
+	entries := [][2]string{
+		{"color", s.Color},
+		{"width", s.Width.String()},
+		{"height", s.Height.String()},
+		{"overflow-x", s.OverflowX},
+		{"overflow-y", s.OverflowY},
+	}
+
+	if dir := s.FlexDirection.String(); dir != "" {
+		flex := func(i int) string {
+			switch {
+			case i < 0:
+				return "0"
+			case i == 0:
+				return ""
+			default:
+				return strconv.FormatInt(int64(i), 10)
+			}
+		}
+
+		entries = append(entries, [][2]string{
+			{"display", "flex"},
+			{"flex-direction", dir},
+			{"flex-grow", flex(s.FlexGrow)},
+			{"flex-shrink", flex(s.FlexShrink)},
+		}...)
+	}
+
+	result := ""
+	for _, pair := range entries {
+		if pair[1] == "" {
+			continue
+		}
+		if result != "" {
+			result += "; "
+		}
+		result += pair[0] + ": " + pair[1]
+	}
+
+	return result
 }
 
 // Props represents the props of an element

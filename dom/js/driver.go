@@ -74,7 +74,7 @@ func (e element) SetProp(key string, value interface{}) {
 			e.n.Set("textContent", value.(string))
 		}
 	case "Styles":
-		e.setAttr("style", value.(dom.Styles).ToCSS())
+		e.setAttr("style", value.(dom.Styles).String())
 	case "OnChange":
 		e.onEvent("change", value.(*dom.EventHandler))
 	case "OnClick":
