@@ -13,8 +13,7 @@ import (
 )
 
 func TestParse(t *testing.T) {
-	files := []string{"data/test.god", "data/skip.god", "data/test2.god"}
-	info := fussy.ParseFiles(files, "skip.god")
+	info := fussy.ParseDir("testdata", "skip.go")
 	s, _ := json.MarshalIndent(info, "", "\t")
 	got := strings.TrimSpace(string(s))
 	want := strings.TrimSpace(parseExpected)
