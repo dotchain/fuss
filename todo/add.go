@@ -31,14 +31,7 @@ func (s *TasksStream) addTaskStream(cache core.Cache) (entry *dom.TextStream) {
 				result = append(result, Task{Description: entry.Value, ID: newID()})
 			}
 
-			// entry has to be updated before s updates
-			// because update of <entry> by itself causes
-			// no re-rendering.  This ugliness can be
-			// fixed by a version of text edit which
-			// resets itself rather than using the last-val
-			entry = entry.Append(nil, "", true)
 			parent = parent.Append(nil, result, true)
-
 			merging = false
 		}
 		entry.On(handler)

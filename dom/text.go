@@ -19,20 +19,25 @@ func textEdit(c *textEditCtx, styles Styles, text *TextStream) Element {
 type TextEditOptions struct {
 	Styles
 	Placeholder string
-	Text *TextStream
+	Text        *TextStream
+	RawText     *string
 }
 
 // TextEditO is like TextEdit but with extended options
 func textEditO(c *textEditOCtx, opt TextEditOptions) Element {
 	var result Element
 
+	text := opt.Text.Value
+	if opt.RawText != nil {
+		text = *opt.RawText
+	}
 	result = c.Elt(
 		"root",
 		Props{
 			Tag:         "input",
 			Type:        "text",
 			Placeholder: opt.Placeholder,
-			TextContent: opt.Text.Value,
+			TextContent: text,
 			Styles:      opt.Styles,
 			OnChange: &EventHandler{func(_ Event) {
 				opt.Text = opt.Text.Append(nil, result.Value(), true)

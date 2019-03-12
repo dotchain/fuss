@@ -12,6 +12,71 @@ import (
 	"github.com/yosssi/gohtml"
 )
 
+func Example_app() {
+	cache := todo.AppStruct{}
+
+	cache.Begin()
+	root := cache.App("root")
+	cache.End()
+
+	// add a "Third task" via the input control
+	html.SetValue(root.Children()[1].Children()[0].Children()[0], "Third task")
+
+	fmt.Println(gohtml.Format(fmt.Sprint(root)))
+
+	cache.Begin()
+	cache.End()
+	leaks := html.GetCurrentResources()
+	if n := len(leaks); n > 0 {
+		fmt.Println("Leaked", n, "resources\n", leaks)
+	}
+
+	// Output:
+	// <div style="display: flex; flex-direction: column">
+	//   <div style="flex-shrink: 0">
+	//     <span>
+	//       FUSS TODO
+	//     </span>
+	//   </div>
+	//   <div style="overflow-y: auto; flex-grow: 1">
+	//     <div style="display: flex; flex-direction: column">
+	//       <input placeholder="Add a task" type="text"/>
+	//       <div style="display: flex; flex-direction: row">
+	//         <input checked="" id="done" type="checkbox"/>
+	//         <label for="done">
+	//           Showing Completed
+	//         </label>
+	//         <input checked="" id="notDone" type="checkbox"/>
+	//         <label for="notDone">
+	//           Showing Incomplete
+	//         </label>
+	//       </div>
+	//       <div style="display: flex; flex-direction: column">
+	//         <div style="display: flex; flex-direction: row">
+	//           <input checked="" type="checkbox"/>
+	//           <input type="text" value="First task"/>
+	//         </div>
+	//         <div style="display: flex; flex-direction: row">
+	//           <input type="checkbox"/>
+	//           <input type="text" value="Second task"/>
+	//         </div>
+	//         <div style="display: flex; flex-direction: row">
+	//           <input type="checkbox"/>
+	//           <input type="text" value="Third task"/>
+	//         </div>
+	//       </div>
+	//     </div>
+	//   </div>
+	//   <div style="flex-shrink: 0">
+	//     <a href="https://github.com/dotchain/fuss">
+	//       <span>
+	//         github
+	//       </span>
+	//     </a>
+	//   </div>
+	// </div>
+}
+
 func Example_renderFilteredTasks() {
 	tasks := todo.Tasks{
 		{"one", false, "first task"},

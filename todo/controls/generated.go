@@ -231,3 +231,97 @@ func (c *FilterStruct) Filter(cKey interface{}, done *dom.BoolStream, active *do
 	c.current[cKey] = cOld
 	return cOld.refreshIfNeeded(done, active)
 }
+
+type textResetCtx struct {
+	core.Cache
+	finalizer func()
+
+	initialized  bool
+	stateHandler core.Handler
+
+	dom struct {
+		dom.TextEditOStruct
+	}
+	memoized struct {
+		ph      string
+		result1 dom.Element
+		text    *dom.TextStream
+	}
+}
+
+func (c *textResetCtx) areArgsSame(text *dom.TextStream, ph string) bool {
+
+	if text != c.memoized.text {
+		return false
+	}
+
+	return ph == c.memoized.ph
+
+}
+
+func (c *textResetCtx) refreshIfNeeded(text *dom.TextStream, ph string) (result1 dom.Element) {
+	if !c.initialized || !c.areArgsSame(text, ph) {
+		return c.refresh(text, ph)
+	}
+	return c.memoized.result1
+}
+
+func (c *textResetCtx) refresh(text *dom.TextStream, ph string) (result1 dom.Element) {
+	c.initialized = true
+	c.stateHandler.Handle = func() {
+		c.refresh(text, ph)
+	}
+
+	c.memoized.text, c.memoized.ph = text, ph
+
+	c.Cache.Begin()
+	defer c.Cache.End()
+
+	c.dom.TextEditOStruct.Begin()
+	defer c.dom.TextEditOStruct.End()
+	c.memoized.result1 = textReset(c, text, ph)
+
+	return c.memoized.result1
+}
+
+func (c *textResetCtx) close() {
+	c.Cache.Begin()
+	c.Cache.End()
+
+	c.dom.TextEditOStruct.Begin()
+	c.dom.TextEditOStruct.End()
+	if c.finalizer != nil {
+		c.finalizer()
+	}
+}
+
+// TextResetStruct is a cache for TextReset
+// TextReset renders a text input that resets when input is submitted
+type TextResetStruct struct {
+	old, current map[interface{}]*textResetCtx
+}
+
+// Begin starts a round
+func (c *TextResetStruct) Begin() {
+	c.old, c.current = c.current, map[interface{}]*textResetCtx{}
+}
+
+// End finishes the round cleaning up any unused components
+func (c *TextResetStruct) End() {
+	for _, ctx := range c.old {
+		ctx.close()
+	}
+	c.old = nil
+}
+
+// TextReset - see the type for details
+func (c *TextResetStruct) TextReset(cKey interface{}, text *dom.TextStream, ph string) (result1 dom.Element) {
+	cOld, ok := c.old[cKey]
+	if ok {
+		delete(c.old, cKey)
+	} else {
+		cOld = &textResetCtx{}
+	}
+	c.current[cKey] = cOld
+	return cOld.refreshIfNeeded(text, ph)
+}

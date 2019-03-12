@@ -51,3 +51,44 @@ func TestTextEdit(t *testing.T) {
 	edit.End()
 	reportDriverLeaks(t)
 }
+
+func TestTextEditPlaceholder(t *testing.T) {
+	var edit dom.TextEditOStruct
+
+	text := dom.NewTextStream("boo")
+
+	edit.Begin()
+	opt := dom.TextEditOptions{Text: text, Placeholder: "booya"}
+	elt := edit.TextEditO("root", opt)
+	edit.End()
+
+	if x := fmt.Sprint(elt); x != "<input placeholder=\"booya\" type=\"text\" value=\"boo\"/>" {
+		t.Error(x)
+	}
+
+	// cleanup
+	edit.Begin()
+	edit.End()
+	reportDriverLeaks(t)
+}
+
+func TestTextEditRawText(t *testing.T) {
+	var edit dom.TextEditOStruct
+
+	text := dom.NewTextStream("boo")
+	raw := "raw"
+
+	edit.Begin()
+	opt := dom.TextEditOptions{Text: text, Placeholder: "booya", RawText: &raw}
+	elt := edit.TextEditO("root", opt)
+	edit.End()
+
+	if x := fmt.Sprint(elt); x != "<input placeholder=\"booya\" type=\"text\" value=\"raw\"/>" {
+		t.Error(x)
+	}
+
+	// cleanup
+	edit.Begin()
+	edit.End()
+	reportDriverLeaks(t)
+}
