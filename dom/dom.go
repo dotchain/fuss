@@ -102,11 +102,27 @@ func (d Direction) String() string {
 	return ""
 }
 
+// Border represents a single border info
+type Border struct {
+	Width Size
+	Color string
+}
+
+// Borders represents all borders
+type Borders struct {
+	Raw                      string
+	Radius                   Size
+	Width                    Size
+	Color                    string
+	Left, Right, Top, Bottom Border
+}
+
 // Styles represents a set of CSS Styles
 type Styles struct {
 	Color                string
 	Width, Height        Size
 	OverflowX, OverflowY string
+	Borders              Borders
 	FlexDirection        Direction
 
 	// FlexGrow and FlexShrink should not be set to zero.
@@ -122,6 +138,18 @@ func (s Styles) String() string {
 		{"height", s.Height.String()},
 		{"overflow-x", s.OverflowX},
 		{"overflow-y", s.OverflowY},
+		{"border", s.Borders.Raw},
+		{"border-radius", s.Borders.Radius.String()},
+		{"border-color", s.Borders.Color},
+		{"border-width", s.Borders.Width.String()},
+		{"border-left-color", s.Borders.Left.Color},
+		{"border-left-width", s.Borders.Left.Width.String()},
+		{"border-right-color", s.Borders.Right.Color},
+		{"border-right-width", s.Borders.Right.Width.String()},
+		{"border-top-color", s.Borders.Top.Color},
+		{"border-top-width", s.Borders.Top.Width.String()},
+		{"border-bottom-color", s.Borders.Bottom.Color},
+		{"border-bottom-width", s.Borders.Bottom.Width.String()},
 	}
 
 	if dir := s.FlexDirection.String(); dir != "" {

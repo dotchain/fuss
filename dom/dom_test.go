@@ -42,6 +42,11 @@ func TestStringify(t *testing.T) {
 			FlexDirection: dom.Row,
 			FlexGrow:      2,
 		},
+
+		"border: ()":         dom.Styles{Borders: dom.Borders{Raw: "()"}},
+		"border-radius: 4px": dom.Styles{Borders: dom.Borders{Radius: dom.Size{Pixels: 4}}},
+		"border-width: 2px":  dom.Styles{Borders: dom.Borders{Width: dom.Size{Pixels: 2}}},
+		"border-color: blue": dom.Styles{Borders: dom.Borders{Color: "blue"}},
 	}
 
 	for k, v := range cases {
