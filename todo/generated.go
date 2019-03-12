@@ -505,9 +505,9 @@ type filteredCtx struct {
 
 	controls struct {
 		controls.FilterStruct
+		controls.TextResetStruct
 	}
 	dom struct {
-		dom.TextEditOStruct
 		dom.VRunStruct
 	}
 	memoized struct {
@@ -561,8 +561,8 @@ func (c *filteredCtx) refresh(styles dom.Styles, tasks *TasksStream) (result3 do
 	c.controls.FilterStruct.Begin()
 	defer c.controls.FilterStruct.End()
 
-	c.dom.TextEditOStruct.Begin()
-	defer c.dom.TextEditOStruct.End()
+	c.controls.TextResetStruct.Begin()
+	defer c.controls.TextResetStruct.End()
 
 	c.dom.VRunStruct.Begin()
 	defer c.dom.VRunStruct.End()
@@ -599,8 +599,8 @@ func (c *filteredCtx) close() {
 	c.controls.FilterStruct.Begin()
 	c.controls.FilterStruct.End()
 
-	c.dom.TextEditOStruct.Begin()
-	c.dom.TextEditOStruct.End()
+	c.controls.TextResetStruct.Begin()
+	c.controls.TextResetStruct.End()
 
 	c.dom.VRunStruct.Begin()
 	c.dom.VRunStruct.End()

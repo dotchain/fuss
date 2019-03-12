@@ -71,18 +71,11 @@ func filteredTasks(c *filteredCtx, styles dom.Styles, tasks *TasksStream, doneSt
 		notDoneState = dom.NewBoolStream(true)
 	}
 
-	opt := dom.TextEditOptions{
-		Placeholder: "Add a task",
-		Text:        tasks.addTaskStream(c.Cache),
-	}
+	addTaskStream := tasks.addTaskStream(c.Cache)
 	return doneState, notDoneState, c.dom.VRun(
 		"root",
 		styles,
-		// note the key below forces the text input control to
-		// be recreated whenever the stream changes thereby forcing
-		// it to be cleared out. this is because textInput is
-		// semi-managed right now.
-		c.dom.TextEditO(opt.Text, opt),
+		c.controls.TextReset("input", addTaskStream, "Add a task"),
 		c.controls.Filter("f", doneState, notDoneState),
 		c.TasksView("tasks", dom.Styles{}, doneState, notDoneState, tasks),
 	)
