@@ -26,7 +26,7 @@ func Example_renderFilteredTasks() {
 	fmt.Println(gohtml.Format(fmt.Sprint(root)))
 
 	// set "ShowDone" to false which should filter out the second task
-	html.SetValue(root.Children()[0], "off")
+	html.SetValue(root.Children()[0].Children()[0], "off")
 	fmt.Println(gohtml.Format(fmt.Sprint(root)))
 
 	cache.Begin()
@@ -37,16 +37,18 @@ func Example_renderFilteredTasks() {
 	}
 
 	// Output:
-	// <div>
-	//   <input checked="" id="done" type="checkbox"/>
-	//   <label for="done">
-	//     Showing Completed
-	//   </label>
-	//   <input checked="" id="notDone" type="checkbox"/>
-	//   <label for="notDone">
-	//     Showing Incomplete
-	//   </label>
-	//   <div>
+	// <div style="display: flex; flex-direction: column">
+	//   <div style="display: flex; flex-direction: row">
+	//     <input checked="" id="done" type="checkbox"/>
+	//     <label for="done">
+	//       Showing Completed
+	//     </label>
+	//     <input checked="" id="notDone" type="checkbox"/>
+	//     <label for="notDone">
+	//       Showing Incomplete
+	//     </label>
+	//   </div>
+	//   <div style="display: flex; flex-direction: column">
 	//     <div style="display: flex; flex-direction: row">
 	//       <input type="checkbox"/>
 	//       <input type="text" value="first task"/>
@@ -62,16 +64,18 @@ func Example_renderFilteredTasks() {
 	//     </label>
 	//   </button>
 	// </div>
-	// <div>
-	//   <input id="done" type="checkbox"/>
-	//   <label for="done">
-	//     Show Completed
-	//   </label>
-	//   <input checked="" id="notDone" type="checkbox"/>
-	//   <label for="notDone">
-	//     Showing Incomplete
-	//   </label>
-	//   <div>
+	// <div style="display: flex; flex-direction: column">
+	//   <div style="display: flex; flex-direction: row">
+	//     <input id="done" type="checkbox"/>
+	//     <label for="done">
+	//       Show Completed
+	//     </label>
+	//     <input checked="" id="notDone" type="checkbox"/>
+	//     <label for="notDone">
+	//       Showing Incomplete
+	//     </label>
+	//   </div>
+	//   <div style="display: flex; flex-direction: column">
 	//     <div style="display: flex; flex-direction: row">
 	//       <input type="checkbox"/>
 	//       <input type="text" value="first task"/>
@@ -123,15 +127,15 @@ func Example_renderTasks() {
 	}
 
 	// Output:
-	// <div>
+	// <div style="display: flex; flex-direction: column">
 	//   <div style="display: flex; flex-direction: row">
 	//     <input checked="" type="checkbox"/>
 	//     <input type="text" value="second task"/>
 	//   </div>
 	// </div>
-	// <div style="color: red">
+	// <div style="color: red; display: flex; flex-direction: column">
 	// </div>
-	// <div>
+	// <div style="display: flex; flex-direction: column">
 	//   <div style="display: flex; flex-direction: row">
 	//     <input type="checkbox"/>
 	//     <input type="text" value="first task"/>
@@ -147,12 +151,7 @@ func Example_renderTask() {
 	task := todo.NewTaskStream(todo.Task{Done: false, Description: "first task"})
 	cache := todo.TaskEditStruct{}
 	cache.Begin()
-	root := cache.TaskEdit("root", dom.Styles{Color: "blue"}, task)
-	cache.End()
-	fmt.Println(gohtml.Format(fmt.Sprint(root)))
-
-	cache.Begin()
-	root = cache.TaskEdit("root", dom.Styles{Color: "red"}, task)
+	root := cache.TaskEdit("root", task)
 	cache.End()
 	fmt.Println(gohtml.Format(fmt.Sprint(root)))
 
@@ -160,7 +159,7 @@ func Example_renderTask() {
 	next.Done = true
 	task = task.Append(nil, next, true)
 	cache.Begin()
-	root = cache.TaskEdit("root", dom.Styles{Color: "red"}, task)
+	root = cache.TaskEdit("root", task)
 	cache.End()
 	fmt.Println(gohtml.Format(fmt.Sprint(root)))
 
@@ -172,15 +171,11 @@ func Example_renderTask() {
 	}
 
 	// Output:
-	// <div style="color: blue; display: flex; flex-direction: row">
+	// <div style="display: flex; flex-direction: row">
 	//   <input type="checkbox"/>
 	//   <input type="text" value="first task"/>
 	// </div>
-	// <div style="color: red; display: flex; flex-direction: row">
-	//   <input type="checkbox"/>
-	//   <input type="text" value="first task"/>
-	// </div>
-	// <div style="color: red; display: flex; flex-direction: row">
+	// <div style="display: flex; flex-direction: row">
 	//   <input checked="" type="checkbox"/>
 	//   <input type="text" value="first task"/>
 	// </div>

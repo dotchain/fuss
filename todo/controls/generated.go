@@ -123,3 +123,111 @@ func (c *ChromeStruct) Chrome(cKey interface{}, header dom.Element, body dom.Ele
 	c.current[cKey] = cOld
 	return cOld.refreshIfNeeded(header, body, footer)
 }
+
+type filterCtx struct {
+	core.Cache
+	finalizer func()
+
+	initialized  bool
+	stateHandler core.Handler
+
+	dom struct {
+		dom.CheckboxEditStruct
+		dom.LabelViewStruct
+		dom.RunStruct
+	}
+	memoized struct {
+		active  *dom.BoolStream
+		done    *dom.BoolStream
+		result1 dom.Element
+	}
+}
+
+func (c *filterCtx) areArgsSame(done *dom.BoolStream, active *dom.BoolStream) bool {
+
+	if done != c.memoized.done {
+		return false
+	}
+
+	return active == c.memoized.active
+
+}
+
+func (c *filterCtx) refreshIfNeeded(done *dom.BoolStream, active *dom.BoolStream) (result1 dom.Element) {
+	if !c.initialized || !c.areArgsSame(done, active) {
+		return c.refresh(done, active)
+	}
+	return c.memoized.result1
+}
+
+func (c *filterCtx) refresh(done *dom.BoolStream, active *dom.BoolStream) (result1 dom.Element) {
+	c.initialized = true
+	c.stateHandler.Handle = func() {
+		c.refresh(done, active)
+	}
+
+	c.memoized.done, c.memoized.active = done, active
+
+	c.Cache.Begin()
+	defer c.Cache.End()
+
+	c.dom.CheckboxEditStruct.Begin()
+	defer c.dom.CheckboxEditStruct.End()
+
+	c.dom.LabelViewStruct.Begin()
+	defer c.dom.LabelViewStruct.End()
+
+	c.dom.RunStruct.Begin()
+	defer c.dom.RunStruct.End()
+	c.memoized.result1 = filter(c, done, active)
+
+	return c.memoized.result1
+}
+
+func (c *filterCtx) close() {
+	c.Cache.Begin()
+	c.Cache.End()
+
+	c.dom.CheckboxEditStruct.Begin()
+	c.dom.CheckboxEditStruct.End()
+
+	c.dom.LabelViewStruct.Begin()
+	c.dom.LabelViewStruct.End()
+
+	c.dom.RunStruct.Begin()
+	c.dom.RunStruct.End()
+	if c.finalizer != nil {
+		c.finalizer()
+	}
+}
+
+// FilterStruct is a cache for Filter
+// Filter renders a checkbox with a label
+type FilterStruct struct {
+	old, current map[interface{}]*filterCtx
+}
+
+// Begin starts a round
+func (c *FilterStruct) Begin() {
+	c.old, c.current = c.current, map[interface{}]*filterCtx{}
+}
+
+// End finishes the round cleaning up any unused components
+func (c *FilterStruct) End() {
+	for _, ctx := range c.old {
+		ctx.close()
+	}
+	c.old = nil
+}
+
+// Filter - see the type for details
+func (c *FilterStruct) Filter(cKey interface{}, done *dom.BoolStream, active *dom.BoolStream) (result1 dom.Element) {
+	cOld, ok := c.old[cKey]
+	if ok {
+		delete(c.old, cKey)
+	} else {
+		cOld = &filterCtx{}
+	}
+	c.current[cKey] = cOld
+	return cOld.refreshIfNeeded(done, active)
+}

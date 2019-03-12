@@ -61,12 +61,8 @@ func (e element) SetProp(key string, value interface{}) {
 		}
 	case "Checked":
 		e.n.Set("checked", value.(bool))
-	case "Type":
-		e.setAttr("type", value.(string))
-	case "ID":
-		e.setAttr("id", value.(string))
-	case "For":
-		e.setAttr("for", value.(string))
+	case "Type", "ID", "For", "Href":
+		e.setAttr(strings.ToLower(key), value.(string))
 	case "TextContent":
 		if strings.ToLower(e.n.Get("tagName").String()) == "input" {
 			e.n.Set("value", value.(string))
