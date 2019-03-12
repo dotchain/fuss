@@ -497,10 +497,11 @@ type filteredCtx struct {
 	initialized  bool
 	stateHandler core.Handler
 
+	controls struct {
+		controls.FilterStruct
+	}
 	dom struct {
-		dom.CheckboxEditStruct
-		dom.EltStruct
-		dom.LabelViewStruct
+		dom.VRunStruct
 	}
 	memoized struct {
 		doneState    *dom.BoolStream
@@ -553,14 +554,11 @@ func (c *filteredCtx) refresh(styles dom.Styles, tasks *TasksStream) (result3 do
 	c.TasksViewStruct.Begin()
 	defer c.TasksViewStruct.End()
 
-	c.dom.CheckboxEditStruct.Begin()
-	defer c.dom.CheckboxEditStruct.End()
+	c.controls.FilterStruct.Begin()
+	defer c.controls.FilterStruct.End()
 
-	c.dom.EltStruct.Begin()
-	defer c.dom.EltStruct.End()
-
-	c.dom.LabelViewStruct.Begin()
-	defer c.dom.LabelViewStruct.End()
+	c.dom.VRunStruct.Begin()
+	defer c.dom.VRunStruct.End()
 	c.memoized.result1, c.memoized.result2, c.memoized.result3 = filteredTasks(c, styles, tasks, c.memoized.doneState, c.memoized.notDoneState)
 
 	if c.memoized.doneState != c.memoized.result1 {
@@ -594,14 +592,11 @@ func (c *filteredCtx) close() {
 	c.TasksViewStruct.Begin()
 	c.TasksViewStruct.End()
 
-	c.dom.CheckboxEditStruct.Begin()
-	c.dom.CheckboxEditStruct.End()
+	c.controls.FilterStruct.Begin()
+	c.controls.FilterStruct.End()
 
-	c.dom.EltStruct.Begin()
-	c.dom.EltStruct.End()
-
-	c.dom.LabelViewStruct.Begin()
-	c.dom.LabelViewStruct.End()
+	c.dom.VRunStruct.Begin()
+	c.dom.VRunStruct.End()
 	if c.memoized.result1 != nil {
 		c.memoized.result1.Off(&c.stateHandler)
 	}
@@ -776,35 +771,30 @@ type taskEditCtx struct {
 	}
 	memoized struct {
 		result1 dom.Element
-		styles  dom.Styles
 		task    *TaskStream
 	}
 }
 
-func (c *taskEditCtx) areArgsSame(styles dom.Styles, task *TaskStream) bool {
-
-	if styles != c.memoized.styles {
-		return false
-	}
+func (c *taskEditCtx) areArgsSame(task *TaskStream) bool {
 
 	return task == c.memoized.task
 
 }
 
-func (c *taskEditCtx) refreshIfNeeded(styles dom.Styles, task *TaskStream) (result1 dom.Element) {
-	if !c.initialized || !c.areArgsSame(styles, task) {
-		return c.refresh(styles, task)
+func (c *taskEditCtx) refreshIfNeeded(task *TaskStream) (result1 dom.Element) {
+	if !c.initialized || !c.areArgsSame(task) {
+		return c.refresh(task)
 	}
 	return c.memoized.result1
 }
 
-func (c *taskEditCtx) refresh(styles dom.Styles, task *TaskStream) (result1 dom.Element) {
+func (c *taskEditCtx) refresh(task *TaskStream) (result1 dom.Element) {
 	c.initialized = true
 	c.stateHandler.Handle = func() {
-		c.refresh(styles, task)
+		c.refresh(task)
 	}
 
-	c.memoized.styles, c.memoized.task = styles, task
+	c.memoized.task = task
 
 	c.Cache.Begin()
 	defer c.Cache.End()
@@ -817,7 +807,7 @@ func (c *taskEditCtx) refresh(styles dom.Styles, task *TaskStream) (result1 dom.
 
 	c.dom.TextEditStruct.Begin()
 	defer c.dom.TextEditStruct.End()
-	c.memoized.result1 = taskEdit(c, styles, task)
+	c.memoized.result1 = taskEdit(c, task)
 
 	return c.memoized.result1
 }
@@ -861,7 +851,7 @@ func (c *TaskEditStruct) End() {
 }
 
 // TaskEdit - see the type for details
-func (c *TaskEditStruct) TaskEdit(cKey interface{}, styles dom.Styles, task *TaskStream) (result1 dom.Element) {
+func (c *TaskEditStruct) TaskEdit(cKey interface{}, task *TaskStream) (result1 dom.Element) {
 	cOld, ok := c.old[cKey]
 	if ok {
 		delete(c.old, cKey)
@@ -869,7 +859,7 @@ func (c *TaskEditStruct) TaskEdit(cKey interface{}, styles dom.Styles, task *Tas
 		cOld = &taskEditCtx{}
 	}
 	c.current[cKey] = cOld
-	return cOld.refreshIfNeeded(styles, task)
+	return cOld.refreshIfNeeded(task)
 }
 
 type tasksViewCtx struct {
@@ -881,7 +871,7 @@ type tasksViewCtx struct {
 	stateHandler core.Handler
 
 	dom struct {
-		dom.EltStruct
+		dom.VRunStruct
 	}
 	memoized struct {
 		result1     dom.Element
@@ -931,8 +921,8 @@ func (c *tasksViewCtx) refresh(styles dom.Styles, showDone *dom.BoolStream, show
 	c.TaskEditStruct.Begin()
 	defer c.TaskEditStruct.End()
 
-	c.dom.EltStruct.Begin()
-	defer c.dom.EltStruct.End()
+	c.dom.VRunStruct.Begin()
+	defer c.dom.VRunStruct.End()
 	c.memoized.result1 = tasksView(c, styles, showDone, showNotDone, tasks)
 
 	return c.memoized.result1
@@ -945,8 +935,8 @@ func (c *tasksViewCtx) close() {
 	c.TaskEditStruct.Begin()
 	c.TaskEditStruct.End()
 
-	c.dom.EltStruct.Begin()
-	c.dom.EltStruct.End()
+	c.dom.VRunStruct.Begin()
+	c.dom.VRunStruct.End()
 	if c.finalizer != nil {
 		c.finalizer()
 	}

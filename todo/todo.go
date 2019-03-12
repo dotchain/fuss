@@ -25,12 +25,12 @@ type Tasks []Task
 // TaskEdit is a control that displays a task as well as allowing it
 // to be edited. The current value of the data is available in the
 // Task field (which is a stream and so supports On/Off methods).
-func taskEdit(c *taskEditCtx, styles dom.Styles, task *TaskStream) dom.Element {
+func taskEdit(c *taskEditCtx, task *TaskStream) dom.Element {
 	done := task.DoneSubstream(c.Cache)
 	desc := task.DescriptionSubstream(c.Cache)
 	return c.dom.Run(
 		"root",
-		styles,
+		dom.Styles{},
 		c.dom.CheckboxEdit("cb", dom.Styles{}, done, ""),
 		c.dom.TextEdit("textedit", dom.Styles{}, desc),
 	)
@@ -42,15 +42,15 @@ func taskEdit(c *taskEditCtx, styles dom.Styles, task *TaskStream) dom.Element {
 // tasks is available via Tasks field which supports On/Off to receive
 // notifications.
 func tasksView(c *tasksViewCtx, styles dom.Styles, showDone *dom.BoolStream, showNotDone *dom.BoolStream, tasks *TasksStream) dom.Element {
-	return c.dom.Elt(
+	return c.dom.VRun(
 		"root",
-		dom.Props{Tag: "div", Styles: styles},
+		styles,
 		renderTasks(tasks.Value, func(index int, t Task) dom.Element {
 			if t.Done && !showDone.Value || !t.Done && !showNotDone.Value {
 				return nil
 			}
 
-			return c.TaskEdit(t.ID, dom.Styles{}, tasks.Substream(c.Cache, index))
+			return c.TaskEdit(t.ID, tasks.Substream(c.Cache, index))
 		})...,
 	)
 }
@@ -98,22 +98,10 @@ func filteredTasks(c *filteredCtx, styles dom.Styles, tasks *TasksStream, doneSt
 		notDoneState = dom.NewBoolStream(true)
 	}
 
-	doneLabel, notDoneLabel := "Show Completed", "Show Incomplete"
-	if doneState.Value {
-		doneLabel = "Showing Completed"
-	}
-
-	if notDoneState.Value {
-		notDoneLabel = "Showing Incomplete"
-	}
-
-	return doneState, notDoneState, c.dom.Elt(
+	return doneState, notDoneState, c.dom.VRun(
 		"root",
-		dom.Props{Tag: "div", Styles: styles},
-		c.dom.CheckboxEdit("done", dom.Styles{}, doneState, "done"),
-		c.dom.LabelView("done", dom.Styles{}, doneLabel, "done"),
-		c.dom.CheckboxEdit("notDone", dom.Styles{}, notDoneState, "notDone"),
-		c.dom.LabelView("notDone", dom.Styles{}, notDoneLabel, "notDone"),
+		styles,
+		c.controls.Filter("f", doneState, notDoneState),
 		c.TasksView("tasks", dom.Styles{}, doneState, notDoneState, tasks),
 		c.NewTaskButton("new", dom.Styles{}, tasks),
 	)
