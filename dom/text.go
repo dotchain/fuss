@@ -25,13 +25,11 @@ type TextEditOptions struct {
 
 // TextEditO is like TextEdit but with extended options
 func textEditO(c *textEditOCtx, opt TextEditOptions) Element {
-	var result Element
-
 	text := opt.Text.Value
 	if opt.RawText != nil {
 		text = *opt.RawText
 	}
-	result = c.Elt(
+	return c.Elt(
 		"root",
 		Props{
 			Tag:         "input",
@@ -39,10 +37,9 @@ func textEditO(c *textEditOCtx, opt TextEditOptions) Element {
 			Placeholder: opt.Placeholder,
 			TextContent: text,
 			Styles:      opt.Styles,
-			OnChange: &EventHandler{func(_ Event) {
-				opt.Text = opt.Text.Append(nil, result.Value(), true)
+			OnChange: &EventHandler{func(e Event) {
+				opt.Text = opt.Text.Append(nil, e.Value(), true)
 			}},
 		},
 	)
-	return result
 }

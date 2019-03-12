@@ -105,21 +105,6 @@ func (e element) onEvent(key string, h *dom.EventHandler) {
 	}
 }
 
-func (e element) Value() string {
-	isInput := strings.ToLower(e.n.Get("tagName").String()) == "input"
-	isCheckbox := e.n.Get("type").String() == "checkbox"
-
-	if isInput && isCheckbox {
-		m := map[bool]string{true: "on", false: "off"}
-		return m[e.n.Get("checked").Bool()]
-	}
-	return e.n.Get("value").String()
-}
-
-func (e element) SetValue(s string) {
-	e.n.Set("value", s)
-}
-
 func (e element) Children() []dom.Element {
 	if x := e.n.Get("firstChild"); x != nil && x.Get("nodeType").Int() == 3 /* text node */ {
 		return nil
@@ -172,15 +157,38 @@ func get(m *js.Object, key *js.Object) (*cbInfo, bool) {
 }
 
 func listener(n *js.Object, dict *js.Object) func(*js.Object) {
-	return func(*js.Object) {
+	return func(native *js.Object) {
 		if info, ok := get(dict, n); ok {
-			info.EventHandler.Handle(dom.Event{})
+			counter++
+			info.EventHandler.Handle(event{native, counter})
 		}
 	}
 }
+
+var counter int64
 
 // QuerySelector returns a DOM node wrapped in the dom.Element interface
 func QuerySelector(s string) dom.Element {
 	return element{js.Global.Get("document").Call("querySelector", s), nil}
 }
 
+type event struct {
+	native  *js.Object
+	counter int64
+}
+
+func (e event) EpochNano() int64 {
+	return int64(e.native.Get("timestamp").Int())*1e6 + e.counter
+}
+
+func (e event) Value() string {
+	n := e.native.Get("currentTarget")
+	isInput := strings.ToLower(n.Get("tagName").String()) == "input"
+	isCheckbox := n.Get("type").String() == "checkbox"
+
+	if isInput && isCheckbox {
+		m := map[bool]string{true: "on", false: "off"}
+		return m[n.Get("checked").Bool()]
+	}
+	return n.Get("value").String()
+}

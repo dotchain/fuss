@@ -27,9 +27,6 @@ type Element interface {
 	// SetProp updates the prop to the provided value
 	SetProp(key string, value interface{})
 
-	// Value is the equivalent of HTMLInputElement.value
-	Value() string
-
 	// Children returns a readonly slice of children
 	Children() []Element
 
@@ -213,5 +210,12 @@ func RegisterDriver(d Driver) (old Driver) {
 
 var driver Driver
 
-// Event is not yet implemented
-type Event struct{}
+// Event is to be implemennted by the driver
+type Event interface {
+	// CreatedEpochNano is the time when the event fired in UnixNano
+	EpochNano() int64
+
+	// Value is applicable for input/change events only
+	// TODO: migrate this to a ChangeEvent interface
+	Value() string
+}

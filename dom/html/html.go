@@ -51,7 +51,7 @@ func SetValue(e dom.Element, value string) {
 func Click(elt dom.Element) {
 	e := elt.(element)
 	if cx, ok := e.d.events["click"][e.Node]; ok {
-		cx.Handle(dom.Event{})
+		cx.Handle(newEvent(e))
 	}
 }
 
@@ -107,7 +107,7 @@ func (e element) sortAttr() {
 func (e element) SetProp(key string, value interface{}) {
 	defer e.sortAttr()
 	switch key {
-	case "ID", "For", "Href", "Type", "Placeholder": 
+	case "ID", "For", "Href", "Type", "Placeholder":
 		e.setStringAttribute(strings.ToLower(key), value.(string))
 	case "Tag":
 		tag := strings.ToLower(value.(string))
@@ -185,36 +185,6 @@ func (e element) removeAttribute(key string) {
 	}
 }
 
-func (e element) Value() string {
-	checked := "off"
-	var val *string
-	inputType := ""
-	for _, a := range e.Node.Attr {
-		switch a.Key {
-		case "checked":
-			checked = "on"
-		case "value":
-			val = &a.Val
-		case "type":
-			inputType = a.Val
-		}
-	}
-
-	if inputType == "checkbox" {
-		return checked
-	}
-
-	if val != nil {
-		return *val
-	}
-
-	if e.Node.FirstChild != nil {
-		return e.Node.FirstChild.Data
-	}
-
-	return ""
-}
-
 func (e element) setValue(s string) {
 	inputType := ""
 	for _, a := range e.Node.Attr {
@@ -231,7 +201,7 @@ func (e element) setValue(s string) {
 	}
 
 	if cx, ok := e.d.events["change"][e.Node]; ok {
-		cx.Handle(dom.Event{})
+		cx.Handle(newEvent(e))
 	}
 }
 
