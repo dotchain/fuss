@@ -6,8 +6,7 @@ package dom
 
 // CheckboxEdit implements a checkbox control.
 func checkboxEdit(c *cbEditCtx, styles Styles, checked *BoolStream, id string) Element {
-	var result Element
-	result = c.Elt(
+	return c.Elt(
 		"root",
 		Props{
 			ID:      id,
@@ -15,10 +14,9 @@ func checkboxEdit(c *cbEditCtx, styles Styles, checked *BoolStream, id string) E
 			Type:    "checkbox",
 			Checked: checked.Value,
 			Styles:  styles,
-			OnChange: &EventHandler{func(_ Event) {
-				checked = checked.Append(nil, result.Value() == "on", true)
+			OnChange: &EventHandler{func(e Event) {
+				checked = checked.Append(nil, e.Value() == "on", true)
 			}},
 		},
 	)
-	return result
 }
