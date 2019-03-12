@@ -34,12 +34,6 @@ func elt(c *nodeCtx, lastState *nodeStream, props Props, children ...Element) (*
 	return lastState, elt
 }
 
-type diff struct {
-	insert bool
-	elt    Element
-	index  int
-}
-
 type node struct {
 	root  Element
 	props Props
@@ -66,7 +60,16 @@ func (e *node) reconcile(props Props, children []Element) Element {
 			}
 		}
 	}
-	e.updateChildren(children)
+
+	before := e.root.Children()
+	eq := func(i, j int) bool {
+		return before[i] == children[j]
+	}
+	insert := func(i, j int) {
+		e.root.InsertChild(i, children[j])
+	}
+	remove := e.root.RemoveChild
+	core.Diff(len(before), len(children), eq, insert, remove)
 	return e.root
 }
 
@@ -78,82 +81,4 @@ func (e *node) filterNil(children []Element) []Element {
 		}
 	}
 	return result
-}
-
-func (e *node) updateChildren(after []Element) {
-	for _, op := range e.bestDiff(e.root.Children(), after, 0, nil) {
-		if op.insert {
-			e.root.InsertChild(op.index, op.elt)
-		} else {
-			e.root.RemoveChild(op.index)
-		}
-	}
-}
-
-func (e *node) bestDiff(before, after []Element, offset int, ops []diff) []diff {
-	for len(before) > 0 && len(after) > 0 && before[0] == after[0] {
-		offset++
-		before, after = before[1:], after[1:]
-	}
-
-	switch {
-	case len(before) == 0:
-		for _, elt := range after {
-			ops = append(ops, diff{true, elt, offset})
-			offset++
-		}
-	case len(after) == 0:
-		for _, item := range before {
-			found := false
-			for _, op := range ops {
-				found = found || op.elt == item
-			}
-			if !found {
-				ops = append(ops, diff{false, nil, offset})
-			}
-		}
-	default:
-		ops = e.chooseDiff(before, after, offset, ops)
-	}
-
-	return ops
-}
-
-func (e *node) chooseDiff(before, after []Element, offset int, ops []diff) []diff {
-	if len(before) > 0 && len(ops) > 0 {
-		for _, op := range ops {
-			if op.insert && op.elt == before[0] {
-				return e.bestDiff(before[1:], after, offset, ops)
-			}
-		}
-	}
-
-	// choice1 = clone of ops + delete first before elt
-	choice1 := append(ops, diff{false, nil, offset})
-	choice1 = e.bestDiff(before[1:], after, offset, choice1)
-
-	index := e.indexOf(before[0], after)
-	if index == -1 {
-		return choice1
-	}
-
-	// choice2 = clone of ops + insert index after elts
-	choice2 := append([]diff(nil), ops...)
-	for kk := 0; kk < index+1; kk++ {
-		choice2 = append(choice2, diff{true, after[kk], offset + kk})
-	}
-	choice2 = e.bestDiff(before, after[index+1:], offset+index+1, choice2)
-	if len(choice1) < len(choice2) {
-		return choice1
-	}
-	return choice2
-}
-
-func (e *node) indexOf(elt Element, elts []Element) int {
-	for kk, elt1 := range elts {
-		if elt1 == elt {
-			return kk
-		}
-	}
-	return -1
 }
