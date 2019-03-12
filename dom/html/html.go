@@ -107,7 +107,7 @@ func (e element) sortAttr() {
 func (e element) SetProp(key string, value interface{}) {
 	defer e.sortAttr()
 	switch key {
-	case "ID", "For", "Href", "Type": 
+	case "ID", "For", "Href", "Type", "Placeholder": 
 		e.setStringAttribute(strings.ToLower(key), value.(string))
 	case "Tag":
 		tag := strings.ToLower(value.(string))

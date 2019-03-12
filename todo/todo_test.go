@@ -26,7 +26,7 @@ func Example_renderFilteredTasks() {
 	fmt.Println(gohtml.Format(fmt.Sprint(root)))
 
 	// set "ShowDone" to false which should filter out the second task
-	html.SetValue(root.Children()[0].Children()[0], "off")
+	html.SetValue(root.Children()[1].Children()[0], "off")
 	fmt.Println(gohtml.Format(fmt.Sprint(root)))
 
 	cache.Begin()
@@ -38,6 +38,7 @@ func Example_renderFilteredTasks() {
 
 	// Output:
 	// <div style="display: flex; flex-direction: column">
+	//   <input placeholder="Add a task" type="text"/>
 	//   <div style="display: flex; flex-direction: row">
 	//     <input checked="" id="done" type="checkbox"/>
 	//     <label for="done">
@@ -58,13 +59,9 @@ func Example_renderFilteredTasks() {
 	//       <input type="text" value="second task"/>
 	//     </div>
 	//   </div>
-	//   <button>
-	//     <label>
-	//       Add a task
-	//     </label>
-	//   </button>
 	// </div>
 	// <div style="display: flex; flex-direction: column">
+	//   <input placeholder="Add a task" type="text"/>
 	//   <div style="display: flex; flex-direction: row">
 	//     <input id="done" type="checkbox"/>
 	//     <label for="done">
@@ -81,11 +78,6 @@ func Example_renderFilteredTasks() {
 	//       <input type="text" value="first task"/>
 	//     </div>
 	//   </div>
-	//   <button>
-	//     <label>
-	//       Add a task
-	//     </label>
-	//   </button>
 	// </div>
 }
 

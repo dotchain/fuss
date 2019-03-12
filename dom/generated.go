@@ -1033,7 +1033,7 @@ type textEditCtx struct {
 	core.Cache
 	finalizer func()
 
-	EltStruct
+	TextEditOStruct
 	initialized  bool
 	stateHandler core.Handler
 
@@ -1072,8 +1072,8 @@ func (c *textEditCtx) refresh(styles Styles, text *TextStream) (result1 Element)
 	c.Cache.Begin()
 	defer c.Cache.End()
 
-	c.EltStruct.Begin()
-	defer c.EltStruct.End()
+	c.TextEditOStruct.Begin()
+	defer c.TextEditOStruct.End()
 	c.memoized.result1 = textEdit(c, styles, text)
 
 	return c.memoized.result1
@@ -1083,8 +1083,8 @@ func (c *textEditCtx) close() {
 	c.Cache.Begin()
 	c.Cache.End()
 
-	c.EltStruct.Begin()
-	c.EltStruct.End()
+	c.TextEditOStruct.Begin()
+	c.TextEditOStruct.End()
 	if c.finalizer != nil {
 		c.finalizer()
 	}
@@ -1119,6 +1119,93 @@ func (c *TextEditStruct) TextEdit(cKey interface{}, styles Styles, text *TextStr
 	}
 	c.current[cKey] = cOld
 	return cOld.refreshIfNeeded(styles, text)
+}
+
+type textEditOCtx struct {
+	core.Cache
+	finalizer func()
+
+	EltStruct
+	initialized  bool
+	stateHandler core.Handler
+
+	memoized struct {
+		opt     TextEditOptions
+		result1 Element
+	}
+}
+
+func (c *textEditOCtx) areArgsSame(opt TextEditOptions) bool {
+
+	return opt == c.memoized.opt
+
+}
+
+func (c *textEditOCtx) refreshIfNeeded(opt TextEditOptions) (result1 Element) {
+	if !c.initialized || !c.areArgsSame(opt) {
+		return c.refresh(opt)
+	}
+	return c.memoized.result1
+}
+
+func (c *textEditOCtx) refresh(opt TextEditOptions) (result1 Element) {
+	c.initialized = true
+	c.stateHandler.Handle = func() {
+		c.refresh(opt)
+	}
+
+	c.memoized.opt = opt
+
+	c.Cache.Begin()
+	defer c.Cache.End()
+
+	c.EltStruct.Begin()
+	defer c.EltStruct.End()
+	c.memoized.result1 = textEditO(c, opt)
+
+	return c.memoized.result1
+}
+
+func (c *textEditOCtx) close() {
+	c.Cache.Begin()
+	c.Cache.End()
+
+	c.EltStruct.Begin()
+	c.EltStruct.End()
+	if c.finalizer != nil {
+		c.finalizer()
+	}
+}
+
+// TextEditOStruct is a cache for TextEditO
+// TextEditO is like TextEdit but with extended options
+type TextEditOStruct struct {
+	old, current map[interface{}]*textEditOCtx
+}
+
+// Begin starts a round
+func (c *TextEditOStruct) Begin() {
+	c.old, c.current = c.current, map[interface{}]*textEditOCtx{}
+}
+
+// End finishes the round cleaning up any unused components
+func (c *TextEditOStruct) End() {
+	for _, ctx := range c.old {
+		ctx.close()
+	}
+	c.old = nil
+}
+
+// TextEditO - see the type for details
+func (c *TextEditOStruct) TextEditO(cKey interface{}, opt TextEditOptions) (result1 Element) {
+	cOld, ok := c.old[cKey]
+	if ok {
+		delete(c.old, cKey)
+	} else {
+		cOld = &textEditOCtx{}
+	}
+	c.current[cKey] = cOld
+	return cOld.refreshIfNeeded(opt)
 }
 
 type textViewCtx struct {

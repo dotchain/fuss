@@ -499,7 +499,6 @@ type filteredCtx struct {
 	core.Cache
 	finalizer func()
 
-	NewTaskButtonStruct
 	TasksViewStruct
 	initialized  bool
 	stateHandler core.Handler
@@ -508,6 +507,7 @@ type filteredCtx struct {
 		controls.FilterStruct
 	}
 	dom struct {
+		dom.TextEditOStruct
 		dom.VRunStruct
 	}
 	memoized struct {
@@ -555,14 +555,14 @@ func (c *filteredCtx) refresh(styles dom.Styles, tasks *TasksStream) (result3 do
 	c.Cache.Begin()
 	defer c.Cache.End()
 
-	c.NewTaskButtonStruct.Begin()
-	defer c.NewTaskButtonStruct.End()
-
 	c.TasksViewStruct.Begin()
 	defer c.TasksViewStruct.End()
 
 	c.controls.FilterStruct.Begin()
 	defer c.controls.FilterStruct.End()
+
+	c.dom.TextEditOStruct.Begin()
+	defer c.dom.TextEditOStruct.End()
 
 	c.dom.VRunStruct.Begin()
 	defer c.dom.VRunStruct.End()
@@ -593,14 +593,14 @@ func (c *filteredCtx) close() {
 	c.Cache.Begin()
 	c.Cache.End()
 
-	c.NewTaskButtonStruct.Begin()
-	c.NewTaskButtonStruct.End()
-
 	c.TasksViewStruct.Begin()
 	c.TasksViewStruct.End()
 
 	c.controls.FilterStruct.Begin()
 	c.controls.FilterStruct.End()
+
+	c.dom.TextEditOStruct.Begin()
+	c.dom.TextEditOStruct.End()
 
 	c.dom.VRunStruct.Begin()
 	c.dom.VRunStruct.End()
@@ -642,123 +642,6 @@ func (c *FilteredTasksStruct) FilteredTasks(cKey interface{}, styles dom.Styles,
 		delete(c.old, cKey)
 	} else {
 		cOld = &filteredCtx{}
-	}
-	c.current[cKey] = cOld
-	return cOld.refreshIfNeeded(styles, tasks)
-}
-
-type newTaskCtx struct {
-	core.Cache
-	finalizer func()
-
-	initialized  bool
-	stateHandler core.Handler
-
-	dom struct {
-		dom.ButtonStruct
-		dom.LabelViewStruct
-	}
-	memoized struct {
-		hState  *handlerStream
-		result1 *handlerStream
-		result2 dom.Element
-		styles  dom.Styles
-		tasks   *TasksStream
-	}
-}
-
-func (c *newTaskCtx) areArgsSame(styles dom.Styles, tasks *TasksStream) bool {
-
-	if styles != c.memoized.styles {
-		return false
-	}
-
-	return tasks == c.memoized.tasks
-
-}
-
-func (c *newTaskCtx) refreshIfNeeded(styles dom.Styles, tasks *TasksStream) (result2 dom.Element) {
-	if !c.initialized || !c.areArgsSame(styles, tasks) {
-		return c.refresh(styles, tasks)
-	}
-	return c.memoized.result2
-}
-
-func (c *newTaskCtx) refresh(styles dom.Styles, tasks *TasksStream) (result2 dom.Element) {
-	c.initialized = true
-	c.stateHandler.Handle = func() {
-		c.refresh(styles, tasks)
-	}
-
-	if c.memoized.hState != nil {
-		c.memoized.hState = c.memoized.hState.Latest()
-	}
-	c.memoized.styles, c.memoized.tasks = styles, tasks
-
-	c.Cache.Begin()
-	defer c.Cache.End()
-
-	c.dom.ButtonStruct.Begin()
-	defer c.dom.ButtonStruct.End()
-
-	c.dom.LabelViewStruct.Begin()
-	defer c.dom.LabelViewStruct.End()
-	c.memoized.result1, c.memoized.result2 = newTaskButton(c, styles, tasks, c.memoized.hState)
-
-	if c.memoized.hState != c.memoized.result1 {
-		if c.memoized.hState != nil {
-			c.memoized.hState.Off(&c.stateHandler)
-		}
-		if c.memoized.result1 != nil {
-			c.memoized.result1.On(&c.stateHandler)
-		}
-		c.memoized.hState = c.memoized.result1
-	}
-	return c.memoized.result2
-}
-
-func (c *newTaskCtx) close() {
-	c.Cache.Begin()
-	c.Cache.End()
-
-	c.dom.ButtonStruct.Begin()
-	c.dom.ButtonStruct.End()
-
-	c.dom.LabelViewStruct.Begin()
-	c.dom.LabelViewStruct.End()
-	if c.memoized.result1 != nil {
-		c.memoized.result1.Off(&c.stateHandler)
-	}
-	if c.finalizer != nil {
-		c.finalizer()
-	}
-}
-
-// NewTaskButtonStruct is a cache for NewTaskButton
-type NewTaskButtonStruct struct {
-	old, current map[interface{}]*newTaskCtx
-}
-
-// Begin starts a round
-func (c *NewTaskButtonStruct) Begin() {
-	c.old, c.current = c.current, map[interface{}]*newTaskCtx{}
-}
-
-// End finishes the round cleaning up any unused components
-func (c *NewTaskButtonStruct) End() {
-	for _, ctx := range c.old {
-		ctx.close()
-	}
-	c.old = nil
-}
-
-// NewTaskButton - see the type for details
-func (c *NewTaskButtonStruct) NewTaskButton(cKey interface{}, styles dom.Styles, tasks *TasksStream) (result2 dom.Element) {
-	cOld, ok := c.old[cKey]
-	if ok {
-		delete(c.old, cKey)
-	} else {
-		cOld = &newTaskCtx{}
 	}
 	c.current[cKey] = cOld
 	return cOld.refreshIfNeeded(styles, tasks)

@@ -6,10 +6,8 @@
 package todo
 
 import (
-	"github.com/dotchain/fuss/core"
 	"github.com/dotchain/fuss/dom"
 	_ "github.com/dotchain/fuss/todo/controls" // requried for codegen
-	"time"
 )
 
 // Task represents an item in the TODO list.
@@ -63,31 +61,6 @@ func renderTasks(t Tasks, fn func(int, Task) dom.Element) []dom.Element {
 	return result
 }
 
-type handlerStream struct {
-	*core.Notifier
-	dom.EventHandler
-}
-
-func (h *handlerStream) Latest() *handlerStream {
-	return h
-}
-
-func newTaskButton(c *newTaskCtx, styles dom.Styles, tasks *TasksStream, hState *handlerStream) (*handlerStream, dom.Element) {
-	if hState == nil {
-		hState = &handlerStream{Notifier: &core.Notifier{}}
-		hState.Handle = func(dom.Event) {
-			tasks = tasks.Latest()
-			v := append(Tasks(nil), tasks.Value...)
-			// TODO: better ID generation
-			v = append(v, Task{ID: time.Now().Format("15:04:05.000")})
-			tasks = tasks.Append(nil, v, true)
-		}
-	}
-
-	label := c.dom.LabelView("root", dom.Styles{}, "Add a task", "")
-	return hState, c.dom.Button("root", dom.Styles{}, &hState.EventHandler, label)
-}
-
 // FilteredTasks is a thin wrapper on top of TasksView with checkboxes for ShowDone and ShowUndone
 //
 func filteredTasks(c *filteredCtx, styles dom.Styles, tasks *TasksStream, doneState *dom.BoolStream, notDoneState *dom.BoolStream) (*dom.BoolStream, *dom.BoolStream, dom.Element) {
@@ -98,12 +71,20 @@ func filteredTasks(c *filteredCtx, styles dom.Styles, tasks *TasksStream, doneSt
 		notDoneState = dom.NewBoolStream(true)
 	}
 
+	opt := dom.TextEditOptions{
+		Placeholder: "Add a task",
+		Text:        tasks.addTaskStream(c.Cache),
+	}
 	return doneState, notDoneState, c.dom.VRun(
 		"root",
 		styles,
+		// note the key below forces the text input control to
+		// be recreated whenever the stream changes thereby forcing
+		// it to be cleared out. this is because textInput is
+		// semi-managed right now.
+		c.dom.TextEditO(opt.Text, opt),
 		c.controls.Filter("f", doneState, notDoneState),
 		c.TasksView("tasks", dom.Styles{}, doneState, notDoneState, tasks),
-		c.NewTaskButton("new", dom.Styles{}, tasks),
 	)
 }
 
