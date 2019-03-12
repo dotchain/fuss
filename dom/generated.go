@@ -207,6 +207,111 @@ func (s *TextStream) unwrapValue(v changes.Value) string {
 	return v.(changes.Atomic).Value.(string)
 }
 
+type aCtx struct {
+	core.Cache
+	finalizer func()
+
+	EltStruct
+	initialized  bool
+	stateHandler core.Handler
+
+	memoized struct {
+		children []Element
+		href     string
+		result1  Element
+		styles   Styles
+	}
+}
+
+func (c *aCtx) areArgsSame(styles Styles, href string, children []Element) bool {
+
+	if styles != c.memoized.styles {
+		return false
+	}
+
+	if href != c.memoized.href {
+		return false
+	}
+
+	if len(children) != len(c.memoized.children) {
+		return false
+	}
+	for childrenIdx := range children {
+		if children[childrenIdx] != c.memoized.children[childrenIdx] {
+			return false
+		}
+	}
+	return true
+
+}
+
+func (c *aCtx) refreshIfNeeded(styles Styles, href string, children []Element) (result1 Element) {
+	if !c.initialized || !c.areArgsSame(styles, href, children) {
+		return c.refresh(styles, href, children)
+	}
+	return c.memoized.result1
+}
+
+func (c *aCtx) refresh(styles Styles, href string, children []Element) (result1 Element) {
+	c.initialized = true
+	c.stateHandler.Handle = func() {
+		c.refresh(styles, href, children)
+	}
+
+	c.memoized.styles, c.memoized.href, c.memoized.children = styles, href, children
+
+	c.Cache.Begin()
+	defer c.Cache.End()
+
+	c.EltStruct.Begin()
+	defer c.EltStruct.End()
+	c.memoized.result1 = A(c, styles, href, children...)
+
+	return c.memoized.result1
+}
+
+func (c *aCtx) close() {
+	c.Cache.Begin()
+	c.Cache.End()
+
+	c.EltStruct.Begin()
+	c.EltStruct.End()
+	if c.finalizer != nil {
+		c.finalizer()
+	}
+}
+
+// AStruct is a cache for A
+// A implements the simplified anchor tag
+type AStruct struct {
+	old, current map[interface{}]*aCtx
+}
+
+// Begin starts a round
+func (c *AStruct) Begin() {
+	c.old, c.current = c.current, map[interface{}]*aCtx{}
+}
+
+// End finishes the round cleaning up any unused components
+func (c *AStruct) End() {
+	for _, ctx := range c.old {
+		ctx.close()
+	}
+	c.old = nil
+}
+
+// A - see the type for details
+func (c *AStruct) A(cKey interface{}, styles Styles, href string, children ...Element) (result1 Element) {
+	cOld, ok := c.old[cKey]
+	if ok {
+		delete(c.old, cKey)
+	} else {
+		cOld = &aCtx{}
+	}
+	c.current[cKey] = cOld
+	return cOld.refreshIfNeeded(styles, href, children)
+}
+
 type buttonCtx struct {
 	core.Cache
 	finalizer func()

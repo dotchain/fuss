@@ -381,6 +381,7 @@ type appCtx struct {
 		controls.ChromeStruct
 	}
 	dom struct {
+		dom.AStruct
 		dom.TextViewStruct
 	}
 	memoized struct {
@@ -421,6 +422,9 @@ func (c *appCtx) refresh() (result2 dom.Element) {
 	c.controls.ChromeStruct.Begin()
 	defer c.controls.ChromeStruct.End()
 
+	c.dom.AStruct.Begin()
+	defer c.dom.AStruct.End()
+
 	c.dom.TextViewStruct.Begin()
 	defer c.dom.TextViewStruct.End()
 	c.memoized.result1, c.memoized.result2 = app(c, c.memoized.tasksState)
@@ -446,6 +450,9 @@ func (c *appCtx) close() {
 
 	c.controls.ChromeStruct.Begin()
 	c.controls.ChromeStruct.End()
+
+	c.dom.AStruct.Begin()
+	c.dom.AStruct.End()
 
 	c.dom.TextViewStruct.Begin()
 	c.dom.TextViewStruct.End()

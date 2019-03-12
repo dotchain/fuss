@@ -107,10 +107,8 @@ func (e element) sortAttr() {
 func (e element) SetProp(key string, value interface{}) {
 	defer e.sortAttr()
 	switch key {
-	case "ID":
-		e.setStringAttribute("id", value.(string))
-	case "For":
-		e.setStringAttribute("for", value.(string))
+	case "ID", "For", "Href", "Type": 
+		e.setStringAttribute(strings.ToLower(key), value.(string))
 	case "Tag":
 		tag := strings.ToLower(value.(string))
 		if tag == "" {
@@ -121,8 +119,6 @@ func (e element) SetProp(key string, value interface{}) {
 		}
 	case "Checked":
 		e.setChecked(value.(bool))
-	case "Type":
-		e.setStringAttribute("type", value.(string))
 	case "TextContent":
 		e.setTextContent(value.(string))
 	case "Styles":

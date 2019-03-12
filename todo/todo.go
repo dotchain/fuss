@@ -120,7 +120,12 @@ func app(c *appCtx, tasksState *TasksStream) (*TasksStream, dom.Element) {
 		"root",
 		c.dom.TextView("h", dom.Styles{}, "FUSS TODO"),
 		c.FilteredTasks("root", dom.Styles{}, tasksState),
-		c.dom.TextView("h", dom.Styles{}, "footer"),
+		c.dom.A(
+			"a",
+			dom.Styles{},
+			"https://github.com/dotchain/fuss",
+			c.dom.TextView("tv", dom.Styles{}, "github"),
+		),
 	)
 	return tasksState, root
 }

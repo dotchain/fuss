@@ -173,6 +173,7 @@ type Props struct {
 	TextContent string
 	ID          string
 	For         string
+	Href        string
 	OnChange    *EventHandler
 	OnClick     *EventHandler
 }
@@ -183,6 +184,7 @@ func (p Props) ToMap() map[string]interface{} {
 		"ID":          p.ID,
 		"For":         p.For,
 		"Tag":         p.Tag,
+		"Href":        p.Href,
 		"Checked":     p.Checked,
 		"Type":        p.Type,
 		"TextContent": p.TextContent,
