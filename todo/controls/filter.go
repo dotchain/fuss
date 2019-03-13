@@ -20,35 +20,33 @@ const (
 // Filter renders a row of options for "All", "Active" or "Done"
 //
 // This is reflected in the selected stream (which is both input and output).
-func filter(c *filterCtx, selected, focusedState *dom.FocusTrackerStream) (*dom.FocusTrackerStream, dom.Element) {
-	if focusedState == nil {
-		focusedState = dom.NewFocusTrackerStream(dom.FocusTracker{})
-	}
-
-	// get the sub streams
-	allF, allS := focusedState.Substream(c.Cache, ShowAll), selected.Substream(c.Cache, ShowAll)
-	activeF, activeS := focusedState.Substream(c.Cache, ShowActive), selected.Substream(c.Cache, ShowActive)
-	doneF, doneS := focusedState.Substream(c.Cache, ShowDone), selected.Substream(c.Cache, ShowDone)
-
-	regular := dom.Styles{Borders: dom.Borders{Color: "lightgrey", Width: dom.Size{Pixels: 1}, Radius: dom.Size{Pixels: 4}}}
-	highlight := regular
-	highlight.Borders.Color = "blue"
-
-	all, active, done := regular, regular, regular
-	switch selected.Value.Current {
-	case ShowAll:
-		all = highlight
-	case ShowActive:
-		active = highlight
-	case ShowDone:
-		done = highlight
-	}
-
-	return focusedState, c.dom.Run(
+func filter(c *filterCtx, selected *dom.TextStream) dom.Element {
+	return c.dom.Run(
 		"root",
 		dom.Styles{},
-		c.dom.Focusable("all", allF, allS, c.dom.LabelView("all", all, "All", "")),
-		c.dom.Focusable("active", activeF, activeS, c.dom.LabelView("active", active, "Active", "")),
-		c.dom.Focusable("done", doneF, doneS, c.dom.LabelView("done", done, "Done", "")),
+		c.FilterOption("all", selected, ShowAll),
+		c.FilterOption("active", selected, ShowActive),
+		c.FilterOption("done", selected, ShowDone),
 	)
 }
+
+// FilterOption renders a filter option as a focusable which when
+// clicked will automatically append the provided key to the selected
+// stream.
+func filterOption(c *filterOptionCtx, selected *dom.TextStream, key string) dom.Element {
+	h := &dom.EventHandler{func(e dom.Event) {
+		if e.Value() == "click" {
+			selected = selected.Append(nil, key, true)
+		}
+	}}
+
+	styles := dom.Styles{Borders: dom.Borders{Color: "lightgrey", Width: dom.Size{Pixels: 1}, Radius: dom.Size{Pixels: 4}}}
+	if selected.Value == key {
+		styles.Borders.Color = "blue"
+	}
+	label := filterLabels[key]
+
+	return c.dom.Focusable("root", h, c.dom.LabelView(key, styles, label, ""))
+}
+
+var filterLabels = map[string]string{ShowAll: "All", ShowActive: "Active", ShowDone: "Done"}

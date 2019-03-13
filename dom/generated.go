@@ -207,31 +207,31 @@ func (s *TextStream) unwrapValue(v changes.Value) string {
 	return v.(changes.Atomic).Value.(string)
 }
 
-// FocusTrackerStream is a stream of FocusTracker values.
-type FocusTrackerStream struct {
+// EventStream is a stream of Event values.
+type EventStream struct {
 	// Notifier provides On/Off/Notify support. New instances of
-	// FocusTrackerStream created via the AppendLocal or AppendRemote
+	// EventStream created via the AppendLocal or AppendRemote
 	// share the same Notifier value.
 	*core.Notifier
 
 	// Value holds the current value. The latest value may be
 	// fetched via the Latest() method.
-	Value FocusTracker
+	Value Event
 
 	// Change tracks the change that leads to the next value.
 	Change changes.Change
 
 	// Next tracks the next value in the stream.
-	Next *FocusTrackerStream
+	Next *EventStream
 }
 
-// NewFocusTrackerStream creates a new FocusTracker stream
-func NewFocusTrackerStream(value FocusTracker) *FocusTrackerStream {
-	return &FocusTrackerStream{&core.Notifier{}, value, nil, nil}
+// NewEventStream creates a new Event stream
+func NewEventStream(value Event) *EventStream {
+	return &EventStream{&core.Notifier{}, value, nil, nil}
 }
 
 // Latest returns the latest value in the stream
-func (s *FocusTrackerStream) Latest() *FocusTrackerStream {
+func (s *EventStream) Latest() *EventStream {
 	for s.Next != nil {
 		s = s.Next
 	}
@@ -242,13 +242,13 @@ func (s *FocusTrackerStream) Latest() *FocusTrackerStream {
 // local or remote. It returns the updated stream whose value matches
 // the provided value and whose Latest() converges to the latest of
 // the stream.
-func (s *FocusTrackerStream) Append(c changes.Change, value FocusTracker, isLocal bool) *FocusTrackerStream {
+func (s *EventStream) Append(c changes.Change, value Event, isLocal bool) *EventStream {
 	if c == nil {
 		c = changes.Replace{Before: s.wrapValue(s.Value), After: s.wrapValue(value)}
 	}
 
 	// return value: after is correctly set to provided value
-	result := &FocusTrackerStream{Notifier: s.Notifier, Value: value}
+	result := &EventStream{Notifier: s.Notifier, Value: value}
 
 	// before tracks s, after tracks result, v tracks latest value
 	// of after chain
@@ -280,7 +280,7 @@ func (s *FocusTrackerStream) Append(c changes.Change, value FocusTracker, isLoca
 		// append this to after and continue with that
 		v = v.Apply(nil, afterChange)
 		after.Change = afterChange
-		after.Next = &FocusTrackerStream{Notifier: s.Notifier, Value: s.unwrapValue(v)}
+		after.Next = &EventStream{Notifier: s.Notifier, Value: s.unwrapValue(v)}
 		after = after.Next
 	}
 
@@ -291,18 +291,18 @@ func (s *FocusTrackerStream) Append(c changes.Change, value FocusTracker, isLoca
 	return result
 }
 
-func (s *FocusTrackerStream) wrapValue(i interface{}) changes.Value {
+func (s *EventStream) wrapValue(i interface{}) changes.Value {
 	if x, ok := i.(changes.Value); ok {
 		return x
 	}
 	return changes.Atomic{i}
 }
 
-func (s *FocusTrackerStream) unwrapValue(v changes.Value) FocusTracker {
-	if x, ok := v.(interface{}).(FocusTracker); ok {
+func (s *EventStream) unwrapValue(v changes.Value) Event {
+	if x, ok := v.(interface{}).(Event); ok {
 		return x
 	}
-	return v.(changes.Atomic).Value.(FocusTracker)
+	return v.(changes.Atomic).Value.(Event)
 }
 
 type aCtx struct {
@@ -840,19 +840,14 @@ type fCtx struct {
 
 	memoized struct {
 		children []Element
-		focused  *BoolStream
+		eh       *EventHandler
 		result1  Element
-		selected *BoolStream
 	}
 }
 
-func (c *fCtx) areArgsSame(focused *BoolStream, selected *BoolStream, children []Element) bool {
+func (c *fCtx) areArgsSame(eh *EventHandler, children []Element) bool {
 
-	if focused != c.memoized.focused {
-		return false
-	}
-
-	if selected != c.memoized.selected {
+	if eh != c.memoized.eh {
 		return false
 	}
 
@@ -868,27 +863,27 @@ func (c *fCtx) areArgsSame(focused *BoolStream, selected *BoolStream, children [
 
 }
 
-func (c *fCtx) refreshIfNeeded(focused *BoolStream, selected *BoolStream, children []Element) (result1 Element) {
-	if !c.initialized || !c.areArgsSame(focused, selected, children) {
-		return c.refresh(focused, selected, children)
+func (c *fCtx) refreshIfNeeded(eh *EventHandler, children []Element) (result1 Element) {
+	if !c.initialized || !c.areArgsSame(eh, children) {
+		return c.refresh(eh, children)
 	}
 	return c.memoized.result1
 }
 
-func (c *fCtx) refresh(focused *BoolStream, selected *BoolStream, children []Element) (result1 Element) {
+func (c *fCtx) refresh(eh *EventHandler, children []Element) (result1 Element) {
 	c.initialized = true
 	c.stateHandler.Handle = func() {
-		c.refresh(focused, selected, children)
+		c.refresh(eh, children)
 	}
 
-	c.memoized.focused, c.memoized.selected, c.memoized.children = focused, selected, children
+	c.memoized.eh, c.memoized.children = eh, children
 
 	c.Cache.Begin()
 	defer c.Cache.End()
 
 	c.EltStruct.Begin()
 	defer c.EltStruct.End()
-	c.memoized.result1 = focusable(c, focused, selected, children...)
+	c.memoized.result1 = focusable(c, eh, children...)
 
 	return c.memoized.result1
 }
@@ -910,8 +905,7 @@ func (c *fCtx) close() {
 //
 // This is different from a checbox or input in that there are no
 // specific "values" available and it also does not expose actual
-// keyboard events.  The focused stream gets updated whenever focus is
-// obtained or lost.
+// keyboard events.
 //
 // Note that there is no programmatic way to focus this element
 type FocusableStruct struct {
@@ -932,7 +926,7 @@ func (c *FocusableStruct) End() {
 }
 
 // Focusable - see the type for details
-func (c *FocusableStruct) Focusable(cKey interface{}, focused *BoolStream, selected *BoolStream, children ...Element) (result1 Element) {
+func (c *FocusableStruct) Focusable(cKey interface{}, eh *EventHandler, children ...Element) (result1 Element) {
 	cOld, ok := c.old[cKey]
 	if ok {
 		delete(c.old, cKey)
@@ -940,7 +934,7 @@ func (c *FocusableStruct) Focusable(cKey interface{}, focused *BoolStream, selec
 		cOld = &fCtx{}
 	}
 	c.current[cKey] = cOld
-	return cOld.refreshIfNeeded(focused, selected, children)
+	return cOld.refreshIfNeeded(eh, children)
 }
 
 type labelViewCtx struct {
