@@ -14,8 +14,13 @@ type event struct {
 	epoch int64
 }
 
-func newEvent(e element) dom.Event {
+func newEvent(e element, name string) dom.Event {
 	epoch := time.Now().UnixNano()
+
+	if e.Node.Data != "input" {
+		return &event{name, epoch}
+	}
+
 	checked := "off"
 	var val *string
 	inputType := ""

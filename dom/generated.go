@@ -732,6 +732,119 @@ func (c *FixedStruct) Fixed(cKey interface{}, styles Styles, cells ...Element) (
 	return cOld.refreshIfNeeded(styles, cells)
 }
 
+type fCtx struct {
+	core.Cache
+	finalizer func()
+
+	EltStruct
+	initialized  bool
+	stateHandler core.Handler
+
+	memoized struct {
+		children []Element
+		focused  *BoolStream
+		result1  Element
+		selected *BoolStream
+	}
+}
+
+func (c *fCtx) areArgsSame(focused *BoolStream, selected *BoolStream, children []Element) bool {
+
+	if focused != c.memoized.focused {
+		return false
+	}
+
+	if selected != c.memoized.selected {
+		return false
+	}
+
+	if len(children) != len(c.memoized.children) {
+		return false
+	}
+	for childrenIdx := range children {
+		if children[childrenIdx] != c.memoized.children[childrenIdx] {
+			return false
+		}
+	}
+	return true
+
+}
+
+func (c *fCtx) refreshIfNeeded(focused *BoolStream, selected *BoolStream, children []Element) (result1 Element) {
+	if !c.initialized || !c.areArgsSame(focused, selected, children) {
+		return c.refresh(focused, selected, children)
+	}
+	return c.memoized.result1
+}
+
+func (c *fCtx) refresh(focused *BoolStream, selected *BoolStream, children []Element) (result1 Element) {
+	c.initialized = true
+	c.stateHandler.Handle = func() {
+		c.refresh(focused, selected, children)
+	}
+
+	c.memoized.focused, c.memoized.selected, c.memoized.children = focused, selected, children
+
+	c.Cache.Begin()
+	defer c.Cache.End()
+
+	c.EltStruct.Begin()
+	defer c.EltStruct.End()
+	c.memoized.result1 = focusable(c, focused, selected, children...)
+
+	return c.memoized.result1
+}
+
+func (c *fCtx) close() {
+	c.Cache.Begin()
+	c.Cache.End()
+
+	c.EltStruct.Begin()
+	c.EltStruct.End()
+	if c.finalizer != nil {
+		c.finalizer()
+	}
+}
+
+// FocusableStruct is a cache for Focusable
+// Focusable is a basic control which can receive focus and be
+// selected by clicks.
+//
+// This is different from a checbox or input in that there are no
+// specific "values" available and it also does not expose actual
+// keyboard events.  The focused stream gets updated whenever focus is
+// obtained or lost.
+//
+// Note that there is no programmatic way to focus this element
+type FocusableStruct struct {
+	old, current map[interface{}]*fCtx
+}
+
+// Begin starts a round
+func (c *FocusableStruct) Begin() {
+	c.old, c.current = c.current, map[interface{}]*fCtx{}
+}
+
+// End finishes the round cleaning up any unused components
+func (c *FocusableStruct) End() {
+	for _, ctx := range c.old {
+		ctx.close()
+	}
+	c.old = nil
+}
+
+// Focusable - see the type for details
+func (c *FocusableStruct) Focusable(cKey interface{}, focused *BoolStream, selected *BoolStream, children ...Element) (result1 Element) {
+	cOld, ok := c.old[cKey]
+	if ok {
+		delete(c.old, cKey)
+	} else {
+		cOld = &fCtx{}
+	}
+	c.current[cKey] = cOld
+	return cOld.refreshIfNeeded(focused, selected, children)
+}
+
 type labelViewCtx struct {
 	core.Cache
 	finalizer func()

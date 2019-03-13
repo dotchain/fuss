@@ -202,11 +202,12 @@ type Props struct {
 	Placeholder string
 	OnChange    *EventHandler
 	OnClick     *EventHandler
+	OnFocus     *EventHandler
 }
 
 // ToMap returns the map version of props (useful for diffs)
 func (p Props) ToMap() map[string]interface{} {
-	return map[string]interface{}{
+	result := map[string]interface{}{
 		"ID":          p.ID,
 		"For":         p.For,
 		"Tag":         p.Tag,
@@ -218,7 +219,12 @@ func (p Props) ToMap() map[string]interface{} {
 		"Styles":      p.Styles,
 		"OnChange":    p.OnChange,
 		"OnClick":     p.OnClick,
+		"OnFocus":     p.OnFocus,
 	}
+	if p.OnFocus != nil && p.Tag != "input" && p.Tag != "button" {
+		result["TabIndex"] = "0"
+	}
+	return result
 }
 
 // EventHandler is struct to hold a callback function

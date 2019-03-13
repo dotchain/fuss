@@ -61,7 +61,7 @@ func (e element) SetProp(key string, value interface{}) {
 		}
 	case "Checked":
 		e.n.Set("checked", value.(bool))
-	case "Type", "ID", "For", "Href", "Placeholder":
+	case "Type", "ID", "For", "Href", "Placeholder", "TabIndex":
 		e.setAttr(strings.ToLower(key), value.(string))
 	case "TextContent":
 		if strings.ToLower(e.n.Get("tagName").String()) == "input" {
@@ -75,6 +75,9 @@ func (e element) SetProp(key string, value interface{}) {
 		e.onEvent("change", value.(*dom.EventHandler))
 	case "OnClick":
 		e.onEvent("click", value.(*dom.EventHandler))
+	case "OnFocus":
+		e.onEvent("focus", value.(*dom.EventHandler))
+		e.onEvent("blur", value.(*dom.EventHandler))
 	default:
 		panic("Unknown key: " + key)
 	}
@@ -183,12 +186,14 @@ func (e event) EpochNano() int64 {
 
 func (e event) Value() string {
 	n := e.native.Get("currentTarget")
-	isInput := strings.ToLower(n.Get("tagName").String()) == "input"
-	isCheckbox := n.Get("type").String() == "checkbox"
+	if strings.ToLower(n.Get("tagName").String()) != "input" {
+		return e.native.Get("type").String()
+	}
 
-	if isInput && isCheckbox {
+	if n.Get("type").String() == "checkbox" {
 		m := map[bool]string{true: "on", false: "off"}
 		return m[n.Get("checked").Bool()]
 	}
+
 	return n.Get("value").String()
 }
