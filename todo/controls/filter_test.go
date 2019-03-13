@@ -14,20 +14,29 @@ import (
 
 func Example_filter() {
 	cache := controls.FilterStruct{}
-	done, active := dom.NewBoolStream(false), dom.NewBoolStream(false)
+	selected := dom.NewFocusTrackerStream(dom.FocusTracker{Current: controls.ShowAll})
 
 	cache.Begin()
-	root := cache.Filter("root", done, active)
+	root := cache.Filter("root", selected)
 	cache.End()
 
 	fmt.Println(gohtml.Format(fmt.Sprint(root)))
 
 	cache.Begin()
-	done = done.Append(nil, true, true)
-	active = active.Append(nil, true, true)
-	root = cache.Filter("root", done, active)
+	selected = selected.Append(nil, dom.FocusTracker{Current: controls.ShowActive}, true)
+	root = cache.Filter("root", selected)
 	cache.End()
+	fmt.Println(gohtml.Format(fmt.Sprint(root)))
 
+	html.Click(root.Children()[2])
+	if selected.Latest().Value.Current != controls.ShowDone {
+		fmt.Println("Unexpected selection state", selected.Latest().Value.Current)
+	}
+
+	cache.Begin()
+	selected = selected.Latest()
+	root = cache.Filter("root", selected)
+	cache.End()
 	fmt.Println(gohtml.Format(fmt.Sprint(root)))
 
 	cache.Begin()
@@ -39,23 +48,54 @@ func Example_filter() {
 
 	// Output:
 	// <div style="display: flex; flex-direction: row">
-	//   <input id="done" type="checkbox"/>
-	//   <label for="done">
-	//     Show Completed
-	//   </label>
-	//   <input id="notDone" type="checkbox"/>
-	//   <label for="notDone">
-	//     Show Incomplete
-	//   </label>
+	//   <div tabindex="0">
+	//     <label style="border-radius: 4px; border-color: blue; border-width: 1px">
+	//       All
+	//     </label>
+	//   </div>
+	//   <div tabindex="0">
+	//     <label style="border-radius: 4px; border-color: lightgrey; border-width: 1px">
+	//       Active
+	//     </label>
+	//   </div>
+	//   <div tabindex="0">
+	//     <label style="border-radius: 4px; border-color: lightgrey; border-width: 1px">
+	//       Done
+	//     </label>
+	//   </div>
 	// </div>
 	// <div style="display: flex; flex-direction: row">
-	//   <input checked="" id="done" type="checkbox"/>
-	//   <label for="done">
-	//     Showing Completed
-	//   </label>
-	//   <input checked="" id="notDone" type="checkbox"/>
-	//   <label for="notDone">
-	//     Showing Incomplete
-	//   </label>
+	//   <div tabindex="0">
+	//     <label style="border-radius: 4px; border-color: lightgrey; border-width: 1px">
+	//       All
+	//     </label>
+	//   </div>
+	//   <div tabindex="0">
+	//     <label style="border-radius: 4px; border-color: blue; border-width: 1px">
+	//       Active
+	//     </label>
+	//   </div>
+	//   <div tabindex="0">
+	//     <label style="border-radius: 4px; border-color: lightgrey; border-width: 1px">
+	//       Done
+	//     </label>
+	//   </div>
+	// </div>
+	// <div style="display: flex; flex-direction: row">
+	//   <div tabindex="0">
+	//     <label style="border-radius: 4px; border-color: lightgrey; border-width: 1px">
+	//       All
+	//     </label>
+	//   </div>
+	//   <div tabindex="0">
+	//     <label style="border-radius: 4px; border-color: lightgrey; border-width: 1px">
+	//       Active
+	//     </label>
+	//   </div>
+	//   <div tabindex="0">
+	//     <label style="border-radius: 4px; border-color: blue; border-width: 1px">
+	//       Done
+	//     </label>
+	//   </div>
 	// </div>
 }

@@ -6,23 +6,49 @@ package controls
 
 import "github.com/dotchain/fuss/dom"
 
-// Filter renders a checkbox with a label
-func filter(c *filterCtx, done, active *dom.BoolStream) dom.Element {
-	doneLabel, activeLabel := "Show Completed", "Show Incomplete"
-	if done.Value {
-		doneLabel = "Showing Completed"
+const (
+	// ShowAll = show both active and done
+	ShowAll = "all"
+
+	// ShowActive = show only active
+	ShowActive = "active"
+
+	// ShowDone = show only done
+	ShowDone = "done"
+)
+
+// Filter renders a row of options for "All", "Active" or "Done"
+//
+// This is reflected in the selected stream (which is both input and output).
+func filter(c *filterCtx, selected, focusedState *dom.FocusTrackerStream) (*dom.FocusTrackerStream, dom.Element) {
+	if focusedState == nil {
+		focusedState = dom.NewFocusTrackerStream(dom.FocusTracker{})
 	}
 
-	if active.Value {
-		activeLabel = "Showing Incomplete"
+	// get the sub streams
+	allF, allS := focusedState.Substream(c.Cache, ShowAll), selected.Substream(c.Cache, ShowAll)
+	activeF, activeS := focusedState.Substream(c.Cache, ShowActive), selected.Substream(c.Cache, ShowActive)
+	doneF, doneS := focusedState.Substream(c.Cache, ShowDone), selected.Substream(c.Cache, ShowDone)
+
+	regular := dom.Styles{Borders: dom.Borders{Color: "lightgrey", Width: dom.Size{Pixels: 1}, Radius: dom.Size{Pixels: 4}}}
+	highlight := regular
+	highlight.Borders.Color = "blue"
+
+	all, active, done := regular, regular, regular
+	switch selected.Value.Current {
+	case ShowAll:
+		all = highlight
+	case ShowActive:
+		active = highlight
+	case ShowDone:
+		done = highlight
 	}
 
-	return c.dom.Run(
+	return focusedState, c.dom.Run(
 		"root",
 		dom.Styles{},
-		c.dom.CheckboxEdit("c1", dom.Styles{}, done, "done"),
-		c.dom.LabelView("l1", dom.Styles{}, doneLabel, "done"),
-		c.dom.CheckboxEdit("c2", dom.Styles{}, active, "notDone"),
-		c.dom.LabelView("l2", dom.Styles{}, activeLabel, "notDone"),
+		c.dom.Focusable("all", allF, allS, c.dom.LabelView("all", all, "All", "")),
+		c.dom.Focusable("active", activeF, activeS, c.dom.LabelView("active", active, "Active", "")),
+		c.dom.Focusable("done", doneF, doneS, c.dom.LabelView("done", done, "Done", "")),
 	)
 }

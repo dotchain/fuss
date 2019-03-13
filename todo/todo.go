@@ -7,7 +7,7 @@ package todo
 
 import (
 	"github.com/dotchain/fuss/dom"
-	_ "github.com/dotchain/fuss/todo/controls" // requried for codegen
+	"github.com/dotchain/fuss/todo/controls"
 )
 
 // Task represents an item in the TODO list.
@@ -39,12 +39,14 @@ func taskEdit(c *taskEditCtx, task *TaskStream) dom.Element {
 // Individual tasks can be modified underneath. The current list of
 // tasks is available via Tasks field which supports On/Off to receive
 // notifications.
-func tasksView(c *tasksViewCtx, styles dom.Styles, showDone *dom.BoolStream, showNotDone *dom.BoolStream, tasks *TasksStream) dom.Element {
+func tasksView(c *tasksViewCtx, styles dom.Styles, filter *dom.FocusTrackerStream, tasks *TasksStream) dom.Element {
 	return c.dom.VRun(
 		"root",
 		styles,
 		renderTasks(tasks.Value, func(index int, t Task) dom.Element {
-			if t.Done && !showDone.Value || !t.Done && !showNotDone.Value {
+			done := filter.Value.Current == controls.ShowDone
+			active := filter.Value.Current == controls.ShowActive
+			if t.Done && active || !t.Done && done {
 				return nil
 			}
 
@@ -63,21 +65,18 @@ func renderTasks(t Tasks, fn func(int, Task) dom.Element) []dom.Element {
 
 // FilteredTasks is a thin wrapper on top of TasksView with checkboxes for ShowDone and ShowUndone
 //
-func filteredTasks(c *filteredCtx, styles dom.Styles, tasks *TasksStream, doneState *dom.BoolStream, notDoneState *dom.BoolStream) (*dom.BoolStream, *dom.BoolStream, dom.Element) {
-	if doneState == nil {
-		doneState = dom.NewBoolStream(true)
-	}
-	if notDoneState == nil {
-		notDoneState = dom.NewBoolStream(true)
+func filteredTasks(c *filteredCtx, styles dom.Styles, tasks *TasksStream, filterState *dom.FocusTrackerStream) (*dom.FocusTrackerStream, dom.Element) {
+	if filterState == nil {
+		filterState = dom.NewFocusTrackerStream(dom.FocusTracker{controls.ShowAll})
 	}
 
 	addTaskStream := tasks.addTaskStream(c.Cache)
-	return doneState, notDoneState, c.dom.VRun(
+	return filterState, c.dom.VRun(
 		"root",
 		styles,
 		c.controls.TextReset("input", addTaskStream, "Add a task"),
-		c.controls.Filter("f", doneState, notDoneState),
-		c.TasksView("tasks", dom.Styles{}, doneState, notDoneState, tasks),
+		c.controls.Filter("f", filterState),
+		c.TasksView("tasks", dom.Styles{}, filterState, tasks),
 	)
 }
 

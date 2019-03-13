@@ -21,6 +21,7 @@ func main() {
 	info.Streams = []fussy.StreamInfo{
 		{StreamType: "BoolStream", ValueType: "bool"},
 		{StreamType: "TextStream", ValueType: "string"},
+		{StreamType: "FocusTrackerStream", ValueType: "FocusTracker"},
 	}
 	ioutil.WriteFile(output, []byte(fussy.Generate(info)), 0644)
 }
