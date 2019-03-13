@@ -9,6 +9,7 @@ import (
 	"github.com/dotchain/fuss/dom"
 	"github.com/dotchain/fuss/dom/html"
 	"github.com/dotchain/fuss/todo"
+	"github.com/dotchain/fuss/todo/controls"
 	"github.com/yosssi/gohtml"
 )
 
@@ -42,14 +43,21 @@ func Example_app() {
 	//     <div style="display: flex; flex-direction: column">
 	//       <input placeholder="Add a task" type="text"/>
 	//       <div style="display: flex; flex-direction: row">
-	//         <input checked="" id="done" type="checkbox"/>
-	//         <label for="done">
-	//           Showing Completed
-	//         </label>
-	//         <input checked="" id="notDone" type="checkbox"/>
-	//         <label for="notDone">
-	//           Showing Incomplete
-	//         </label>
+	//         <div tabindex="0">
+	//           <label style="border-radius: 4px; border-color: blue; border-width: 1px">
+	//             All
+	//           </label>
+	//         </div>
+	//         <div tabindex="0">
+	//           <label style="border-radius: 4px; border-color: lightgrey; border-width: 1px">
+	//             Active
+	//           </label>
+	//         </div>
+	//         <div tabindex="0">
+	//           <label style="border-radius: 4px; border-color: lightgrey; border-width: 1px">
+	//             Done
+	//           </label>
+	//         </div>
 	//       </div>
 	//       <div style="display: flex; flex-direction: column">
 	//         <div style="display: flex; flex-direction: row">
@@ -90,8 +98,10 @@ func Example_renderFilteredTasks() {
 
 	fmt.Println(gohtml.Format(fmt.Sprint(root)))
 
-	// set "ShowDone" to false which should filter out the second task
-	html.SetValue(root.Children()[1].Children()[0], "off")
+	// TODO: find a better way to work with private state in
+	// test tools rather than mucking directly with HTML output
+	// set filter = "Active" which should filter out the second task
+	html.Click(root.Children()[1].Children()[1])
 	fmt.Println(gohtml.Format(fmt.Sprint(root)))
 
 	cache.Begin()
@@ -105,14 +115,21 @@ func Example_renderFilteredTasks() {
 	// <div style="display: flex; flex-direction: column">
 	//   <input placeholder="Add a task" type="text"/>
 	//   <div style="display: flex; flex-direction: row">
-	//     <input checked="" id="done" type="checkbox"/>
-	//     <label for="done">
-	//       Showing Completed
-	//     </label>
-	//     <input checked="" id="notDone" type="checkbox"/>
-	//     <label for="notDone">
-	//       Showing Incomplete
-	//     </label>
+	//     <div tabindex="0">
+	//       <label style="border-radius: 4px; border-color: blue; border-width: 1px">
+	//         All
+	//       </label>
+	//     </div>
+	//     <div tabindex="0">
+	//       <label style="border-radius: 4px; border-color: lightgrey; border-width: 1px">
+	//         Active
+	//       </label>
+	//     </div>
+	//     <div tabindex="0">
+	//       <label style="border-radius: 4px; border-color: lightgrey; border-width: 1px">
+	//         Done
+	//       </label>
+	//     </div>
 	//   </div>
 	//   <div style="display: flex; flex-direction: column">
 	//     <div style="display: flex; flex-direction: row">
@@ -128,14 +145,21 @@ func Example_renderFilteredTasks() {
 	// <div style="display: flex; flex-direction: column">
 	//   <input placeholder="Add a task" type="text"/>
 	//   <div style="display: flex; flex-direction: row">
-	//     <input id="done" type="checkbox"/>
-	//     <label for="done">
-	//       Show Completed
-	//     </label>
-	//     <input checked="" id="notDone" type="checkbox"/>
-	//     <label for="notDone">
-	//       Showing Incomplete
-	//     </label>
+	//     <div tabindex="0">
+	//       <label style="border-radius: 4px; border-color: lightgrey; border-width: 1px">
+	//         All
+	//       </label>
+	//     </div>
+	//     <div tabindex="0">
+	//       <label style="border-radius: 4px; border-color: blue; border-width: 1px">
+	//         Active
+	//       </label>
+	//     </div>
+	//     <div tabindex="0">
+	//       <label style="border-radius: 4px; border-color: lightgrey; border-width: 1px">
+	//         Done
+	//       </label>
+	//     </div>
 	//   </div>
 	//   <div style="display: flex; flex-direction: column">
 	//     <div style="display: flex; flex-direction: row">
@@ -154,25 +178,22 @@ func Example_renderTasks() {
 		{"two", true, "second task"},
 	}
 	s := todo.NewTasksStream(tasks)
-	showDone, showNotDone := dom.NewBoolStream(true), dom.NewBoolStream(false)
+	selected := dom.NewFocusTrackerStream(dom.FocusTracker{Current: controls.ShowDone})
+
 	cache.Begin()
-	root := cache.TasksView("root", dom.Styles{}, showDone, showNotDone, s)
+	root := cache.TasksView("root", dom.Styles{}, selected, s)
 	cache.End()
 	fmt.Println(gohtml.Format(fmt.Sprint(root)))
 
-	showDone = showDone.Append(nil, false, true)
+	selected = selected.Append(nil, dom.FocusTracker{Current: controls.ShowActive}, true)
 	cache.Begin()
-	root = cache.TasksView("root", dom.Styles{Color: "red"}, showDone, showNotDone, s)
+	root = cache.TasksView("root", dom.Styles{Color: "red"}, selected, s)
 	cache.End()
 	fmt.Println(gohtml.Format(fmt.Sprint(root)))
 
-	showDone = showDone.Append(nil, true, true)
+	selected = selected.Append(nil, dom.FocusTracker{Current: controls.ShowAll}, true)
 	cache.Begin()
-	_ = cache.TasksView("root", dom.Styles{}, showDone, showNotDone, s)
-	cache.End()
-	showNotDone = showNotDone.Append(nil, true, true)
-	cache.Begin()
-	root = cache.TasksView("root", dom.Styles{}, showDone, showNotDone, s)
+	root = cache.TasksView("root", dom.Styles{}, selected, s)
 	cache.End()
 	fmt.Println(gohtml.Format(fmt.Sprint(root)))
 
@@ -191,6 +212,10 @@ func Example_renderTasks() {
 	//   </div>
 	// </div>
 	// <div style="color: red; display: flex; flex-direction: column">
+	//   <div style="display: flex; flex-direction: row">
+	//     <input type="checkbox"/>
+	//     <input type="text" value="first task"/>
+	//   </div>
 	// </div>
 	// <div style="display: flex; flex-direction: column">
 	//   <div style="display: flex; flex-direction: row">

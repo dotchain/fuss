@@ -511,13 +511,11 @@ type filteredCtx struct {
 		dom.VRunStruct
 	}
 	memoized struct {
-		doneState    *dom.BoolStream
-		notDoneState *dom.BoolStream
-		result1      *dom.BoolStream
-		result2      *dom.BoolStream
-		result3      dom.Element
-		styles       dom.Styles
-		tasks        *TasksStream
+		filterState *dom.FocusTrackerStream
+		result1     *dom.FocusTrackerStream
+		result2     dom.Element
+		styles      dom.Styles
+		tasks       *TasksStream
 	}
 }
 
@@ -531,24 +529,21 @@ func (c *filteredCtx) areArgsSame(styles dom.Styles, tasks *TasksStream) bool {
 
 }
 
-func (c *filteredCtx) refreshIfNeeded(styles dom.Styles, tasks *TasksStream) (result3 dom.Element) {
+func (c *filteredCtx) refreshIfNeeded(styles dom.Styles, tasks *TasksStream) (result2 dom.Element) {
 	if !c.initialized || !c.areArgsSame(styles, tasks) {
 		return c.refresh(styles, tasks)
 	}
-	return c.memoized.result3
+	return c.memoized.result2
 }
 
-func (c *filteredCtx) refresh(styles dom.Styles, tasks *TasksStream) (result3 dom.Element) {
+func (c *filteredCtx) refresh(styles dom.Styles, tasks *TasksStream) (result2 dom.Element) {
 	c.initialized = true
 	c.stateHandler.Handle = func() {
 		c.refresh(styles, tasks)
 	}
 
-	if c.memoized.doneState != nil {
-		c.memoized.doneState = c.memoized.doneState.Latest()
-	}
-	if c.memoized.notDoneState != nil {
-		c.memoized.notDoneState = c.memoized.notDoneState.Latest()
+	if c.memoized.filterState != nil {
+		c.memoized.filterState = c.memoized.filterState.Latest()
 	}
 	c.memoized.styles, c.memoized.tasks = styles, tasks
 
@@ -566,27 +561,18 @@ func (c *filteredCtx) refresh(styles dom.Styles, tasks *TasksStream) (result3 do
 
 	c.dom.VRunStruct.Begin()
 	defer c.dom.VRunStruct.End()
-	c.memoized.result1, c.memoized.result2, c.memoized.result3 = filteredTasks(c, styles, tasks, c.memoized.doneState, c.memoized.notDoneState)
+	c.memoized.result1, c.memoized.result2 = filteredTasks(c, styles, tasks, c.memoized.filterState)
 
-	if c.memoized.doneState != c.memoized.result1 {
-		if c.memoized.doneState != nil {
-			c.memoized.doneState.Off(&c.stateHandler)
+	if c.memoized.filterState != c.memoized.result1 {
+		if c.memoized.filterState != nil {
+			c.memoized.filterState.Off(&c.stateHandler)
 		}
 		if c.memoized.result1 != nil {
 			c.memoized.result1.On(&c.stateHandler)
 		}
-		c.memoized.doneState = c.memoized.result1
+		c.memoized.filterState = c.memoized.result1
 	}
-	if c.memoized.notDoneState != c.memoized.result2 {
-		if c.memoized.notDoneState != nil {
-			c.memoized.notDoneState.Off(&c.stateHandler)
-		}
-		if c.memoized.result2 != nil {
-			c.memoized.result2.On(&c.stateHandler)
-		}
-		c.memoized.notDoneState = c.memoized.result2
-	}
-	return c.memoized.result3
+	return c.memoized.result2
 }
 
 func (c *filteredCtx) close() {
@@ -606,9 +592,6 @@ func (c *filteredCtx) close() {
 	c.dom.VRunStruct.End()
 	if c.memoized.result1 != nil {
 		c.memoized.result1.Off(&c.stateHandler)
-	}
-	if c.memoized.result2 != nil {
-		c.memoized.result2.Off(&c.stateHandler)
 	}
 	if c.finalizer != nil {
 		c.finalizer()
@@ -636,7 +619,7 @@ func (c *FilteredTasksStruct) End() {
 }
 
 // FilteredTasks - see the type for details
-func (c *FilteredTasksStruct) FilteredTasks(cKey interface{}, styles dom.Styles, tasks *TasksStream) (result3 dom.Element) {
+func (c *FilteredTasksStruct) FilteredTasks(cKey interface{}, styles dom.Styles, tasks *TasksStream) (result2 dom.Element) {
 	cOld, ok := c.old[cKey]
 	if ok {
 		delete(c.old, cKey)
@@ -764,25 +747,20 @@ type tasksViewCtx struct {
 		dom.VRunStruct
 	}
 	memoized struct {
-		result1     dom.Element
-		showDone    *dom.BoolStream
-		showNotDone *dom.BoolStream
-		styles      dom.Styles
-		tasks       *TasksStream
+		filter  *dom.FocusTrackerStream
+		result1 dom.Element
+		styles  dom.Styles
+		tasks   *TasksStream
 	}
 }
 
-func (c *tasksViewCtx) areArgsSame(styles dom.Styles, showDone *dom.BoolStream, showNotDone *dom.BoolStream, tasks *TasksStream) bool {
+func (c *tasksViewCtx) areArgsSame(styles dom.Styles, filter *dom.FocusTrackerStream, tasks *TasksStream) bool {
 
 	if styles != c.memoized.styles {
 		return false
 	}
 
-	if showDone != c.memoized.showDone {
-		return false
-	}
-
-	if showNotDone != c.memoized.showNotDone {
+	if filter != c.memoized.filter {
 		return false
 	}
 
@@ -790,20 +768,20 @@ func (c *tasksViewCtx) areArgsSame(styles dom.Styles, showDone *dom.BoolStream, 
 
 }
 
-func (c *tasksViewCtx) refreshIfNeeded(styles dom.Styles, showDone *dom.BoolStream, showNotDone *dom.BoolStream, tasks *TasksStream) (result1 dom.Element) {
-	if !c.initialized || !c.areArgsSame(styles, showDone, showNotDone, tasks) {
-		return c.refresh(styles, showDone, showNotDone, tasks)
+func (c *tasksViewCtx) refreshIfNeeded(styles dom.Styles, filter *dom.FocusTrackerStream, tasks *TasksStream) (result1 dom.Element) {
+	if !c.initialized || !c.areArgsSame(styles, filter, tasks) {
+		return c.refresh(styles, filter, tasks)
 	}
 	return c.memoized.result1
 }
 
-func (c *tasksViewCtx) refresh(styles dom.Styles, showDone *dom.BoolStream, showNotDone *dom.BoolStream, tasks *TasksStream) (result1 dom.Element) {
+func (c *tasksViewCtx) refresh(styles dom.Styles, filter *dom.FocusTrackerStream, tasks *TasksStream) (result1 dom.Element) {
 	c.initialized = true
 	c.stateHandler.Handle = func() {
-		c.refresh(styles, showDone, showNotDone, tasks)
+		c.refresh(styles, filter, tasks)
 	}
 
-	c.memoized.styles, c.memoized.showDone, c.memoized.showNotDone, c.memoized.tasks = styles, showDone, showNotDone, tasks
+	c.memoized.styles, c.memoized.filter, c.memoized.tasks = styles, filter, tasks
 
 	c.Cache.Begin()
 	defer c.Cache.End()
@@ -813,7 +791,7 @@ func (c *tasksViewCtx) refresh(styles dom.Styles, showDone *dom.BoolStream, show
 
 	c.dom.VRunStruct.Begin()
 	defer c.dom.VRunStruct.End()
-	c.memoized.result1 = tasksView(c, styles, showDone, showNotDone, tasks)
+	c.memoized.result1 = tasksView(c, styles, filter, tasks)
 
 	return c.memoized.result1
 }
@@ -856,7 +834,7 @@ func (c *TasksViewStruct) End() {
 }
 
 // TasksView - see the type for details
-func (c *TasksViewStruct) TasksView(cKey interface{}, styles dom.Styles, showDone *dom.BoolStream, showNotDone *dom.BoolStream, tasks *TasksStream) (result1 dom.Element) {
+func (c *TasksViewStruct) TasksView(cKey interface{}, styles dom.Styles, filter *dom.FocusTrackerStream, tasks *TasksStream) (result1 dom.Element) {
 	cOld, ok := c.old[cKey]
 	if ok {
 		delete(c.old, cKey)
@@ -864,5 +842,5 @@ func (c *TasksViewStruct) TasksView(cKey interface{}, styles dom.Styles, showDon
 		cOld = &tasksViewCtx{}
 	}
 	c.current[cKey] = cOld
-	return cOld.refreshIfNeeded(styles, showDone, showNotDone, tasks)
+	return cOld.refreshIfNeeded(styles, filter, tasks)
 }

@@ -132,77 +132,91 @@ type filterCtx struct {
 	stateHandler core.Handler
 
 	dom struct {
-		dom.CheckboxEditStruct
+		dom.FocusableStruct
 		dom.LabelViewStruct
 		dom.RunStruct
 	}
 	memoized struct {
-		active  *dom.BoolStream
-		done    *dom.BoolStream
-		result1 dom.Element
+		focusedState *dom.FocusTrackerStream
+		result1      *dom.FocusTrackerStream
+		result2      dom.Element
+		selected     *dom.FocusTrackerStream
 	}
 }
 
-func (c *filterCtx) areArgsSame(done *dom.BoolStream, active *dom.BoolStream) bool {
+func (c *filterCtx) areArgsSame(selected *dom.FocusTrackerStream) bool {
 
-	if done != c.memoized.done {
-		return false
-	}
-
-	return active == c.memoized.active
+	return selected == c.memoized.selected
 
 }
 
-func (c *filterCtx) refreshIfNeeded(done *dom.BoolStream, active *dom.BoolStream) (result1 dom.Element) {
-	if !c.initialized || !c.areArgsSame(done, active) {
-		return c.refresh(done, active)
+func (c *filterCtx) refreshIfNeeded(selected *dom.FocusTrackerStream) (result2 dom.Element) {
+	if !c.initialized || !c.areArgsSame(selected) {
+		return c.refresh(selected)
 	}
-	return c.memoized.result1
+	return c.memoized.result2
 }
 
-func (c *filterCtx) refresh(done *dom.BoolStream, active *dom.BoolStream) (result1 dom.Element) {
+func (c *filterCtx) refresh(selected *dom.FocusTrackerStream) (result2 dom.Element) {
 	c.initialized = true
 	c.stateHandler.Handle = func() {
-		c.refresh(done, active)
+		c.refresh(selected)
 	}
 
-	c.memoized.done, c.memoized.active = done, active
+	if c.memoized.focusedState != nil {
+		c.memoized.focusedState = c.memoized.focusedState.Latest()
+	}
+	c.memoized.selected = selected
 
 	c.Cache.Begin()
 	defer c.Cache.End()
 
-	c.dom.CheckboxEditStruct.Begin()
-	defer c.dom.CheckboxEditStruct.End()
+	c.dom.FocusableStruct.Begin()
+	defer c.dom.FocusableStruct.End()
 
 	c.dom.LabelViewStruct.Begin()
 	defer c.dom.LabelViewStruct.End()
 
 	c.dom.RunStruct.Begin()
 	defer c.dom.RunStruct.End()
-	c.memoized.result1 = filter(c, done, active)
+	c.memoized.result1, c.memoized.result2 = filter(c, selected, c.memoized.focusedState)
 
-	return c.memoized.result1
+	if c.memoized.focusedState != c.memoized.result1 {
+		if c.memoized.focusedState != nil {
+			c.memoized.focusedState.Off(&c.stateHandler)
+		}
+		if c.memoized.result1 != nil {
+			c.memoized.result1.On(&c.stateHandler)
+		}
+		c.memoized.focusedState = c.memoized.result1
+	}
+	return c.memoized.result2
 }
 
 func (c *filterCtx) close() {
 	c.Cache.Begin()
 	c.Cache.End()
 
-	c.dom.CheckboxEditStruct.Begin()
-	c.dom.CheckboxEditStruct.End()
+	c.dom.FocusableStruct.Begin()
+	c.dom.FocusableStruct.End()
 
 	c.dom.LabelViewStruct.Begin()
 	c.dom.LabelViewStruct.End()
 
 	c.dom.RunStruct.Begin()
 	c.dom.RunStruct.End()
+	if c.memoized.result1 != nil {
+		c.memoized.result1.Off(&c.stateHandler)
+	}
 	if c.finalizer != nil {
 		c.finalizer()
 	}
 }
 
 // FilterStruct is a cache for Filter
-// Filter renders a checkbox with a label
+// Filter renders a row of options for "All", "Active" or "Done"
+//
+// This is reflected in the selected stream (which is both input and output).
 type FilterStruct struct {
 	old, current map[interface{}]*filterCtx
 }
@@ -221,7 +235,7 @@ func (c *FilterStruct) End() {
 }
 
 // Filter - see the type for details
-func (c *FilterStruct) Filter(cKey interface{}, done *dom.BoolStream, active *dom.BoolStream) (result1 dom.Element) {
+func (c *FilterStruct) Filter(cKey interface{}, selected *dom.FocusTrackerStream) (result2 dom.Element) {
 	cOld, ok := c.old[cKey]
 	if ok {
 		delete(c.old, cKey)
@@ -229,7 +243,7 @@ func (c *FilterStruct) Filter(cKey interface{}, done *dom.BoolStream, active *do
 		cOld = &filterCtx{}
 	}
 	c.current[cKey] = cOld
-	return cOld.refreshIfNeeded(done, active)
+	return cOld.refreshIfNeeded(selected)
 }
 
 type textResetCtx struct {

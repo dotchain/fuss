@@ -16,6 +16,8 @@ func init() {
 	events := map[string]*js.Object{
 		"change": js.Global.Get("Map").New(),
 		"click":  js.Global.Get("Map").New(),
+		"focus":  js.Global.Get("Map").New(),
+		"blur":   js.Global.Get("Map").New(),
 	}
 	dom.RegisterDriver(driver{events})
 }

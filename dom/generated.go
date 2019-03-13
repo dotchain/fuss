@@ -207,6 +207,104 @@ func (s *TextStream) unwrapValue(v changes.Value) string {
 	return v.(changes.Atomic).Value.(string)
 }
 
+// FocusTrackerStream is a stream of FocusTracker values.
+type FocusTrackerStream struct {
+	// Notifier provides On/Off/Notify support. New instances of
+	// FocusTrackerStream created via the AppendLocal or AppendRemote
+	// share the same Notifier value.
+	*core.Notifier
+
+	// Value holds the current value. The latest value may be
+	// fetched via the Latest() method.
+	Value FocusTracker
+
+	// Change tracks the change that leads to the next value.
+	Change changes.Change
+
+	// Next tracks the next value in the stream.
+	Next *FocusTrackerStream
+}
+
+// NewFocusTrackerStream creates a new FocusTracker stream
+func NewFocusTrackerStream(value FocusTracker) *FocusTrackerStream {
+	return &FocusTrackerStream{&core.Notifier{}, value, nil, nil}
+}
+
+// Latest returns the latest value in the stream
+func (s *FocusTrackerStream) Latest() *FocusTrackerStream {
+	for s.Next != nil {
+		s = s.Next
+	}
+	return s
+}
+
+// Append appends a local change. isLocal identifies if the caller is
+// local or remote. It returns the updated stream whose value matches
+// the provided value and whose Latest() converges to the latest of
+// the stream.
+func (s *FocusTrackerStream) Append(c changes.Change, value FocusTracker, isLocal bool) *FocusTrackerStream {
+	if c == nil {
+		c = changes.Replace{Before: s.wrapValue(s.Value), After: s.wrapValue(value)}
+	}
+
+	// return value: after is correctly set to provided value
+	result := &FocusTrackerStream{Notifier: s.Notifier, Value: value}
+
+	// before tracks s, after tracks result, v tracks latest value
+	// of after chain
+	before := s
+	var v changes.Value = changes.Atomic{value}
+
+	// walk the chain of Next and find corresponding values to
+	// add to after so that both s annd after converge
+	after := result
+	for ; before.Next != nil; before = before.Next {
+		var afterChange changes.Change
+
+		if isLocal {
+			c, afterChange = before.Change.Merge(c)
+		} else {
+			afterChange, c = c.Merge(before.Change)
+		}
+
+		if c == nil {
+			// the convergence point is before.Next
+			after.Change, after.Next = afterChange, before.Next
+			return result
+		}
+
+		if afterChange == nil {
+			continue
+		}
+
+		// append this to after and continue with that
+		v = v.Apply(nil, afterChange)
+		after.Change = afterChange
+		after.Next = &FocusTrackerStream{Notifier: s.Notifier, Value: s.unwrapValue(v)}
+		after = after.Next
+	}
+
+	// append the residual change (c) to converge to wherever
+	// after has landed. Notify since s.Latest() has now changed
+	before.Change, before.Next = c, after
+	s.Notify()
+	return result
+}
+
+func (s *FocusTrackerStream) wrapValue(i interface{}) changes.Value {
+	if x, ok := i.(changes.Value); ok {
+		return x
+	}
+	return changes.Atomic{i}
+}
+
+func (s *FocusTrackerStream) unwrapValue(v changes.Value) FocusTracker {
+	if x, ok := v.(interface{}).(FocusTracker); ok {
+		return x
+	}
+	return v.(changes.Atomic).Value.(FocusTracker)
+}
+
 type aCtx struct {
 	core.Cache
 	finalizer func()
