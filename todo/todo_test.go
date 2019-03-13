@@ -178,20 +178,20 @@ func Example_renderTasks() {
 		{"two", true, "second task"},
 	}
 	s := todo.NewTasksStream(tasks)
-	selected := dom.NewFocusTrackerStream(dom.FocusTracker{Current: controls.ShowDone})
+	selected := dom.NewTextStream(controls.ShowDone)
 
 	cache.Begin()
 	root := cache.TasksView("root", dom.Styles{}, selected, s)
 	cache.End()
 	fmt.Println(gohtml.Format(fmt.Sprint(root)))
 
-	selected = selected.Append(nil, dom.FocusTracker{Current: controls.ShowActive}, true)
+	selected = selected.Append(nil, controls.ShowActive, true)
 	cache.Begin()
 	root = cache.TasksView("root", dom.Styles{Color: "red"}, selected, s)
 	cache.End()
 	fmt.Println(gohtml.Format(fmt.Sprint(root)))
 
-	selected = selected.Append(nil, dom.FocusTracker{Current: controls.ShowAll}, true)
+	selected = selected.Append(nil, controls.ShowAll, true)
 	cache.Begin()
 	root = cache.TasksView("root", dom.Styles{}, selected, s)
 	cache.End()

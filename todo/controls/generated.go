@@ -128,86 +128,62 @@ type filterCtx struct {
 	core.Cache
 	finalizer func()
 
+	FilterOptionStruct
 	initialized  bool
 	stateHandler core.Handler
 
 	dom struct {
-		dom.FocusableStruct
-		dom.LabelViewStruct
 		dom.RunStruct
 	}
 	memoized struct {
-		focusedState *dom.FocusTrackerStream
-		result1      *dom.FocusTrackerStream
-		result2      dom.Element
-		selected     *dom.FocusTrackerStream
+		result1  dom.Element
+		selected *dom.TextStream
 	}
 }
 
-func (c *filterCtx) areArgsSame(selected *dom.FocusTrackerStream) bool {
+func (c *filterCtx) areArgsSame(selected *dom.TextStream) bool {
 
 	return selected == c.memoized.selected
 
 }
 
-func (c *filterCtx) refreshIfNeeded(selected *dom.FocusTrackerStream) (result2 dom.Element) {
+func (c *filterCtx) refreshIfNeeded(selected *dom.TextStream) (result1 dom.Element) {
 	if !c.initialized || !c.areArgsSame(selected) {
 		return c.refresh(selected)
 	}
-	return c.memoized.result2
+	return c.memoized.result1
 }
 
-func (c *filterCtx) refresh(selected *dom.FocusTrackerStream) (result2 dom.Element) {
+func (c *filterCtx) refresh(selected *dom.TextStream) (result1 dom.Element) {
 	c.initialized = true
 	c.stateHandler.Handle = func() {
 		c.refresh(selected)
 	}
 
-	if c.memoized.focusedState != nil {
-		c.memoized.focusedState = c.memoized.focusedState.Latest()
-	}
 	c.memoized.selected = selected
 
 	c.Cache.Begin()
 	defer c.Cache.End()
 
-	c.dom.FocusableStruct.Begin()
-	defer c.dom.FocusableStruct.End()
-
-	c.dom.LabelViewStruct.Begin()
-	defer c.dom.LabelViewStruct.End()
+	c.FilterOptionStruct.Begin()
+	defer c.FilterOptionStruct.End()
 
 	c.dom.RunStruct.Begin()
 	defer c.dom.RunStruct.End()
-	c.memoized.result1, c.memoized.result2 = filter(c, selected, c.memoized.focusedState)
+	c.memoized.result1 = filter(c, selected)
 
-	if c.memoized.focusedState != c.memoized.result1 {
-		if c.memoized.focusedState != nil {
-			c.memoized.focusedState.Off(&c.stateHandler)
-		}
-		if c.memoized.result1 != nil {
-			c.memoized.result1.On(&c.stateHandler)
-		}
-		c.memoized.focusedState = c.memoized.result1
-	}
-	return c.memoized.result2
+	return c.memoized.result1
 }
 
 func (c *filterCtx) close() {
 	c.Cache.Begin()
 	c.Cache.End()
 
-	c.dom.FocusableStruct.Begin()
-	c.dom.FocusableStruct.End()
-
-	c.dom.LabelViewStruct.Begin()
-	c.dom.LabelViewStruct.End()
+	c.FilterOptionStruct.Begin()
+	c.FilterOptionStruct.End()
 
 	c.dom.RunStruct.Begin()
 	c.dom.RunStruct.End()
-	if c.memoized.result1 != nil {
-		c.memoized.result1.Off(&c.stateHandler)
-	}
 	if c.finalizer != nil {
 		c.finalizer()
 	}
@@ -235,7 +211,7 @@ func (c *FilterStruct) End() {
 }
 
 // Filter - see the type for details
-func (c *FilterStruct) Filter(cKey interface{}, selected *dom.FocusTrackerStream) (result2 dom.Element) {
+func (c *FilterStruct) Filter(cKey interface{}, selected *dom.TextStream) (result1 dom.Element) {
 	cOld, ok := c.old[cKey]
 	if ok {
 		delete(c.old, cKey)
@@ -244,6 +220,109 @@ func (c *FilterStruct) Filter(cKey interface{}, selected *dom.FocusTrackerStream
 	}
 	c.current[cKey] = cOld
 	return cOld.refreshIfNeeded(selected)
+}
+
+type filterOptionCtx struct {
+	core.Cache
+	finalizer func()
+
+	initialized  bool
+	stateHandler core.Handler
+
+	dom struct {
+		dom.FocusableStruct
+		dom.LabelViewStruct
+	}
+	memoized struct {
+		key      string
+		result1  dom.Element
+		selected *dom.TextStream
+	}
+}
+
+func (c *filterOptionCtx) areArgsSame(selected *dom.TextStream, key string) bool {
+
+	if selected != c.memoized.selected {
+		return false
+	}
+
+	return key == c.memoized.key
+
+}
+
+func (c *filterOptionCtx) refreshIfNeeded(selected *dom.TextStream, key string) (result1 dom.Element) {
+	if !c.initialized || !c.areArgsSame(selected, key) {
+		return c.refresh(selected, key)
+	}
+	return c.memoized.result1
+}
+
+func (c *filterOptionCtx) refresh(selected *dom.TextStream, key string) (result1 dom.Element) {
+	c.initialized = true
+	c.stateHandler.Handle = func() {
+		c.refresh(selected, key)
+	}
+
+	c.memoized.selected, c.memoized.key = selected, key
+
+	c.Cache.Begin()
+	defer c.Cache.End()
+
+	c.dom.FocusableStruct.Begin()
+	defer c.dom.FocusableStruct.End()
+
+	c.dom.LabelViewStruct.Begin()
+	defer c.dom.LabelViewStruct.End()
+	c.memoized.result1 = filterOption(c, selected, key)
+
+	return c.memoized.result1
+}
+
+func (c *filterOptionCtx) close() {
+	c.Cache.Begin()
+	c.Cache.End()
+
+	c.dom.FocusableStruct.Begin()
+	c.dom.FocusableStruct.End()
+
+	c.dom.LabelViewStruct.Begin()
+	c.dom.LabelViewStruct.End()
+	if c.finalizer != nil {
+		c.finalizer()
+	}
+}
+
+// FilterOptionStruct is a cache for FilterOption
+// FilterOption renders a filter option as a focusable which when
+// clicked will automatically append the provided key to the selected
+// stream.
+type FilterOptionStruct struct {
+	old, current map[interface{}]*filterOptionCtx
+}
+
+// Begin starts a round
+func (c *FilterOptionStruct) Begin() {
+	c.old, c.current = c.current, map[interface{}]*filterOptionCtx{}
+}
+
+// End finishes the round cleaning up any unused components
+func (c *FilterOptionStruct) End() {
+	for _, ctx := range c.old {
+		ctx.close()
+	}
+	c.old = nil
+}
+
+// FilterOption - see the type for details
+func (c *FilterOptionStruct) FilterOption(cKey interface{}, selected *dom.TextStream, key string) (result1 dom.Element) {
+	cOld, ok := c.old[cKey]
+	if ok {
+		delete(c.old, cKey)
+	} else {
+		cOld = &filterOptionCtx{}
+	}
+	c.current[cKey] = cOld
+	return cOld.refreshIfNeeded(selected, key)
 }
 
 type textResetCtx struct {

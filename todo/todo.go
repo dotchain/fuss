@@ -39,13 +39,13 @@ func taskEdit(c *taskEditCtx, task *TaskStream) dom.Element {
 // Individual tasks can be modified underneath. The current list of
 // tasks is available via Tasks field which supports On/Off to receive
 // notifications.
-func tasksView(c *tasksViewCtx, styles dom.Styles, filter *dom.FocusTrackerStream, tasks *TasksStream) dom.Element {
+func tasksView(c *tasksViewCtx, styles dom.Styles, filter *dom.TextStream, tasks *TasksStream) dom.Element {
 	return c.dom.VRun(
 		"root",
 		styles,
 		renderTasks(tasks.Value, func(index int, t Task) dom.Element {
-			done := filter.Value.Current == controls.ShowDone
-			active := filter.Value.Current == controls.ShowActive
+			done := filter.Value == controls.ShowDone
+			active := filter.Value == controls.ShowActive
 			if t.Done && active || !t.Done && done {
 				return nil
 			}
@@ -65,9 +65,9 @@ func renderTasks(t Tasks, fn func(int, Task) dom.Element) []dom.Element {
 
 // FilteredTasks is a thin wrapper on top of TasksView with checkboxes for ShowDone and ShowUndone
 //
-func filteredTasks(c *filteredCtx, styles dom.Styles, tasks *TasksStream, filterState *dom.FocusTrackerStream) (*dom.FocusTrackerStream, dom.Element) {
+func filteredTasks(c *filteredCtx, styles dom.Styles, tasks *TasksStream, filterState *dom.TextStream) (*dom.TextStream, dom.Element) {
 	if filterState == nil {
-		filterState = dom.NewFocusTrackerStream(dom.FocusTracker{controls.ShowAll})
+		filterState = dom.NewTextStream(controls.ShowAll)
 	}
 
 	addTaskStream := tasks.addTaskStream(c.Cache)

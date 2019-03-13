@@ -15,9 +15,19 @@ func TestFocusable(t *testing.T) {
 	var f dom.FocusableStruct
 
 	focused, selected := dom.NewBoolStream(false), dom.NewBoolStream(false)
+	h := &dom.EventHandler{func(e dom.Event) {
+		switch e.Value() {
+		case "click":
+			selected.Append(nil, true, true)
+		case "focus":
+			focused.Append(nil, true, true)
+		case "blur":
+			focused.Append(nil, false, true)
+		}
+	}}
 
 	f.Begin()
-	elt := f.Focusable("root", focused, selected)
+	elt := f.Focusable("root", h)
 	f.End()
 
 	if x := fmt.Sprint(elt); x != "<div tabindex=\"0\"></div>" {

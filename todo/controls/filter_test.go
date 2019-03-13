@@ -14,7 +14,7 @@ import (
 
 func Example_filter() {
 	cache := controls.FilterStruct{}
-	selected := dom.NewFocusTrackerStream(dom.FocusTracker{Current: controls.ShowAll})
+	selected := dom.NewTextStream(controls.ShowAll)
 
 	cache.Begin()
 	root := cache.Filter("root", selected)
@@ -23,14 +23,14 @@ func Example_filter() {
 	fmt.Println(gohtml.Format(fmt.Sprint(root)))
 
 	cache.Begin()
-	selected = selected.Append(nil, dom.FocusTracker{Current: controls.ShowActive}, true)
+	selected = selected.Append(nil, controls.ShowActive, true)
 	root = cache.Filter("root", selected)
 	cache.End()
 	fmt.Println(gohtml.Format(fmt.Sprint(root)))
 
 	html.Click(root.Children()[2])
-	if selected.Latest().Value.Current != controls.ShowDone {
-		fmt.Println("Unexpected selection state", selected.Latest().Value.Current)
+	if selected.Latest().Value != controls.ShowDone {
+		fmt.Println("Unexpected selection state", selected.Latest().Value)
 	}
 
 	cache.Begin()

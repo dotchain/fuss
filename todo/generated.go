@@ -511,8 +511,8 @@ type filteredCtx struct {
 		dom.VRunStruct
 	}
 	memoized struct {
-		filterState *dom.FocusTrackerStream
-		result1     *dom.FocusTrackerStream
+		filterState *dom.TextStream
+		result1     *dom.TextStream
 		result2     dom.Element
 		styles      dom.Styles
 		tasks       *TasksStream
@@ -747,14 +747,14 @@ type tasksViewCtx struct {
 		dom.VRunStruct
 	}
 	memoized struct {
-		filter  *dom.FocusTrackerStream
+		filter  *dom.TextStream
 		result1 dom.Element
 		styles  dom.Styles
 		tasks   *TasksStream
 	}
 }
 
-func (c *tasksViewCtx) areArgsSame(styles dom.Styles, filter *dom.FocusTrackerStream, tasks *TasksStream) bool {
+func (c *tasksViewCtx) areArgsSame(styles dom.Styles, filter *dom.TextStream, tasks *TasksStream) bool {
 
 	if styles != c.memoized.styles {
 		return false
@@ -768,14 +768,14 @@ func (c *tasksViewCtx) areArgsSame(styles dom.Styles, filter *dom.FocusTrackerSt
 
 }
 
-func (c *tasksViewCtx) refreshIfNeeded(styles dom.Styles, filter *dom.FocusTrackerStream, tasks *TasksStream) (result1 dom.Element) {
+func (c *tasksViewCtx) refreshIfNeeded(styles dom.Styles, filter *dom.TextStream, tasks *TasksStream) (result1 dom.Element) {
 	if !c.initialized || !c.areArgsSame(styles, filter, tasks) {
 		return c.refresh(styles, filter, tasks)
 	}
 	return c.memoized.result1
 }
 
-func (c *tasksViewCtx) refresh(styles dom.Styles, filter *dom.FocusTrackerStream, tasks *TasksStream) (result1 dom.Element) {
+func (c *tasksViewCtx) refresh(styles dom.Styles, filter *dom.TextStream, tasks *TasksStream) (result1 dom.Element) {
 	c.initialized = true
 	c.stateHandler.Handle = func() {
 		c.refresh(styles, filter, tasks)
@@ -834,7 +834,7 @@ func (c *TasksViewStruct) End() {
 }
 
 // TasksView - see the type for details
-func (c *TasksViewStruct) TasksView(cKey interface{}, styles dom.Styles, filter *dom.FocusTrackerStream, tasks *TasksStream) (result1 dom.Element) {
+func (c *TasksViewStruct) TasksView(cKey interface{}, styles dom.Styles, filter *dom.TextStream, tasks *TasksStream) (result1 dom.Element) {
 	cOld, ok := c.old[cKey]
 	if ok {
 		delete(c.old, cKey)
