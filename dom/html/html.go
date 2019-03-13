@@ -22,6 +22,8 @@ func init() {
 	current = &driver{events: map[string]map[*html.Node]*dom.EventHandler{
 		"change": {},
 		"click":  {},
+		"focus":  {},
+		"blur":   {},
 	}}
 	dom.RegisterDriver(current)
 }
@@ -49,9 +51,34 @@ func SetValue(e dom.Element, value string) {
 
 // Click clicks the provided element
 func Click(elt dom.Element) {
+	fireEvent(elt, "click")
+}
+
+// Focus focuses the provided element (after blurring the previous)
+func Focus(elt dom.Element) {
 	e := elt.(element)
-	if cx, ok := e.d.events["click"][e.Node]; ok {
-		cx.Handle(newEvent(e))
+	if e.d.activeElement == elt {
+		return
+	}
+	if e.d.activeElement != nil {
+		fireEvent(e.d.activeElement, "blur")
+	}
+	e.d.activeElement = elt
+	fireEvent(elt, "focus")
+}
+
+// Blur blurs any active elements
+func Blur() {
+	if current.activeElement != nil {
+		fireEvent(current.activeElement, "blur")
+	}
+	current.activeElement = nil
+}
+
+func fireEvent(elt dom.Element, name string) {
+	e := elt.(element)
+	if cx, ok := e.d.events[name][e.Node]; ok {
+		cx.Handle(newEvent(e, name))
 	}
 }
 
@@ -59,7 +86,8 @@ func Click(elt dom.Element) {
 // Node type
 type driver struct {
 	// events tracks all registered handlers
-	events map[string]map[*html.Node]*dom.EventHandler
+	events        map[string]map[*html.Node]*dom.EventHandler
+	activeElement dom.Element
 }
 
 // NewElement implements the dom.driver NewElement method
@@ -107,7 +135,7 @@ func (e element) sortAttr() {
 func (e element) SetProp(key string, value interface{}) {
 	defer e.sortAttr()
 	switch key {
-	case "ID", "For", "Href", "Type", "Placeholder":
+	case "ID", "For", "Href", "Type", "Placeholder", "TabIndex":
 		e.setStringAttribute(strings.ToLower(key), value.(string))
 	case "Tag":
 		tag := strings.ToLower(value.(string))
@@ -127,6 +155,9 @@ func (e element) SetProp(key string, value interface{}) {
 		e.onEvent("change", value.(*dom.EventHandler))
 	case "OnClick":
 		e.onEvent("click", value.(*dom.EventHandler))
+	case "OnFocus":
+		e.onEvent("focus", value.(*dom.EventHandler))
+		e.onEvent("blur", value.(*dom.EventHandler))
 	default:
 		panic("Unknown key: " + key)
 	}
@@ -201,7 +232,7 @@ func (e element) setValue(s string) {
 	}
 
 	if cx, ok := e.d.events["change"][e.Node]; ok {
-		cx.Handle(newEvent(e))
+		cx.Handle(newEvent(e, "change"))
 	}
 }
 
