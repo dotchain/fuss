@@ -22,7 +22,7 @@
 			],
 			"Results": [
 				{
-					"Name": "",
+					"Name": "result1",
 					"Type": "float32",
 					"IsState": false
 				}
@@ -47,7 +47,7 @@
 					],
 					"Results": [
 						{
-							"Name": "",
+							"Name": "result1",
 							"Type": "int",
 							"IsState": false
 						}
@@ -73,7 +73,7 @@
 					],
 					"Results": [
 						{
-							"Name": "",
+							"Name": "result1",
 							"Type": "int",
 							"IsState": false
 						}
@@ -100,7 +100,47 @@
 			],
 			"Results": [
 				{
-					"Name": "",
+					"Name": "result1",
+					"Type": "int",
+					"IsState": false
+				}
+			],
+			"Subs": null
+		},
+		{
+			"Name": "edgeTrigger",
+			"Type": "EdgeTriggerFunc",
+			"Ctor": "NewEdgeTrigger",
+			"Args": [
+				{
+					"Name": "deps",
+					"Type": "*none",
+					"IsState": false
+				},
+				{
+					"Name": "state",
+					"Type": "int",
+					"IsState": true
+				},
+				{
+					"Name": "input",
+					"Type": "int",
+					"IsState": false
+				}
+			],
+			"Results": [
+				{
+					"Name": "state1",
+					"Type": "int",
+					"IsState": true
+				},
+				{
+					"Name": "r1",
+					"Type": "int",
+					"IsState": false
+				},
+				{
+					"Name": "r2",
 					"Type": "int",
 					"IsState": false
 				}
@@ -125,7 +165,7 @@
 			],
 			"Results": [
 				{
-					"Name": "",
+					"Name": "result1",
 					"Type": "int",
 					"IsState": false
 				}

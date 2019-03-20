@@ -1,5 +1,11 @@
 package datum
 
+// ignorable looks like count but first arg is not a pointer
+type IgnorableFunc = func(key interface{}, a Array) int
+func ignorable(deps none, a Array) int {
+	return 0
+}
+
 // CountFunc returns the length the provided array
 type CountFunc = func(key interface{}, a Array) int
 func count(deps *none, a Array) int {
@@ -25,4 +31,11 @@ func avg(deps *sumDeps, a Array) float32 {
 type sumDeps struct {
 	count CountFunc
 	sum SumFunc
+}
+
+// EdgeTriggerFunc returns the number of times it has been rebuilt
+type EdgeTriggerFunc func(key interface{}) int
+func edgeTrigger(deps *none, state, input int) (state1 int, r1, r2 int) {
+	state ++
+	return state, state, state
 }

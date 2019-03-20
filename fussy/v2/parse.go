@@ -5,11 +5,13 @@
 package fussy
 
 import (
+	"fmt"
 	"go/ast"
 	"go/importer"
 	"go/parser"
 	"go/token"
 	"go/types"
+	"log"
 	"sort"
 	"strings"
 	"unicode"
@@ -175,21 +177,40 @@ func coreComponentInfo(s *types.Scope, name string, fn *types.Signature) *Compon
 			ctor = "new" + fName[:len(fName)-4]
 		}
 	}
+
+	stateArgs := []ArgInfo{}
 	ci := &ComponentInfo{Name: name, Type: fName, Ctor: ctor}
 	for kk := 0; kk < fn.Params().Len(); kk++ {
 		arg := fn.Params().At(kk)
 		ai := ArgInfo{Name: arg.Name(), Type: arg.Type().String()}
-		ai.IsState = isStateArg(ai.Name)
+		if ai.IsState = isStateArg(ai.Name); ai.IsState {
+			stateArgs = append(stateArgs, ai)
+		}
+
 		ci.Args = append(ci.Args, ai)
 	}
 
 	for kk := 0; kk < fn.Results().Len(); kk++ {
 		arg := fn.Results().At(kk)
 		ai := ArgInfo{Name: arg.Name(), Type: arg.Type().String()}
-		ai.IsState = isStateArg(ai.Name)
+		if ai.Name == "" {
+			ai.Name = fmt.Sprintf("result%d", kk+1)
+		}
+		for jj := 0; jj < len(stateArgs); jj++ {
+			if stateArgs[jj].Type == ai.Type {
+				ai.IsState = true
+				copy(stateArgs[jj:], stateArgs[jj+1:])
+				stateArgs = stateArgs[:len(stateArgs)-1]
+				break
+			}
+		}
 		ci.Results = append(ci.Results, ai)
 	}
 
+	if len(stateArgs) != 0 {
+		log.Println("Unmatched state", ci.Name, stateArgs[0].Name)
+		return nil
+	}
 	return ci
 }
 
