@@ -1,0 +1,136 @@
+{
+	"Generator": "",
+	"Package": "datum",
+	"Imports": null,
+	"Streams": null,
+	"Components": [
+		{
+			"Name": "avg",
+			"Type": "AvgFunc",
+			"Ctor": "NewAvg",
+			"Args": [
+				{
+					"Name": "deps",
+					"Type": "*sumDeps",
+					"IsState": false
+				},
+				{
+					"Name": "a",
+					"Type": "Array",
+					"IsState": false
+				}
+			],
+			"Results": [
+				{
+					"Name": "",
+					"Type": "float32",
+					"IsState": false
+				}
+			],
+			"Subs": [
+				{
+					"LocalName": "count",
+					"Name": "Count",
+					"Type": "CountFunc",
+					"Ctor": "NewCount",
+					"Args": [
+						{
+							"Name": "key",
+							"Type": "interface{}",
+							"IsState": false
+						},
+						{
+							"Name": "a",
+							"Type": "Array",
+							"IsState": false
+						}
+					],
+					"Results": [
+						{
+							"Name": "",
+							"Type": "int",
+							"IsState": false
+						}
+					],
+					"Subs": null
+				},
+				{
+					"LocalName": "sum",
+					"Name": "Sum",
+					"Type": "SumFunc",
+					"Ctor": "NewSum",
+					"Args": [
+						{
+							"Name": "key",
+							"Type": "interface{}",
+							"IsState": false
+						},
+						{
+							"Name": "a",
+							"Type": "Array",
+							"IsState": false
+						}
+					],
+					"Results": [
+						{
+							"Name": "",
+							"Type": "int",
+							"IsState": false
+						}
+					],
+					"Subs": null
+				}
+			]
+		},
+		{
+			"Name": "count",
+			"Type": "CountFunc",
+			"Ctor": "NewCount",
+			"Args": [
+				{
+					"Name": "deps",
+					"Type": "*none",
+					"IsState": false
+				},
+				{
+					"Name": "a",
+					"Type": "Array",
+					"IsState": false
+				}
+			],
+			"Results": [
+				{
+					"Name": "",
+					"Type": "int",
+					"IsState": false
+				}
+			],
+			"Subs": null
+		},
+		{
+			"Name": "sum",
+			"Type": "SumFunc",
+			"Ctor": "NewSum",
+			"Args": [
+				{
+					"Name": "deps",
+					"Type": "*none",
+					"IsState": false
+				},
+				{
+					"Name": "a",
+					"Type": "Array",
+					"IsState": false
+				}
+			],
+			"Results": [
+				{
+					"Name": "",
+					"Type": "int",
+					"IsState": false
+				}
+			],
+			"Subs": null
+		}
+	]
+}
