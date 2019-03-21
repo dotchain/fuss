@@ -1,7 +1,7 @@
 {
 	"Generator": "",
 	"Package": "datum",
-	"Imports": null,
+	"Imports": [],
 	"Streams": null,
 	"Components": [
 		{
@@ -24,7 +24,7 @@
 			],
 			"Results": [
 				{
-					"Name": "result1",
+					"Name": "result",
 					"Type": "float32",
 					"IsState": false,
 					"ImplementsEquals": false
@@ -52,7 +52,7 @@
 					],
 					"Results": [
 						{
-							"Name": "result1",
+							"Name": "result",
 							"Type": "int",
 							"IsState": false,
 							"ImplementsEquals": false
@@ -81,7 +81,7 @@
 					],
 					"Results": [
 						{
-							"Name": "result1",
+							"Name": "result",
 							"Type": "int",
 							"IsState": false,
 							"ImplementsEquals": false
@@ -111,13 +111,13 @@
 			],
 			"Results": [
 				{
-					"Name": "result1",
+					"Name": "result",
 					"Type": "int",
 					"IsState": false,
 					"ImplementsEquals": false
 				}
 			],
-			"Subs": null
+			"Subs": []
 		},
 		{
 			"Name": "edgeTrigger",
@@ -163,7 +163,7 @@
 					"ImplementsEquals": false
 				}
 			],
-			"Subs": null
+			"Subs": []
 		},
 		{
 			"Name": "sum",
@@ -185,13 +185,13 @@
 			],
 			"Results": [
 				{
-					"Name": "result1",
+					"Name": "result",
 					"Type": "int",
 					"IsState": false,
 					"ImplementsEquals": false
 				}
 			],
-			"Subs": null
+			"Subs": []
 		}
 	]
 }

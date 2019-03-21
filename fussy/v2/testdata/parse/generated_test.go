@@ -13,14 +13,14 @@ import (
 // NewMyTest is the constructor for MyTestFunc
 func NewMyTest() (update MyTestFunc, close func()) {
 	var lasta datum.Array
-	var lastresult1 float32
+	var lastresult float32
 	var initialized bool
 	avgFnMap := map[interface{}]datum.AvgFunc{}
 	avgCloseMap := map[interface{}]func(){}
 	avgUsedMap := map[interface{}]bool{}
 
 	depsLocal := &testDeps{
-		avg: func(key interface{}, a datum.Array) (result1 float32) {
+		avg: func(key interface{}, a datum.Array) (result float32) {
 			avgUsedMap[key] = true
 			if avgFnMap[key] == nil {
 				avgFnMap[key], avgCloseMap[key] = datum.NewAvg()
@@ -40,20 +40,20 @@ func NewMyTest() (update MyTestFunc, close func()) {
 		avgUsedMap = map[interface{}]bool{}
 	}
 
-	update = func(deps interface{}, a datum.Array) (result1 float32) {
+	update = func(deps interface{}, a datum.Array) (result float32) {
 		if initialized {
 			switch {
 			case lasta.Equals(a):
 
 			default:
-				return lastresult1
+				return lastresult
 			}
 		}
 		initialized = true
 		lasta = a
-		lastresult1 = myTest(depsLocal, a)
+		lastresult = myTest(depsLocal, a)
 		close()
-		return lastresult1
+		return lastresult
 	}
 
 	return update, close

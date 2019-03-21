@@ -3,7 +3,7 @@
 	"Package": "datum_test",
 	"Imports": [
 		[
-			"",
+			"datum",
 			"github.com/dotchain/fuss/fussy/v2/testdata/parse"
 		]
 	],
@@ -29,7 +29,7 @@
 			],
 			"Results": [
 				{
-					"Name": "result1",
+					"Name": "result",
 					"Type": "float32",
 					"IsState": false,
 					"ImplementsEquals": false
@@ -57,7 +57,7 @@
 					],
 					"Results": [
 						{
-							"Name": "result1",
+							"Name": "result",
 							"Type": "float32",
 							"IsState": false,
 							"ImplementsEquals": false
