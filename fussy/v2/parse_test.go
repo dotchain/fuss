@@ -23,4 +23,17 @@ func TestParse(t *testing.T) {
 		}
 		return string(s), nil
 	})
+
+	info, err = fussy.ParseDir("testdata/parse", "datum_test")
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	testFile(t, "parse/test.go", "parse/info_test.output.json", func(string) (string, error) {
+		s, err := json.MarshalIndent(info, "", "\t")
+		if err != nil {
+			return "", err
+		}
+		return string(s), nil
+	})
 }

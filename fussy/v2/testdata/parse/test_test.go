@@ -2,8 +2,14 @@
 
 package datum_test
 
-// SucceedTest should not really show up anywhere
-func succeedTest(c *unknownTest, x int) int {
-	return 0
+import "github.com/dotchain/fuss/fussy/v2/testdata/parse"
+
+type MyTestFunc = func(key interface{}, a datum.Array ) float32
+func myTest(deps *testDeps, a datum.Array) float32 {
+	return deps.avg("key", a)
+}
+
+type testDeps struct {
+	avg datum.AvgFunc
 }
 
