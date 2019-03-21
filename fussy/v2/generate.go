@@ -98,8 +98,9 @@ type ResultInfo struct {
 
 // ArgInfo holds func arg related info
 type ArgInfo struct {
-	Name, Type string
-	IsState    bool
+	Name, Type       string
+	IsState          bool
+	ImplementsEquals bool
 }
 
 // SubComponentInfo holds sub-component related info
@@ -187,6 +188,30 @@ func (c *ComponentInfo) PublicResultsArray() []ArgInfo {
 	result := []ArgInfo{}
 	for _, a := range c.Results {
 		if !a.IsState {
+			result = append(result, a)
+		}
+	}
+	return result
+}
+
+// PublicArgsArrayEqualsNotNilable returns all non-state args
+// implementing Equals
+func (c *ComponentInfo) PublicArgsArrayEquals() []ArgInfo {
+	result := []ArgInfo{}
+	for kk, a := range c.Args {
+		if kk > 0 && !a.IsState && a.ImplementsEquals {
+			result = append(result, a)
+		}
+	}
+	return result
+}
+
+// PublicArgsArrayOther returns all non-state args which don't
+// implement equals
+func (c *ComponentInfo) PublicArgsArrayOther() []ArgInfo {
+	result := []ArgInfo{}
+	for kk, a := range c.Args {
+		if kk > 0 && !a.IsState && !a.ImplementsEquals {
 			result = append(result, a)
 		}
 	}

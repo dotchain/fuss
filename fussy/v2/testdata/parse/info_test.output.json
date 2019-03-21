@@ -17,19 +17,22 @@
 				{
 					"Name": "deps",
 					"Type": "*testDeps",
-					"IsState": false
+					"IsState": false,
+					"ImplementsEquals": false
 				},
 				{
 					"Name": "a",
 					"Type": "datum.Array",
-					"IsState": false
+					"IsState": false,
+					"ImplementsEquals": true
 				}
 			],
 			"Results": [
 				{
 					"Name": "result1",
 					"Type": "float32",
-					"IsState": false
+					"IsState": false,
+					"ImplementsEquals": false
 				}
 			],
 			"Subs": [
@@ -42,19 +45,22 @@
 						{
 							"Name": "key",
 							"Type": "interface{}",
-							"IsState": false
+							"IsState": false,
+							"ImplementsEquals": false
 						},
 						{
 							"Name": "a",
 							"Type": "datum.Array",
-							"IsState": false
+							"IsState": false,
+							"ImplementsEquals": true
 						}
 					],
 					"Results": [
 						{
 							"Name": "result1",
 							"Type": "float32",
-							"IsState": false
+							"IsState": false,
+							"ImplementsEquals": false
 						}
 					],
 					"Subs": null

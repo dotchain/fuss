@@ -213,6 +213,17 @@ func coreComponentInfo(s *types.Scope, name string, fn *types.Signature, nt func
 	for kk := 0; kk < fn.Params().Len(); kk++ {
 		arg := fn.Params().At(kk)
 		ai := ArgInfo{Name: arg.Name(), Type: nt(arg.Type().String())}
+
+		any := types.NewParam(token.NoPos, arg.Pkg(), "x", types.NewInterfaceType(nil, nil).Complete())
+		boolean := types.NewParam(token.NoPos, arg.Pkg(), "x", types.Typ[types.Bool])
+		sig := types.NewSignature(nil, types.NewTuple(any), types.NewTuple(boolean), false)
+		equals := types.NewInterfaceType(
+			[]*types.Func{types.NewFunc(token.NoPos, arg.Pkg(), "Equals", sig)},
+			nil).Complete()
+		ai.ImplementsEquals = types.Implements(arg.Type(), equals)
+		if !ai.ImplementsEquals && !types.Comparable(arg.Type()) {
+			log.Println("args must be comparable or implement equals", name, arg.Name())
+		}
 		if ai.IsState = isStateArg(ai.Name); ai.IsState {
 			stateArgs = append(stateArgs, ai)
 		}
@@ -235,7 +246,7 @@ func coreComponentInfo(s *types.Scope, name string, fn *types.Signature, nt func
 		}
 		if ai.Name == "" {
 			ai.Name = fmt.Sprintf("result%d", rcount)
-			rcount ++
+			rcount++
 		}
 		ci.Results = append(ci.Results, ai)
 	}
