@@ -5,14 +5,15 @@
 package fussy
 
 import (
+	"bytes"
 	"fmt"
 	"go/ast"
+	"go/format"
 	"go/importer"
 	"go/parser"
 	"go/token"
 	"go/types"
 	"log"
-	"sort"
 	"strings"
 	"unicode"
 )
@@ -20,7 +21,7 @@ import (
 // ParsePackage parses the provided directory for the named package
 func ParseDir(dir, pkg string) (*Info, error) {
 	fset := token.NewFileSet()
-	pkgs, err := parser.ParseDir(fset, dir, nil, 0)
+	pkgs, err := parser.ParseDir(fset, dir, nil, parser.ParseComments)
 	if err != nil {
 		return nil, err
 	}
@@ -30,17 +31,6 @@ func ParseDir(dir, pkg string) (*Info, error) {
 	}
 
 	info := &Info{Package: pkg}
-
-	ids := []string{}
-	for id := range p.Imports {
-		ids = append(ids, id)
-	}
-	sort.Strings(ids)
-	for _, id := range ids {
-		path := p.Imports[id].Decl.(*ast.ImportSpec).Path.Value
-		im := [2]string{id, path[1 : len(path)-2]}
-		info.Imports = append(info.Imports, im)
-	}
 
 	// Not using importer.Default() because of issue:
 	//   https://github.com/golang/go/issues/11415
@@ -84,9 +74,35 @@ func ParseDir(dir, pkg string) (*Info, error) {
 				if id, ok := f.Type.(*ast.Ident); ok {
 					return id.Name
 				}
+				if sel, ok := f.Type.(*ast.SelectorExpr); ok {
+					var b bytes.Buffer
+					if err := format.Node(&b, fset, sel); err == nil {
+						return b.String()
+					}
+				}
 			}
 		}
 		return ""
+	}
+
+	normalizeType := func(s string) string {
+		//  TODO: need to use transitive closure here and possibly cache
+		for _, im := range info.Imports {
+			path := im[1] + "."
+			if !strings.Contains(path, "/") {
+				continue
+			}
+
+			imported, err := conf.Importer.Import(im[1])
+			if err != nil {
+				continue
+			}
+
+			for idx := strings.Index(s, path); idx != -1; idx = strings.Index(s, path) {
+				s = s[:idx] + imported.Name() + "." + s[idx+len(path):]
+			}
+		}
+		return s
 	}
 
 	pp, err := conf.Check("", fset, files, nil)
@@ -94,9 +110,13 @@ func ParseDir(dir, pkg string) (*Info, error) {
 		return nil, err
 	}
 
+	for _, im := range pp.Imports() {
+		info.Imports = append(info.Imports, [2]string{"", im.Path()})
+	}
+
 	s := pp.Scope()
 	for _, name := range s.Names() {
-		if ci := componentInfo(s, name, true, findFieldType); ci != nil {
+		if ci := componentInfo(s, name, true, findFieldType, normalizeType); ci != nil {
 			info.Components = append(info.Components, *ci)
 		}
 	}
@@ -104,7 +124,7 @@ func ParseDir(dir, pkg string) (*Info, error) {
 	return info, nil
 }
 
-func componentInfo(s *types.Scope, name string, subs bool, ff func(string, string) string) *ComponentInfo {
+func componentInfo(s *types.Scope, name string, subs bool, ff func(string, string) string, nt func(string) string) *ComponentInfo {
 	o := s.Lookup(name)
 	if tn, ok := o.(*types.TypeName); ok && tn.IsAlias() {
 		return nil
@@ -115,7 +135,7 @@ func componentInfo(s *types.Scope, name string, subs bool, ff func(string, strin
 		return nil
 	}
 
-	ci := coreComponentInfo(s, name, fn)
+	ci := coreComponentInfo(s, name, fn, nt)
 	if ci == nil || !subs {
 		return ci
 	}
@@ -142,7 +162,7 @@ func componentInfo(s *types.Scope, name string, subs bool, ff func(string, strin
 			return nil
 		}
 		ft = ft[:len(ft)-4]
-		inner := coreComponentInfo(s, ft, field.Type().(*types.Signature))
+		inner := coreComponentInfo(s, ft, field.Type().(*types.Signature), nt)
 		if inner == nil {
 			return nil
 		}
@@ -152,7 +172,7 @@ func componentInfo(s *types.Scope, name string, subs bool, ff func(string, strin
 	return ci
 }
 
-func coreComponentInfo(s *types.Scope, name string, fn *types.Signature) *ComponentInfo {
+func coreComponentInfo(s *types.Scope, name string, fn *types.Signature, nt func(string) string) *ComponentInfo {
 	if fn.Recv() != nil {
 		return nil
 	}
@@ -182,7 +202,7 @@ func coreComponentInfo(s *types.Scope, name string, fn *types.Signature) *Compon
 	ci := &ComponentInfo{Name: name, Type: fName, Ctor: ctor}
 	for kk := 0; kk < fn.Params().Len(); kk++ {
 		arg := fn.Params().At(kk)
-		ai := ArgInfo{Name: arg.Name(), Type: arg.Type().String()}
+		ai := ArgInfo{Name: arg.Name(), Type: nt(arg.Type().String())}
 		if ai.IsState = isStateArg(ai.Name); ai.IsState {
 			stateArgs = append(stateArgs, ai)
 		}
@@ -192,7 +212,7 @@ func coreComponentInfo(s *types.Scope, name string, fn *types.Signature) *Compon
 
 	for kk := 0; kk < fn.Results().Len(); kk++ {
 		arg := fn.Results().At(kk)
-		ai := ArgInfo{Name: arg.Name(), Type: arg.Type().String()}
+		ai := ArgInfo{Name: arg.Name(), Type: nt(arg.Type().String())}
 		if ai.Name == "" {
 			ai.Name = fmt.Sprintf("result%d", kk+1)
 		}

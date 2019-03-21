@@ -1,0 +1,65 @@
+{
+	"Generator": "",
+	"Package": "datum_test",
+	"Imports": [
+		[
+			"",
+			"github.com/dotchain/fuss/fussy/v2/testdata/parse"
+		]
+	],
+	"Streams": null,
+	"Components": [
+		{
+			"Name": "myTest",
+			"Type": "MyTestFunc",
+			"Ctor": "NewMyTest",
+			"Args": [
+				{
+					"Name": "deps",
+					"Type": "*testDeps",
+					"IsState": false
+				},
+				{
+					"Name": "a",
+					"Type": "datum.Array",
+					"IsState": false
+				}
+			],
+			"Results": [
+				{
+					"Name": "result1",
+					"Type": "float32",
+					"IsState": false
+				}
+			],
+			"Subs": [
+				{
+					"LocalName": "avg",
+					"Name": "datum.Avg",
+					"Type": "datum.AvgFunc",
+					"Ctor": "datum.NewAvg",
+					"Args": [
+						{
+							"Name": "key",
+							"Type": "interface{}",
+							"IsState": false
+						},
+						{
+							"Name": "a",
+							"Type": "datum.Array",
+							"IsState": false
+						}
+					],
+					"Results": [
+						{
+							"Name": "result1",
+							"Type": "float32",
+							"IsState": false
+						}
+					],
+					"Subs": null
+				}
+			]
+		}
+	]
+}
