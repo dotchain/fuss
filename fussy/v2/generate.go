@@ -101,6 +101,7 @@ type ArgInfo struct {
 	Name, Type       string
 	IsState          bool
 	ImplementsEquals bool
+	ImplementsEvents bool
 }
 
 // SubComponentInfo holds sub-component related info
@@ -120,6 +121,17 @@ type ComponentInfo struct {
 // NonContextArgsArgs returns the list of non-context args, including state
 func (c *ComponentInfo) NonContextArgsArray() []ArgInfo {
 	return c.Args[1:]
+}
+
+// EventedStateArgs returns all state args that implement events
+func (c *ComponentInfo) EventedStateArgs() []ArgInfo {
+	result := []ArgInfo{}
+	for kk, a := range c.Args {
+		if kk > 0 && a.IsState && a.ImplementsEvents {
+			result = append(result, a)
+		}
+	}
+	return result
 }
 
 // PublicArgsDecl returns all public args and types

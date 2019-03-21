@@ -14,6 +14,8 @@ var componentsTpl = template.Must(template.New("code").Parse(`
 
 // {{.Ctor}} is the constructor for {{.Type}}
 func {{.Ctor}}() (update {{.Type}}, close func()) {
+	var refresh func()
+
 	{{ range .NonContextArgsArray }}var last{{.Name}} {{.Type}};{{end}}
 	{{ range .PublicResultsArray}}var last{{.Name}} {{.Type}};{{end}}
 	var initialized bool
@@ -49,6 +51,13 @@ func {{.Ctor}}() (update {{.Type}}, close func()) {
 	}
 
 	update = func({{.PublicArgsDecl}}) {{.PublicResultsDecl}} {
+		refresh = func() { 
+			{{range .EventedStateArgs}} last{{.Name}}.Off(&refresh); {{end}}
+			{{.Invoke}}
+			{{range .EventedStateArgs}} last{{.Name}}.On(&refresh); {{end}}
+			close() 
+		}
+
 		if initialized {
 			switch {
 			{{range .PublicArgsArrayEquals}}case last{{.Name}}.Equals({{.Name}}): {{end}}
@@ -59,8 +68,7 @@ func {{.Ctor}}() (update {{.Type}}, close func()) {
 		}
 		initialized = true
 		{{range .PublicArgsArray}}last{{.Name}} = {{.Name}};{{end}}
-		{{.Invoke}}
-		close()
+		refresh()
 		return {{.LastPublicResults}}
 	}
 

@@ -8,6 +8,8 @@ package datum
 
 // NewAvg is the constructor for AvgFunc
 func NewAvg() (update AvgFunc, close func()) {
+	var refresh func()
+
 	var lasta Array
 	var lastresult float32
 	var initialized bool
@@ -58,6 +60,13 @@ func NewAvg() (update AvgFunc, close func()) {
 	}
 
 	update = func(deps interface{}, a Array) (result float32) {
+		refresh = func() {
+
+			lastresult = avg(depsLocal, a)
+
+			close()
+		}
+
 		if initialized {
 			switch {
 			case lasta.Equals(a):
@@ -68,8 +77,7 @@ func NewAvg() (update AvgFunc, close func()) {
 		}
 		initialized = true
 		lasta = a
-		lastresult = avg(depsLocal, a)
-		close()
+		refresh()
 		return lastresult
 	}
 
@@ -78,6 +86,8 @@ func NewAvg() (update AvgFunc, close func()) {
 
 // NewCount is the constructor for CountFunc
 func NewCount() (update CountFunc, close func()) {
+	var refresh func()
+
 	var lasta Array
 	var lastresult int
 	var initialized bool
@@ -87,6 +97,13 @@ func NewCount() (update CountFunc, close func()) {
 	close = func() {}
 
 	update = func(deps interface{}, a Array) (result int) {
+		refresh = func() {
+
+			lastresult = count(depsLocal, a)
+
+			close()
+		}
+
 		if initialized {
 			switch {
 			case lasta.Equals(a):
@@ -97,8 +114,7 @@ func NewCount() (update CountFunc, close func()) {
 		}
 		initialized = true
 		lasta = a
-		lastresult = count(depsLocal, a)
-		close()
+		refresh()
 		return lastresult
 	}
 
@@ -107,7 +123,9 @@ func NewCount() (update CountFunc, close func()) {
 
 // NewEdgeTrigger is the constructor for EdgeTriggerFunc
 func NewEdgeTrigger() (update EdgeTriggerFunc, close func()) {
-	var laststate int
+	var refresh func()
+
+	var laststate stateful
 	var lastinput int
 	var lastr1 int
 	var lastr2 int
@@ -118,6 +136,13 @@ func NewEdgeTrigger() (update EdgeTriggerFunc, close func()) {
 	close = func() {}
 
 	update = func(deps interface{}, input int) (r1 int, r2 int) {
+		refresh = func() {
+			laststate.Off(&refresh)
+			laststate, lastr1, lastr2 = edgeTrigger(depsLocal, laststate, input)
+			laststate.On(&refresh)
+			close()
+		}
+
 		if initialized {
 			switch {
 
@@ -128,8 +153,7 @@ func NewEdgeTrigger() (update EdgeTriggerFunc, close func()) {
 		}
 		initialized = true
 		lastinput = input
-		laststate, lastr1, lastr2 = edgeTrigger(depsLocal, laststate, input)
-		close()
+		refresh()
 		return lastr1, lastr2
 	}
 
@@ -138,6 +162,8 @@ func NewEdgeTrigger() (update EdgeTriggerFunc, close func()) {
 
 // NewSum is the constructor for SumFunc
 func NewSum() (update SumFunc, close func()) {
+	var refresh func()
+
 	var lasta Array
 	var lastresult int
 	var initialized bool
@@ -147,6 +173,13 @@ func NewSum() (update SumFunc, close func()) {
 	close = func() {}
 
 	update = func(deps interface{}, a Array) (result int) {
+		refresh = func() {
+
+			lastresult = sum(depsLocal, a)
+
+			close()
+		}
+
 		if initialized {
 			switch {
 			case lasta.Equals(a):
@@ -157,8 +190,7 @@ func NewSum() (update SumFunc, close func()) {
 		}
 		initialized = true
 		lasta = a
-		lastresult = sum(depsLocal, a)
-		close()
+		refresh()
 		return lastresult
 	}
 
