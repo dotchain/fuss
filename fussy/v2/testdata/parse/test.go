@@ -34,7 +34,7 @@ type sumDeps struct {
 }
 
 // EdgeTriggerFunc returns the number of times it has been rebuilt
-type EdgeTriggerFunc func(key interface{}) int
+type EdgeTriggerFunc = func(key interface{}, input int) (r1, r2 int)
 func edgeTrigger(deps *none, state, input int) (state1 int, r1, r2 int) {
 	state ++
 	return state, state, state

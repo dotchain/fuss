@@ -182,6 +182,17 @@ func (c *ComponentInfo) LastPublicResults() string {
 	return strings.Join(result, ",")
 }
 
+// PublicResultsArray returns the non-state resultss
+func (c *ComponentInfo) PublicResultsArray() []ArgInfo {
+	result := []ArgInfo{}
+	for _, a := range c.Results {
+		if !a.IsState {
+			result = append(result, a)
+		}
+	}
+	return result
+}
+
 // PublicArgsArray returns all non-state args
 func (c *ComponentInfo) PublicArgsArray() []ArgInfo {
 	result := []ArgInfo{}

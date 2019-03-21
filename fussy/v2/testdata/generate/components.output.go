@@ -56,7 +56,6 @@ func NewTaskView() (update TaskViewF, close func()) {
 
 	return update, close
 }
-
 func equal(before, after interface{}) bool {
 	if b, ok := before.(equals); ok {
 		return b.Equals(after)
