@@ -10,21 +10,21 @@ import (
 )
 
 var componentsTpl = template.Must(template.New("code").Parse(`
-{{ range .Components -}}
+{{- range .Components}}
 
 // {{.Ctor}} is the constructor for {{.Type}}
 func {{.Ctor}}() (update {{.Type}}, close func()) {
 	{{ range .NonContextArgsArray }}var last{{.Name}} {{.Type}};{{end}}
-	{{ range .Results}}var last{{.Name}} {{.Type}};{{end}}
+	{{ range .PublicResultsArray}}var last{{.Name}} {{.Type}};{{end}}
 	var initialized bool
-	{{ range .Subs -}}
+	{{- range .Subs}}
 	{{.LocalName}}FnMap := map[interface{}]{{.Type}}{}
 	{{.LocalName}}CloseMap := map[interface{}]func(){}
 	{{.LocalName}}UsedMap := map[interface{}]bool{}
-	{{- end}}
+	{{end}}
 
 	{{.ContextName}}Local := &{{.ContextType}}{
-		{{range  .Subs -}}
+		{{- range  .Subs}}
 		{{.LocalName}}: func({{.PublicArgsDecl}}) {{.PublicResultsDecl}} {
 			{{.LocalName}}UsedMap[{{.ContextName}}] = true
 			if {{.LocalName}}FnMap[{{.ContextName}}] == nil {
@@ -32,11 +32,11 @@ func {{.Ctor}}() (update {{.Type}}, close func()) {
 			}
 			return {{.LocalName}}FnMap[{{.ContextName}}]({{.PublicArgs}})
 		},
-		{{- end}}
+		{{end -}}
 	}
 
 	close = func() {
-		{{range  .Subs -}}
+		{{- range  .Subs}}
 		for key := range {{.LocalName}}CloseMap {
 			if !{{.LocalName}}UsedMap[key] {
 				{{.LocalName}}CloseMap[key]()
@@ -45,7 +45,7 @@ func {{.Ctor}}() (update {{.Type}}, close func()) {
 			}
 		}
 		{{.LocalName}}UsedMap = map[interface{}]bool{}
-		{{- end}}
+		{{end -}}
 	}
 
 	update = func({{.PublicArgsDecl}}) {{.PublicResultsDecl}} {
@@ -65,7 +65,7 @@ func {{.Ctor}}() (update {{.Type}}, close func()) {
 
 	return update, close
 }
-{{- end}}
+{{end -}}
 
 func equal(before, after interface{}) bool {
 	if b, ok := before.(equals); ok {

@@ -130,7 +130,7 @@
 			],
 			"Results": [
 				{
-					"Name": "state1",
+					"Name": "state",
 					"Type": "int",
 					"IsState": true
 				},

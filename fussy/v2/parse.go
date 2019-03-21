@@ -14,14 +14,24 @@ import (
 	"go/token"
 	"go/types"
 	"log"
+	"os"
 	"strings"
 	"unicode"
 )
 
 // ParsePackage parses the provided directory for the named package
-func ParseDir(dir, pkg string) (*Info, error) {
+func ParseDir(dir, pkg string, skipFiles []string) (*Info, error) {
 	fset := token.NewFileSet()
-	pkgs, err := parser.ParseDir(fset, dir, nil, parser.ParseComments)
+	filter := func(f os.FileInfo) bool {
+		n := f.Name()
+		for _, skip := range skipFiles {
+			if n == skip {
+				return false
+			}
+		}
+		return true
+	}
+	pkgs, err := parser.ParseDir(fset, dir, filter, parser.ParseComments)
 	if err != nil {
 		return nil, err
 	}
@@ -210,19 +220,22 @@ func coreComponentInfo(s *types.Scope, name string, fn *types.Signature, nt func
 		ci.Args = append(ci.Args, ai)
 	}
 
+	rcount := 1
 	for kk := 0; kk < fn.Results().Len(); kk++ {
 		arg := fn.Results().At(kk)
 		ai := ArgInfo{Name: arg.Name(), Type: nt(arg.Type().String())}
-		if ai.Name == "" {
-			ai.Name = fmt.Sprintf("result%d", kk+1)
-		}
 		for jj := 0; jj < len(stateArgs); jj++ {
 			if stateArgs[jj].Type == ai.Type {
 				ai.IsState = true
+				ai.Name = stateArgs[jj].Name
 				copy(stateArgs[jj:], stateArgs[jj+1:])
 				stateArgs = stateArgs[:len(stateArgs)-1]
 				break
 			}
+		}
+		if ai.Name == "" {
+			ai.Name = fmt.Sprintf("result%d", rcount)
+			rcount ++
 		}
 		ci.Results = append(ci.Results, ai)
 	}

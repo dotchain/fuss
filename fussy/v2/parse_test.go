@@ -11,7 +11,8 @@ import (
 )
 
 func TestParse(t *testing.T) {
-	info, err := fussy.ParseDir("testdata/parse", "datum")
+	skip := []string{"generated.go", "generated_test.go"}
+	info, err := fussy.ParseDir("testdata/parse", "datum", skip)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -24,7 +25,11 @@ func TestParse(t *testing.T) {
 		return string(s), nil
 	})
 
-	info, err = fussy.ParseDir("testdata/parse", "datum_test")
+	testFile(t, "parse/test.go", "parse/generated.go", func(string) (string, error) {
+		return fussy.Generate(*info), nil
+	})
+
+	info, err = fussy.ParseDir("testdata/parse", "datum_test", skip)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -36,4 +41,9 @@ func TestParse(t *testing.T) {
 		}
 		return string(s), nil
 	})
+
+	testFile(t, "parse/test.go", "parse/generated_test.go", func(string) (string, error) {
+		return fussy.Generate(*info), nil
+	})
+
 }
