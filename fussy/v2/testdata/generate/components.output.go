@@ -8,6 +8,8 @@ package task
 
 // NewTaskView is the constructor for TaskViewF
 func NewTaskView() (update TaskViewF, close func()) {
+	var refresh func()
+
 	var lastboo bool
 	var lastchildren []int
 	var lastresult1 int
@@ -38,6 +40,13 @@ func NewTaskView() (update TaskViewF, close func()) {
 	}
 
 	update = func(ctx interface{}, boo bool, children []int) (result1 int) {
+		refresh = func() {
+
+			lastresult1 = taskView(ctxLocal, boo, children)
+
+			close()
+		}
+
 		if initialized {
 			switch {
 
@@ -50,8 +59,7 @@ func NewTaskView() (update TaskViewF, close func()) {
 		initialized = true
 		lastboo = boo
 		lastchildren = children
-		lastresult1 = taskView(ctxLocal, boo, children)
-		close()
+		refresh()
 		return lastresult1
 	}
 

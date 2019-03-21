@@ -12,6 +12,8 @@ import (
 
 // NewMyTest is the constructor for MyTestFunc
 func NewMyTest() (update MyTestFunc, close func()) {
+	var refresh func()
+
 	var lasta datum.Array
 	var lastresult float32
 	var initialized bool
@@ -41,6 +43,13 @@ func NewMyTest() (update MyTestFunc, close func()) {
 	}
 
 	update = func(deps interface{}, a datum.Array) (result float32) {
+		refresh = func() {
+
+			lastresult = myTest(depsLocal, a)
+
+			close()
+		}
+
 		if initialized {
 			switch {
 			case lasta.Equals(a):
@@ -51,8 +60,7 @@ func NewMyTest() (update MyTestFunc, close func()) {
 		}
 		initialized = true
 		lasta = a
-		lastresult = myTest(depsLocal, a)
-		close()
+		refresh()
 		return lastresult
 	}
 

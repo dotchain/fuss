@@ -13,13 +13,15 @@
 					"Name": "deps",
 					"Type": "*sumDeps",
 					"IsState": false,
-					"ImplementsEquals": false
+					"ImplementsEquals": false,
+					"ImplementsEvents": false
 				},
 				{
 					"Name": "a",
 					"Type": "Array",
 					"IsState": false,
-					"ImplementsEquals": true
+					"ImplementsEquals": true,
+					"ImplementsEvents": false
 				}
 			],
 			"Results": [
@@ -27,7 +29,8 @@
 					"Name": "result",
 					"Type": "float32",
 					"IsState": false,
-					"ImplementsEquals": false
+					"ImplementsEquals": false,
+					"ImplementsEvents": false
 				}
 			],
 			"Subs": [
@@ -41,13 +44,15 @@
 							"Name": "key",
 							"Type": "interface{}",
 							"IsState": false,
-							"ImplementsEquals": false
+							"ImplementsEquals": false,
+							"ImplementsEvents": false
 						},
 						{
 							"Name": "a",
 							"Type": "Array",
 							"IsState": false,
-							"ImplementsEquals": true
+							"ImplementsEquals": true,
+							"ImplementsEvents": false
 						}
 					],
 					"Results": [
@@ -55,7 +60,8 @@
 							"Name": "result",
 							"Type": "int",
 							"IsState": false,
-							"ImplementsEquals": false
+							"ImplementsEquals": false,
+							"ImplementsEvents": false
 						}
 					],
 					"Subs": null
@@ -70,13 +76,15 @@
 							"Name": "key",
 							"Type": "interface{}",
 							"IsState": false,
-							"ImplementsEquals": false
+							"ImplementsEquals": false,
+							"ImplementsEvents": false
 						},
 						{
 							"Name": "a",
 							"Type": "Array",
 							"IsState": false,
-							"ImplementsEquals": true
+							"ImplementsEquals": true,
+							"ImplementsEvents": false
 						}
 					],
 					"Results": [
@@ -84,7 +92,8 @@
 							"Name": "result",
 							"Type": "int",
 							"IsState": false,
-							"ImplementsEquals": false
+							"ImplementsEquals": false,
+							"ImplementsEvents": false
 						}
 					],
 					"Subs": null
@@ -100,13 +109,15 @@
 					"Name": "deps",
 					"Type": "*none",
 					"IsState": false,
-					"ImplementsEquals": false
+					"ImplementsEquals": false,
+					"ImplementsEvents": false
 				},
 				{
 					"Name": "a",
 					"Type": "Array",
 					"IsState": false,
-					"ImplementsEquals": true
+					"ImplementsEquals": true,
+					"ImplementsEvents": false
 				}
 			],
 			"Results": [
@@ -114,7 +125,8 @@
 					"Name": "result",
 					"Type": "int",
 					"IsState": false,
-					"ImplementsEquals": false
+					"ImplementsEquals": false,
+					"ImplementsEvents": false
 				}
 			],
 			"Subs": []
@@ -128,39 +140,45 @@
 					"Name": "deps",
 					"Type": "*none",
 					"IsState": false,
-					"ImplementsEquals": false
+					"ImplementsEquals": false,
+					"ImplementsEvents": false
 				},
 				{
 					"Name": "state",
-					"Type": "int",
+					"Type": "stateful",
 					"IsState": true,
-					"ImplementsEquals": false
+					"ImplementsEquals": false,
+					"ImplementsEvents": true
 				},
 				{
 					"Name": "input",
 					"Type": "int",
 					"IsState": false,
-					"ImplementsEquals": false
+					"ImplementsEquals": false,
+					"ImplementsEvents": false
 				}
 			],
 			"Results": [
 				{
 					"Name": "state",
-					"Type": "int",
+					"Type": "stateful",
 					"IsState": true,
-					"ImplementsEquals": false
+					"ImplementsEquals": false,
+					"ImplementsEvents": false
 				},
 				{
 					"Name": "r1",
 					"Type": "int",
 					"IsState": false,
-					"ImplementsEquals": false
+					"ImplementsEquals": false,
+					"ImplementsEvents": false
 				},
 				{
 					"Name": "r2",
 					"Type": "int",
 					"IsState": false,
-					"ImplementsEquals": false
+					"ImplementsEquals": false,
+					"ImplementsEvents": false
 				}
 			],
 			"Subs": []
@@ -174,13 +192,15 @@
 					"Name": "deps",
 					"Type": "*none",
 					"IsState": false,
-					"ImplementsEquals": false
+					"ImplementsEquals": false,
+					"ImplementsEvents": false
 				},
 				{
 					"Name": "a",
 					"Type": "Array",
 					"IsState": false,
-					"ImplementsEquals": true
+					"ImplementsEquals": true,
+					"ImplementsEvents": false
 				}
 			],
 			"Results": [
@@ -188,7 +208,8 @@
 					"Name": "result",
 					"Type": "int",
 					"IsState": false,
-					"ImplementsEquals": false
+					"ImplementsEquals": false,
+					"ImplementsEvents": false
 				}
 			],
 			"Subs": []

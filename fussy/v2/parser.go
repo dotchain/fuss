@@ -28,7 +28,7 @@ type parse struct {
 	files   []*ast.File
 	fset    *token.FileSet
 	imports map[*types.Package]string
-	eq      *types.Interface
+	eq, ev  *types.Interface
 }
 
 func (p *parse) components() ([]ComponentInfo, [][2]string, error) {
@@ -205,12 +205,13 @@ func (p *parse) isStateArg(s string) bool {
 func (p *parse) argInfo(arg *types.Var) ArgInfo {
 	name, typ := arg.Name(), arg.Type()
 	eq := types.Implements(typ, p.equals())
+	ev := types.Implements(typ, p.eventSource())
 	isState := p.isStateArg(name)
 	typs := types.TypeString(typ, p.qualify)
 	if !eq && !types.Comparable(typ) {
 		log.Println("args must be comparable or implement equals", name, typs)
 	}
-	return ArgInfo{Name: name, Type: typs, ImplementsEquals: eq, IsState: isState}
+	return ArgInfo{name, typs, isState, eq, ev}
 }
 
 func (p *parse) equals() *types.Interface {
@@ -218,16 +219,36 @@ func (p *parse) equals() *types.Interface {
 		return p.eq
 	}
 
-	param := func(t types.Type) *types.Var {
-		return types.NewParam(token.NoPos, nil, "", t)
-	}
-
-	args := types.NewTuple(param(types.NewInterfaceType(nil, nil).Complete()))
-	res := types.NewTuple(param(types.Typ[types.Bool]))
-	sig := types.NewSignature(nil, args, res, false)
-	methods := []*types.Func{types.NewFunc(token.NoPos, nil, "Equals", sig)}
+	void := types.NewInterfaceType(nil, nil).Complete()
+	methods := []*types.Func{p.method("Equals", types.Typ[types.Bool], void)}
 	p.eq = types.NewInterfaceType(methods, nil).Complete()
 	return p.eq
+}
+
+func (p *parse) method(name string, retType types.Type, args ...types.Type) *types.Func {
+	var result *types.Tuple
+	if retType != nil {
+		result = types.NewTuple(types.NewParam(token.NoPos, nil, "", retType))
+	}
+	var params []*types.Var
+	for _, arg := range args {
+		v := types.NewParam(token.NoPos, nil, "", arg)
+		params = append(params, v)
+	}
+	sig := types.NewSignature(nil, types.NewTuple(params...), result, false)
+	return types.NewFunc(token.NoPos, nil, name, sig)
+}
+
+func (p *parse) eventSource() *types.Interface {
+	if p.ev != nil {
+		return p.ev
+	}
+
+	fptr := types.NewPointer(p.method("", nil).Type())
+	on := p.method("On", nil, fptr)
+	off := p.method("Off", nil, fptr)
+	p.ev = types.NewInterfaceType([]*types.Func{on, off}, nil).Complete()
+	return p.ev
 }
 
 func (p *parse) qualify(pkg *types.Package) string {
