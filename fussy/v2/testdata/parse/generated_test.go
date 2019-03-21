@@ -43,7 +43,8 @@ func NewMyTest() (update MyTestFunc, close func()) {
 	update = func(deps interface{}, a datum.Array) (result1 float32) {
 		if initialized {
 			switch {
-			case !equal(lasta, a):
+			case lasta.Equals(a):
+
 			default:
 				return lastresult1
 			}
@@ -56,15 +57,6 @@ func NewMyTest() (update MyTestFunc, close func()) {
 	}
 
 	return update, close
-}
-func equal(before, after interface{}) bool {
-	if b, ok := before.(equals); ok {
-		return b.Equals(after)
-	}
-	if a, ok := after.(equals); ok {
-		return a.Equals(before)
-	}
-	return after == before
 }
 
 type equals interface {

@@ -60,7 +60,8 @@ func NewAvg() (update AvgFunc, close func()) {
 	update = func(deps interface{}, a Array) (result1 float32) {
 		if initialized {
 			switch {
-			case !equal(lasta, a):
+			case lasta.Equals(a):
+
 			default:
 				return lastresult1
 			}
@@ -88,7 +89,8 @@ func NewCount() (update CountFunc, close func()) {
 	update = func(deps interface{}, a Array) (result1 int) {
 		if initialized {
 			switch {
-			case !equal(lasta, a):
+			case lasta.Equals(a):
+
 			default:
 				return lastresult1
 			}
@@ -118,7 +120,8 @@ func NewEdgeTrigger() (update EdgeTriggerFunc, close func()) {
 	update = func(deps interface{}, input int) (r1 int, r2 int) {
 		if initialized {
 			switch {
-			case !equal(lastinput, input):
+
+			case lastinput != input:
 			default:
 				return lastr1, lastr2
 			}
@@ -146,7 +149,8 @@ func NewSum() (update SumFunc, close func()) {
 	update = func(deps interface{}, a Array) (result1 int) {
 		if initialized {
 			switch {
-			case !equal(lasta, a):
+			case lasta.Equals(a):
+
 			default:
 				return lastresult1
 			}
@@ -159,15 +163,6 @@ func NewSum() (update SumFunc, close func()) {
 	}
 
 	return update, close
-}
-func equal(before, after interface{}) bool {
-	if b, ok := before.(equals); ok {
-		return b.Equals(after)
-	}
-	if a, ok := after.(equals); ok {
-		return a.Equals(before)
-	}
-	return after == before
 }
 
 type equals interface {

@@ -40,8 +40,9 @@ func NewTaskView() (update TaskViewF, close func()) {
 	update = func(ctx interface{}, boo bool, children []int) (result1 int) {
 		if initialized {
 			switch {
-			case !equal(lastboo, boo):
-			case !equal(lastchildren, children):
+
+			case lastboo != boo:
+			case lastchildren != children:
 			default:
 				return lastresult1
 			}
@@ -55,15 +56,6 @@ func NewTaskView() (update TaskViewF, close func()) {
 	}
 
 	return update, close
-}
-func equal(before, after interface{}) bool {
-	if b, ok := before.(equals); ok {
-		return b.Equals(after)
-	}
-	if a, ok := after.(equals); ok {
-		return a.Equals(before)
-	}
-	return after == before
 }
 
 type equals interface {

@@ -51,7 +51,8 @@ func {{.Ctor}}() (update {{.Type}}, close func()) {
 	update = func({{.PublicArgsDecl}}) {{.PublicResultsDecl}} {
 		if initialized {
 			switch {
-			{{range .PublicArgsArray}}case !equal(last{{.Name}}, {{.Name}}): {{end}}
+			{{range .PublicArgsArrayEquals}}case last{{.Name}}.Equals({{.Name}}): {{end}}
+			{{range .PublicArgsArrayOther}}case last{{.Name}} != {{.Name}}: {{end}}
 			default:
 				return {{.LastPublicResults}}
 			}
@@ -66,16 +67,6 @@ func {{.Ctor}}() (update {{.Type}}, close func()) {
 	return update, close
 }
 {{end -}}
-
-func equal(before, after interface{}) bool {
-	if b, ok := before.(equals); ok {
-		return b.Equals(after)
-	}
-	if a, ok := after.(equals); ok {
-		return a.Equals(before)
-	}
-	return after == before
-}
 
 type equals interface {
 	Equals(o interface{}) bool

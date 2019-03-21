@@ -12,19 +12,22 @@
 				{
 					"Name": "deps",
 					"Type": "*sumDeps",
-					"IsState": false
+					"IsState": false,
+					"ImplementsEquals": false
 				},
 				{
 					"Name": "a",
 					"Type": "Array",
-					"IsState": false
+					"IsState": false,
+					"ImplementsEquals": true
 				}
 			],
 			"Results": [
 				{
 					"Name": "result1",
 					"Type": "float32",
-					"IsState": false
+					"IsState": false,
+					"ImplementsEquals": false
 				}
 			],
 			"Subs": [
@@ -37,19 +40,22 @@
 						{
 							"Name": "key",
 							"Type": "interface{}",
-							"IsState": false
+							"IsState": false,
+							"ImplementsEquals": false
 						},
 						{
 							"Name": "a",
 							"Type": "Array",
-							"IsState": false
+							"IsState": false,
+							"ImplementsEquals": true
 						}
 					],
 					"Results": [
 						{
 							"Name": "result1",
 							"Type": "int",
-							"IsState": false
+							"IsState": false,
+							"ImplementsEquals": false
 						}
 					],
 					"Subs": null
@@ -63,19 +69,22 @@
 						{
 							"Name": "key",
 							"Type": "interface{}",
-							"IsState": false
+							"IsState": false,
+							"ImplementsEquals": false
 						},
 						{
 							"Name": "a",
 							"Type": "Array",
-							"IsState": false
+							"IsState": false,
+							"ImplementsEquals": true
 						}
 					],
 					"Results": [
 						{
 							"Name": "result1",
 							"Type": "int",
-							"IsState": false
+							"IsState": false,
+							"ImplementsEquals": false
 						}
 					],
 					"Subs": null
@@ -90,19 +99,22 @@
 				{
 					"Name": "deps",
 					"Type": "*none",
-					"IsState": false
+					"IsState": false,
+					"ImplementsEquals": false
 				},
 				{
 					"Name": "a",
 					"Type": "Array",
-					"IsState": false
+					"IsState": false,
+					"ImplementsEquals": true
 				}
 			],
 			"Results": [
 				{
 					"Name": "result1",
 					"Type": "int",
-					"IsState": false
+					"IsState": false,
+					"ImplementsEquals": false
 				}
 			],
 			"Subs": null
@@ -115,34 +127,40 @@
 				{
 					"Name": "deps",
 					"Type": "*none",
-					"IsState": false
+					"IsState": false,
+					"ImplementsEquals": false
 				},
 				{
 					"Name": "state",
 					"Type": "int",
-					"IsState": true
+					"IsState": true,
+					"ImplementsEquals": false
 				},
 				{
 					"Name": "input",
 					"Type": "int",
-					"IsState": false
+					"IsState": false,
+					"ImplementsEquals": false
 				}
 			],
 			"Results": [
 				{
 					"Name": "state",
 					"Type": "int",
-					"IsState": true
+					"IsState": true,
+					"ImplementsEquals": false
 				},
 				{
 					"Name": "r1",
 					"Type": "int",
-					"IsState": false
+					"IsState": false,
+					"ImplementsEquals": false
 				},
 				{
 					"Name": "r2",
 					"Type": "int",
-					"IsState": false
+					"IsState": false,
+					"ImplementsEquals": false
 				}
 			],
 			"Subs": null
@@ -155,19 +173,22 @@
 				{
 					"Name": "deps",
 					"Type": "*none",
-					"IsState": false
+					"IsState": false,
+					"ImplementsEquals": false
 				},
 				{
 					"Name": "a",
 					"Type": "Array",
-					"IsState": false
+					"IsState": false,
+					"ImplementsEquals": true
 				}
 			],
 			"Results": [
 				{
 					"Name": "result1",
 					"Type": "int",
-					"IsState": false
+					"IsState": false,
+					"ImplementsEquals": false
 				}
 			],
 			"Subs": null
