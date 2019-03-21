@@ -9,7 +9,7 @@ package datum
 // NewAvg is the constructor for AvgFunc
 func NewAvg() (update AvgFunc, close func()) {
 	var lasta Array
-	var lastresult1 float32
+	var lastresult float32
 	var initialized bool
 	countFnMap := map[interface{}]CountFunc{}
 	countCloseMap := map[interface{}]func(){}
@@ -20,7 +20,7 @@ func NewAvg() (update AvgFunc, close func()) {
 	sumUsedMap := map[interface{}]bool{}
 
 	depsLocal := &sumDeps{
-		count: func(key interface{}, a Array) (result1 int) {
+		count: func(key interface{}, a Array) (result int) {
 			countUsedMap[key] = true
 			if countFnMap[key] == nil {
 				countFnMap[key], countCloseMap[key] = NewCount()
@@ -28,7 +28,7 @@ func NewAvg() (update AvgFunc, close func()) {
 			return countFnMap[key](key, a)
 		},
 
-		sum: func(key interface{}, a Array) (result1 int) {
+		sum: func(key interface{}, a Array) (result int) {
 			sumUsedMap[key] = true
 			if sumFnMap[key] == nil {
 				sumFnMap[key], sumCloseMap[key] = NewSum()
@@ -57,20 +57,20 @@ func NewAvg() (update AvgFunc, close func()) {
 		sumUsedMap = map[interface{}]bool{}
 	}
 
-	update = func(deps interface{}, a Array) (result1 float32) {
+	update = func(deps interface{}, a Array) (result float32) {
 		if initialized {
 			switch {
 			case lasta.Equals(a):
 
 			default:
-				return lastresult1
+				return lastresult
 			}
 		}
 		initialized = true
 		lasta = a
-		lastresult1 = avg(depsLocal, a)
+		lastresult = avg(depsLocal, a)
 		close()
-		return lastresult1
+		return lastresult
 	}
 
 	return update, close
@@ -79,27 +79,27 @@ func NewAvg() (update AvgFunc, close func()) {
 // NewCount is the constructor for CountFunc
 func NewCount() (update CountFunc, close func()) {
 	var lasta Array
-	var lastresult1 int
+	var lastresult int
 	var initialized bool
 
 	depsLocal := &none{}
 
 	close = func() {}
 
-	update = func(deps interface{}, a Array) (result1 int) {
+	update = func(deps interface{}, a Array) (result int) {
 		if initialized {
 			switch {
 			case lasta.Equals(a):
 
 			default:
-				return lastresult1
+				return lastresult
 			}
 		}
 		initialized = true
 		lasta = a
-		lastresult1 = count(depsLocal, a)
+		lastresult = count(depsLocal, a)
 		close()
-		return lastresult1
+		return lastresult
 	}
 
 	return update, close
@@ -139,27 +139,27 @@ func NewEdgeTrigger() (update EdgeTriggerFunc, close func()) {
 // NewSum is the constructor for SumFunc
 func NewSum() (update SumFunc, close func()) {
 	var lasta Array
-	var lastresult1 int
+	var lastresult int
 	var initialized bool
 
 	depsLocal := &none{}
 
 	close = func() {}
 
-	update = func(deps interface{}, a Array) (result1 int) {
+	update = func(deps interface{}, a Array) (result int) {
 		if initialized {
 			switch {
 			case lasta.Equals(a):
 
 			default:
-				return lastresult1
+				return lastresult
 			}
 		}
 		initialized = true
 		lasta = a
-		lastresult1 = sum(depsLocal, a)
+		lastresult = sum(depsLocal, a)
 		close()
-		return lastresult1
+		return lastresult
 	}
 
 	return update, close
