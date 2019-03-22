@@ -14,14 +14,16 @@
 					"Type": "*sumDeps",
 					"IsState": false,
 					"ImplementsEquals": false,
-					"ImplementsEvents": false
+					"ImplementsEvents": false,
+					"ImplementsClose": false
 				},
 				{
 					"Name": "a",
 					"Type": "Array",
 					"IsState": false,
 					"ImplementsEquals": true,
-					"ImplementsEvents": false
+					"ImplementsEvents": false,
+					"ImplementsClose": false
 				}
 			],
 			"Results": [
@@ -30,7 +32,8 @@
 					"Type": "float32",
 					"IsState": false,
 					"ImplementsEquals": false,
-					"ImplementsEvents": false
+					"ImplementsEvents": false,
+					"ImplementsClose": false
 				}
 			],
 			"Variadic": false,
@@ -46,14 +49,16 @@
 							"Type": "interface{}",
 							"IsState": false,
 							"ImplementsEquals": false,
-							"ImplementsEvents": false
+							"ImplementsEvents": false,
+							"ImplementsClose": false
 						},
 						{
 							"Name": "a",
 							"Type": "Array",
 							"IsState": false,
 							"ImplementsEquals": true,
-							"ImplementsEvents": false
+							"ImplementsEvents": false,
+							"ImplementsClose": false
 						}
 					],
 					"Results": [
@@ -62,7 +67,8 @@
 							"Type": "int",
 							"IsState": false,
 							"ImplementsEquals": false,
-							"ImplementsEvents": false
+							"ImplementsEvents": false,
+							"ImplementsClose": false
 						}
 					],
 					"Variadic": false,
@@ -79,14 +85,16 @@
 							"Type": "interface{}",
 							"IsState": false,
 							"ImplementsEquals": false,
-							"ImplementsEvents": false
+							"ImplementsEvents": false,
+							"ImplementsClose": false
 						},
 						{
 							"Name": "a",
 							"Type": "Array",
 							"IsState": false,
 							"ImplementsEquals": true,
-							"ImplementsEvents": false
+							"ImplementsEvents": false,
+							"ImplementsClose": false
 						}
 					],
 					"Results": [
@@ -95,13 +103,57 @@
 							"Type": "int",
 							"IsState": false,
 							"ImplementsEquals": false,
-							"ImplementsEvents": false
+							"ImplementsEvents": false,
+							"ImplementsClose": false
 						}
 					],
 					"Variadic": false,
 					"Subs": null
 				}
 			]
+		},
+		{
+			"Name": "closer",
+			"Type": "CloserFunc",
+			"Ctor": "NewCloser",
+			"Args": [
+				{
+					"Name": "deps",
+					"Type": "*none",
+					"IsState": false,
+					"ImplementsEquals": false,
+					"ImplementsEvents": false,
+					"ImplementsClose": false
+				},
+				{
+					"Name": "closerState",
+					"Type": "closable",
+					"IsState": true,
+					"ImplementsEquals": false,
+					"ImplementsEvents": false,
+					"ImplementsClose": true
+				}
+			],
+			"Results": [
+				{
+					"Name": "closerState",
+					"Type": "closable",
+					"IsState": true,
+					"ImplementsEquals": false,
+					"ImplementsEvents": false,
+					"ImplementsClose": false
+				},
+				{
+					"Name": "result",
+					"Type": "int",
+					"IsState": false,
+					"ImplementsEquals": false,
+					"ImplementsEvents": false,
+					"ImplementsClose": false
+				}
+			],
+			"Variadic": false,
+			"Subs": []
 		},
 		{
 			"Name": "count",
@@ -113,14 +165,16 @@
 					"Type": "*none",
 					"IsState": false,
 					"ImplementsEquals": false,
-					"ImplementsEvents": false
+					"ImplementsEvents": false,
+					"ImplementsClose": false
 				},
 				{
 					"Name": "a",
 					"Type": "Array",
 					"IsState": false,
 					"ImplementsEquals": true,
-					"ImplementsEvents": false
+					"ImplementsEvents": false,
+					"ImplementsClose": false
 				}
 			],
 			"Results": [
@@ -129,7 +183,8 @@
 					"Type": "int",
 					"IsState": false,
 					"ImplementsEquals": false,
-					"ImplementsEvents": false
+					"ImplementsEvents": false,
+					"ImplementsClose": false
 				}
 			],
 			"Variadic": false,
@@ -145,21 +200,24 @@
 					"Type": "*none",
 					"IsState": false,
 					"ImplementsEquals": false,
-					"ImplementsEvents": false
+					"ImplementsEvents": false,
+					"ImplementsClose": false
 				},
 				{
 					"Name": "state",
 					"Type": "stateful",
 					"IsState": true,
 					"ImplementsEquals": false,
-					"ImplementsEvents": true
+					"ImplementsEvents": true,
+					"ImplementsClose": false
 				},
 				{
 					"Name": "input",
 					"Type": "int",
 					"IsState": false,
 					"ImplementsEquals": false,
-					"ImplementsEvents": false
+					"ImplementsEvents": false,
+					"ImplementsClose": false
 				}
 			],
 			"Results": [
@@ -168,21 +226,24 @@
 					"Type": "stateful",
 					"IsState": true,
 					"ImplementsEquals": false,
-					"ImplementsEvents": false
+					"ImplementsEvents": false,
+					"ImplementsClose": false
 				},
 				{
 					"Name": "r1",
 					"Type": "int",
 					"IsState": false,
 					"ImplementsEquals": false,
-					"ImplementsEvents": false
+					"ImplementsEvents": false,
+					"ImplementsClose": false
 				},
 				{
 					"Name": "r2",
 					"Type": "int",
 					"IsState": false,
 					"ImplementsEquals": false,
-					"ImplementsEvents": false
+					"ImplementsEvents": false,
+					"ImplementsClose": false
 				}
 			],
 			"Variadic": false,
@@ -198,14 +259,16 @@
 					"Type": "*none",
 					"IsState": false,
 					"ImplementsEquals": false,
-					"ImplementsEvents": false
+					"ImplementsEvents": false,
+					"ImplementsClose": false
 				},
 				{
 					"Name": "a",
 					"Type": "Array",
 					"IsState": false,
 					"ImplementsEquals": true,
-					"ImplementsEvents": false
+					"ImplementsEvents": false,
+					"ImplementsClose": false
 				}
 			],
 			"Results": [
@@ -214,7 +277,8 @@
 					"Type": "int",
 					"IsState": false,
 					"ImplementsEquals": false,
-					"ImplementsEvents": false
+					"ImplementsEvents": false,
+					"ImplementsClose": false
 				}
 			],
 			"Variadic": false,
@@ -230,14 +294,16 @@
 					"Type": "*none",
 					"IsState": false,
 					"ImplementsEquals": false,
-					"ImplementsEvents": false
+					"ImplementsEvents": false,
+					"ImplementsClose": false
 				},
 				{
 					"Name": "args",
 					"Type": "[]int",
 					"IsState": false,
 					"ImplementsEquals": false,
-					"ImplementsEvents": false
+					"ImplementsEvents": false,
+					"ImplementsClose": false
 				}
 			],
 			"Results": [
@@ -246,7 +312,8 @@
 					"Type": "int",
 					"IsState": false,
 					"ImplementsEquals": false,
-					"ImplementsEvents": false
+					"ImplementsEvents": false,
+					"ImplementsClose": false
 				}
 			],
 			"Variadic": true,

@@ -7,7 +7,7 @@
 package datum
 
 // NewAvg is the constructor for AvgFunc
-func NewAvg() (update AvgFunc, close func()) {
+func NewAvg() (update AvgFunc, closeAll func()) {
 	var refresh func()
 
 	var lasta Array
@@ -39,7 +39,7 @@ func NewAvg() (update AvgFunc, close func()) {
 		},
 	}
 
-	close = func() {
+	close := func() {
 		for key := range countCloseMap {
 			if !countUsedMap[key] {
 				countCloseMap[key]()
@@ -57,6 +57,11 @@ func NewAvg() (update AvgFunc, close func()) {
 			}
 		}
 		sumUsedMap = map[interface{}]bool{}
+	}
+
+	closeAll = func() {
+		close()
+
 	}
 
 	update = func(deps interface{}, a Array) (result float32) {
@@ -82,11 +87,53 @@ func NewAvg() (update AvgFunc, close func()) {
 		return lastresult
 	}
 
-	return update, close
+	return update, closeAll
+}
+
+// NewCloser is the constructor for CloserFunc
+func NewCloser() (update CloserFunc, closeAll func()) {
+	var refresh func()
+
+	var lastcloserState closable
+	var lastresult int
+	var initialized bool
+
+	depsLocal := &none{}
+
+	close := func() {}
+
+	closeAll = func() {
+		close()
+		lastcloserState.Close()
+	}
+
+	update = func(deps interface{}) (result int) {
+		refresh = func() {
+
+			lastcloserState, lastresult = closer(depsLocal, lastcloserState)
+
+			close()
+		}
+
+		if initialized {
+			switch {
+
+			default:
+
+				return lastresult
+			}
+		}
+		initialized = true
+
+		refresh()
+		return lastresult
+	}
+
+	return update, closeAll
 }
 
 // NewCount is the constructor for CountFunc
-func NewCount() (update CountFunc, close func()) {
+func NewCount() (update CountFunc, closeAll func()) {
 	var refresh func()
 
 	var lasta Array
@@ -95,7 +142,12 @@ func NewCount() (update CountFunc, close func()) {
 
 	depsLocal := &none{}
 
-	close = func() {}
+	close := func() {}
+
+	closeAll = func() {
+		close()
+
+	}
 
 	update = func(deps interface{}, a Array) (result int) {
 		refresh = func() {
@@ -120,11 +172,11 @@ func NewCount() (update CountFunc, close func()) {
 		return lastresult
 	}
 
-	return update, close
+	return update, closeAll
 }
 
 // NewEdgeTrigger is the constructor for EdgeTriggerFunc
-func NewEdgeTrigger() (update EdgeTriggerFunc, close func()) {
+func NewEdgeTrigger() (update EdgeTriggerFunc, closeAll func()) {
 	var refresh func()
 
 	var laststate stateful
@@ -135,7 +187,12 @@ func NewEdgeTrigger() (update EdgeTriggerFunc, close func()) {
 
 	depsLocal := &none{}
 
-	close = func() {}
+	close := func() {}
+
+	closeAll = func() {
+		close()
+
+	}
 
 	update = func(deps interface{}, input int) (r1 int, r2 int) {
 		refresh = func() {
@@ -160,11 +217,11 @@ func NewEdgeTrigger() (update EdgeTriggerFunc, close func()) {
 		return lastr1, lastr2
 	}
 
-	return update, close
+	return update, closeAll
 }
 
 // NewSum is the constructor for SumFunc
-func NewSum() (update SumFunc, close func()) {
+func NewSum() (update SumFunc, closeAll func()) {
 	var refresh func()
 
 	var lasta Array
@@ -173,7 +230,12 @@ func NewSum() (update SumFunc, close func()) {
 
 	depsLocal := &none{}
 
-	close = func() {}
+	close := func() {}
+
+	closeAll = func() {
+		close()
+
+	}
 
 	update = func(deps interface{}, a Array) (result int) {
 		refresh = func() {
@@ -198,11 +260,11 @@ func NewSum() (update SumFunc, close func()) {
 		return lastresult
 	}
 
-	return update, close
+	return update, closeAll
 }
 
 // NewVariadic is the constructor for VariadicFunc
-func NewVariadic() (update VariadicFunc, close func()) {
+func NewVariadic() (update VariadicFunc, closeAll func()) {
 	var refresh func()
 
 	var lastargs []int
@@ -211,7 +273,12 @@ func NewVariadic() (update VariadicFunc, close func()) {
 
 	depsLocal := &none{}
 
-	close = func() {}
+	close := func() {}
+
+	closeAll = func() {
+		close()
+
+	}
 
 	update = func(deps interface{}, args ...int) (result int) {
 		refresh = func() {
@@ -248,7 +315,7 @@ func NewVariadic() (update VariadicFunc, close func()) {
 		return lastresult
 	}
 
-	return update, close
+	return update, closeAll
 }
 
 type equals interface {

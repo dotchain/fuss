@@ -23,35 +23,40 @@
 					"Type": "*taskCtx",
 					"IsState": false,
 					"ImplementsEquals": false,
-					"ImplementsEvents": false
+					"ImplementsEvents": false,
+					"ImplementsClose": false
 				},
 				{
 					"Name": "boova",
 					"Type": "bool",
 					"IsState": false,
 					"ImplementsEquals": false,
-					"ImplementsEvents": false
+					"ImplementsEvents": false,
+					"ImplementsClose": false
 				},
 				{
 					"Name": "state1",
 					"Type": "int",
 					"IsState": true,
 					"ImplementsEquals": false,
-					"ImplementsEvents": false
+					"ImplementsEvents": false,
+					"ImplementsClose": false
 				},
 				{
 					"Name": "goop",
 					"Type": "*stream",
 					"IsState": false,
 					"ImplementsEquals": true,
-					"ImplementsEvents": true
+					"ImplementsEvents": true,
+					"ImplementsClose": false
 				},
 				{
 					"Name": "boo",
 					"Type": "[]bool",
 					"IsState": false,
 					"ImplementsEquals": false,
-					"ImplementsEvents": false
+					"ImplementsEvents": false,
+					"ImplementsClose": false
 				}
 			],
 			"Results": [
@@ -60,14 +65,16 @@
 					"Type": "int",
 					"IsState": true,
 					"ImplementsEquals": false,
-					"ImplementsEvents": false
+					"ImplementsEvents": false,
+					"ImplementsClose": false
 				},
 				{
 					"Name": "result1",
 					"Type": "int",
 					"IsState": false,
 					"ImplementsEquals": false,
-					"ImplementsEvents": false
+					"ImplementsEvents": false,
+					"ImplementsClose": false
 				}
 			],
 			"Variadic": true,
@@ -83,7 +90,8 @@
 							"Type": "_ctx_",
 							"IsState": false,
 							"ImplementsEquals": false,
-							"ImplementsEvents": false
+							"ImplementsEvents": false,
+							"ImplementsClose": false
 						}
 					],
 					"Results": [
@@ -92,7 +100,8 @@
 							"Type": "int",
 							"IsState": false,
 							"ImplementsEquals": false,
-							"ImplementsEvents": false
+							"ImplementsEvents": false,
+							"ImplementsClose": false
 						}
 					],
 					"Variadic": false,

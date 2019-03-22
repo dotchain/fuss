@@ -25,10 +25,10 @@ func newParser(pkg *types.Package, files []*ast.File, fset *token.FileSet) *pars
 type parse struct {
 	*types.Package
 	*types.Scope
-	files   []*ast.File
-	fset    *token.FileSet
-	imports map[*types.Package]string
-	eq, ev  *types.Interface
+	files      []*ast.File
+	fset       *token.FileSet
+	imports    map[*types.Package]string
+	eq, ev, cl *types.Interface
 }
 
 func (p *parse) components() ([]ComponentInfo, [][2]string, error) {
@@ -209,11 +209,12 @@ func (p *parse) argInfo(arg *types.Var) ArgInfo {
 	eq := types.Implements(typ, p.equals())
 	ev := types.Implements(typ, p.eventSource())
 	isState := p.isStateArg(name)
+	cl := isState && types.Implements(typ, p.closeInterface())
 	typs := types.TypeString(typ, p.qualify)
 	if !eq && !types.Comparable(typ) {
 		log.Println("args must be comparable or implement equals", name, typs)
 	}
-	return ArgInfo{name, typs, isState, eq, ev}
+	return ArgInfo{name, typs, isState, eq, ev, cl}
 }
 
 func (p *parse) equals() *types.Interface {
@@ -225,6 +226,16 @@ func (p *parse) equals() *types.Interface {
 	methods := []*types.Func{p.method("Equals", types.Typ[types.Bool], void)}
 	p.eq = types.NewInterfaceType(methods, nil).Complete()
 	return p.eq
+}
+
+func (p *parse) closeInterface() *types.Interface {
+	if p.cl != nil {
+		return p.cl
+	}
+
+	methods := []*types.Func{p.method("Close", nil)}
+	p.cl = types.NewInterfaceType(methods, nil).Complete()
+	return p.cl
 }
 
 func (p *parse) method(name string, retType types.Type, args ...types.Type) *types.Func {

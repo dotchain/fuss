@@ -7,7 +7,7 @@
 package task
 
 // NewTaskView is the constructor for TaskViewF
-func NewTaskView() (update TaskViewF, close func()) {
+func NewTaskView() (update TaskViewF, closeAll func()) {
 	var refresh func()
 
 	var lastboova bool
@@ -30,7 +30,7 @@ func NewTaskView() (update TaskViewF, close func()) {
 		},
 	}
 
-	close = func() {
+	close := func() {
 		for key := range cbCloseMap {
 			if !cbUsedMap[key] {
 				cbCloseMap[key]()
@@ -39,6 +39,11 @@ func NewTaskView() (update TaskViewF, close func()) {
 			}
 		}
 		cbUsedMap = map[interface{}]bool{}
+	}
+
+	closeAll = func() {
+		close()
+
 	}
 
 	update = func(ctx interface{}, boova bool, goop *stream, boo ...bool) (result1 int) {
@@ -79,7 +84,7 @@ func NewTaskView() (update TaskViewF, close func()) {
 		return lastresult1
 	}
 
-	return update, close
+	return update, closeAll
 }
 
 type equals interface {

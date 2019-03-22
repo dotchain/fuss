@@ -53,3 +53,15 @@ type VariadicFunc = func(key interface{}, args ...int) int
 func variadic(deps *none, args ...int) int {
 	return 0
 }
+
+
+// Closseable test
+type CloserFunc = func(key interface{}) int
+func closer(deps *none, closerState closable) (closable, int) {
+	return closable(0), 0
+}
+
+type closable int
+func (c closable) Close() {
+}
+

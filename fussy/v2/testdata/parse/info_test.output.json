@@ -19,14 +19,16 @@
 					"Type": "*testDeps",
 					"IsState": false,
 					"ImplementsEquals": false,
-					"ImplementsEvents": false
+					"ImplementsEvents": false,
+					"ImplementsClose": false
 				},
 				{
 					"Name": "a",
 					"Type": "datum.Array",
 					"IsState": false,
 					"ImplementsEquals": true,
-					"ImplementsEvents": false
+					"ImplementsEvents": false,
+					"ImplementsClose": false
 				}
 			],
 			"Results": [
@@ -35,7 +37,8 @@
 					"Type": "float32",
 					"IsState": false,
 					"ImplementsEquals": false,
-					"ImplementsEvents": false
+					"ImplementsEvents": false,
+					"ImplementsClose": false
 				}
 			],
 			"Variadic": false,
@@ -51,14 +54,16 @@
 							"Type": "interface{}",
 							"IsState": false,
 							"ImplementsEquals": false,
-							"ImplementsEvents": false
+							"ImplementsEvents": false,
+							"ImplementsClose": false
 						},
 						{
 							"Name": "a",
 							"Type": "datum.Array",
 							"IsState": false,
 							"ImplementsEquals": true,
-							"ImplementsEvents": false
+							"ImplementsEvents": false,
+							"ImplementsClose": false
 						}
 					],
 					"Results": [
@@ -67,7 +72,8 @@
 							"Type": "float32",
 							"IsState": false,
 							"ImplementsEquals": false,
-							"ImplementsEvents": false
+							"ImplementsEvents": false,
+							"ImplementsClose": false
 						}
 					],
 					"Variadic": false,
