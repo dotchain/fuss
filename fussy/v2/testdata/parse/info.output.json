@@ -33,6 +33,7 @@
 					"ImplementsEvents": false
 				}
 			],
+			"Variadic": false,
 			"Subs": [
 				{
 					"LocalName": "count",
@@ -64,6 +65,7 @@
 							"ImplementsEvents": false
 						}
 					],
+					"Variadic": false,
 					"Subs": null
 				},
 				{
@@ -96,6 +98,7 @@
 							"ImplementsEvents": false
 						}
 					],
+					"Variadic": false,
 					"Subs": null
 				}
 			]
@@ -129,6 +132,7 @@
 					"ImplementsEvents": false
 				}
 			],
+			"Variadic": false,
 			"Subs": []
 		},
 		{
@@ -181,6 +185,7 @@
 					"ImplementsEvents": false
 				}
 			],
+			"Variadic": false,
 			"Subs": []
 		},
 		{
@@ -212,6 +217,39 @@
 					"ImplementsEvents": false
 				}
 			],
+			"Variadic": false,
+			"Subs": []
+		},
+		{
+			"Name": "variadic",
+			"Type": "VariadicFunc",
+			"Ctor": "NewVariadic",
+			"Args": [
+				{
+					"Name": "deps",
+					"Type": "*none",
+					"IsState": false,
+					"ImplementsEquals": false,
+					"ImplementsEvents": false
+				},
+				{
+					"Name": "args",
+					"Type": "[]int",
+					"IsState": false,
+					"ImplementsEquals": false,
+					"ImplementsEvents": false
+				}
+			],
+			"Results": [
+				{
+					"Name": "result",
+					"Type": "int",
+					"IsState": false,
+					"ImplementsEquals": false,
+					"ImplementsEvents": false
+				}
+			],
+			"Variadic": true,
 			"Subs": []
 		}
 	]

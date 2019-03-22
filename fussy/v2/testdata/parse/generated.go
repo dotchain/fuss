@@ -72,6 +72,7 @@ func NewAvg() (update AvgFunc, close func()) {
 			case lasta.Equals(a):
 
 			default:
+
 				return lastresult
 			}
 		}
@@ -109,6 +110,7 @@ func NewCount() (update CountFunc, close func()) {
 			case lasta.Equals(a):
 
 			default:
+
 				return lastresult
 			}
 		}
@@ -148,6 +150,7 @@ func NewEdgeTrigger() (update EdgeTriggerFunc, close func()) {
 
 			case lastinput != input:
 			default:
+
 				return lastr1, lastr2
 			}
 		}
@@ -185,11 +188,62 @@ func NewSum() (update SumFunc, close func()) {
 			case lasta.Equals(a):
 
 			default:
+
 				return lastresult
 			}
 		}
 		initialized = true
 		lasta = a
+		refresh()
+		return lastresult
+	}
+
+	return update, close
+}
+
+// NewVariadic is the constructor for VariadicFunc
+func NewVariadic() (update VariadicFunc, close func()) {
+	var refresh func()
+
+	var lastargs []int
+	var lastresult int
+	var initialized bool
+
+	depsLocal := &none{}
+
+	close = func() {}
+
+	update = func(deps interface{}, args ...int) (result int) {
+		refresh = func() {
+
+			lastresult = variadic(depsLocal, args...)
+
+			close()
+		}
+
+		if initialized {
+			switch {
+
+			default:
+
+				if len(lastargs) != len(args) {
+					break
+				}
+				diff := false
+				for kk := 0; !diff && kk < len(args); kk++ {
+
+					diff = lastargs[kk] == args[kk]
+
+				}
+				if diff {
+					break
+				}
+
+				return lastresult
+			}
+		}
+		initialized = true
+		lastargs = args
 		refresh()
 		return lastresult
 	}

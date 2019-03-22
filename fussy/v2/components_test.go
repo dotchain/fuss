@@ -13,8 +13,16 @@ import (
 )
 
 func TestComponents(t *testing.T) {
-	// s, _ := json.MarshalIndent(info, "", "  ")
-	// fmt.Println(string(s))
+	// regenerate to make sure input is normalized json
+	testFile(t, "generate/components.input.json", "generate/components.input.json", func(input string) (string, error) {
+		var info fussy.Info
+		if err := json.Unmarshal([]byte(input), &info); err != nil {
+			return "", err
+		}
+		b, err := json.MarshalIndent(info, "", "\t")
+		return string(b), err
+	})
+
 	testFile(t, "generate/components.input.json", "generate/components.output.go", func(input string) (string, error) {
 		var info fussy.Info
 		if err := json.Unmarshal([]byte(input), &info); err != nil {

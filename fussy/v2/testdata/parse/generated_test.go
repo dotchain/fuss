@@ -55,6 +55,7 @@ func NewMyTest() (update MyTestFunc, close func()) {
 			case lasta.Equals(a):
 
 			default:
+
 				return lastresult
 			}
 		}
