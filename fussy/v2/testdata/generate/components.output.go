@@ -86,7 +86,3 @@ func NewTaskView() (update TaskViewF, closeAll func()) {
 
 	return update, closeAll
 }
-
-type equals interface {
-	Equals(o interface{}) bool
-}
