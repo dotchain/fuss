@@ -10,21 +10,23 @@ package task
 func NewTaskView() (update TaskViewF, close func()) {
 	var refresh func()
 
-	var lastboo bool
-	var lastchildren []int
+	var lastboova bool
+	var laststate1 int
+	var lastgoop *stream
+	var lastboo []bool
 	var lastresult1 int
 	var initialized bool
-	cbFnMap := map[interface{}]dom.CheckboxF{}
+	cbFnMap := map[interface{}]CheckboxF{}
 	cbCloseMap := map[interface{}]func(){}
 	cbUsedMap := map[interface{}]bool{}
 
 	ctxLocal := &taskCtx{
-		cb: func(ctx interface{}, boo bool) (result1 int) {
+		cb: func(ctx interface{}) (result1 int) {
 			cbUsedMap[ctx] = true
 			if cbFnMap[ctx] == nil {
-				cbFnMap[ctx], cbCloseMap[ctx] = dom.NewCheckbox()
+				cbFnMap[ctx], cbCloseMap[ctx] = NewCheckbox()
 			}
-			return cbFnMap[ctx](ctx, boo)
+			return cbFnMap[ctx](ctx)
 		},
 	}
 
@@ -39,26 +41,40 @@ func NewTaskView() (update TaskViewF, close func()) {
 		cbUsedMap = map[interface{}]bool{}
 	}
 
-	update = func(ctx interface{}, boo bool, children []int) (result1 int) {
+	update = func(ctx interface{}, boova bool, goop *stream, boo ...bool) (result1 int) {
 		refresh = func() {
 
-			lastresult1 = taskView(ctxLocal, boo, children)
+			laststate1, lastresult1 = taskView(ctxLocal, boova, laststate1, goop, boo...)
 
 			close()
 		}
 
 		if initialized {
 			switch {
-
-			case lastboo != boo:
-			case lastchildren != children:
+			case lastgoop.Equals(goop):
+			case lastboova != boova:
 			default:
+
+				if len(lastboo) != len(boo) {
+					break
+				}
+				diff := false
+				for kk := 0; !diff && kk < len(boo); kk++ {
+
+					diff = lastboo[kk] == boo[kk]
+
+				}
+				if diff {
+					break
+				}
+
 				return lastresult1
 			}
 		}
 		initialized = true
+		lastboova = boova
+		lastgoop = goop
 		lastboo = boo
-		lastchildren = children
 		refresh()
 		return lastresult1
 	}

@@ -1,74 +1,104 @@
 {
-  "Generator": "github.com/dotchain/fuss/fussy/components_test.go",
-  "Package": "task",
-  "Imports": [
-    [
-      "hello",
-      "github.com/boo/hello"
-    ],
-    [
-      "hello2",
-      "github.com/boo/hello2"
-    ]
-  ],
-  "Streams": null,
-  "Components": [
-    {
-      "Name": "taskView",
-      "Type": "TaskViewF",
-      "Ctor": "NewTaskView",
-      "Args": [
-        {
-          "Name": "ctx",
-          "Type": "*taskCtx",
-          "IsState": false
-        },
-        {
-          "Name": "boo",
-          "Type": "bool",
-          "IsState": false
-        },
-        {
-          "Name": "children",
-          "Type": "[]int",
-          "IsState": false
-        }
-      ],
-      "Results": [
-        {
-          "Name": "result1",
-          "Type": "int",
-          "IsState": false
-        }
-      ],
-      "Subs": [
-        {
-          "LocalName": "cb",
-          "Name": "_name_",
-          "Type": "dom.CheckboxF",
-          "Ctor": "dom.NewCheckbox",
-          "Args": [
-            {
-              "Name": "ctx",
-              "Type": "_ctx_",
-              "IsState": false
-            },
-            {
-              "Name": "boo",
-              "Type": "bool",
-              "IsState": false
-            }
-          ],
-          "Results": [
-            {
-              "Name": "result1",
-              "Type": "int",
-              "IsState": false
-            }
-          ],
-          "Subs": null
-        }
-      ]
-    }
-  ]
+	"Generator": "github.com/dotchain/fuss/fussy/components_test.go",
+	"Package": "task",
+	"Imports": [
+		[
+			"hello",
+			"github.com/boo/hello"
+		],
+		[
+			"hello2",
+			"github.com/boo/hello2"
+		]
+	],
+	"Streams": null,
+	"Components": [
+		{
+			"Name": "taskView",
+			"Type": "TaskViewF",
+			"Ctor": "NewTaskView",
+			"Args": [
+				{
+					"Name": "ctx",
+					"Type": "*taskCtx",
+					"IsState": false,
+					"ImplementsEquals": false,
+					"ImplementsEvents": false
+				},
+				{
+					"Name": "boova",
+					"Type": "bool",
+					"IsState": false,
+					"ImplementsEquals": false,
+					"ImplementsEvents": false
+				},
+				{
+					"Name": "state1",
+					"Type": "int",
+					"IsState": true,
+					"ImplementsEquals": false,
+					"ImplementsEvents": false
+				},
+				{
+					"Name": "goop",
+					"Type": "*stream",
+					"IsState": false,
+					"ImplementsEquals": true,
+					"ImplementsEvents": true
+				},
+				{
+					"Name": "boo",
+					"Type": "[]bool",
+					"IsState": false,
+					"ImplementsEquals": false,
+					"ImplementsEvents": false
+				}
+			],
+			"Results": [
+				{
+					"Name": "state1",
+					"Type": "int",
+					"IsState": true,
+					"ImplementsEquals": false,
+					"ImplementsEvents": false
+				},
+				{
+					"Name": "result1",
+					"Type": "int",
+					"IsState": false,
+					"ImplementsEquals": false,
+					"ImplementsEvents": false
+				}
+			],
+			"Variadic": true,
+			"Subs": [
+				{
+					"LocalName": "cb",
+					"Name": "_name_",
+					"Type": "CheckboxF",
+					"Ctor": "NewCheckbox",
+					"Args": [
+						{
+							"Name": "ctx",
+							"Type": "_ctx_",
+							"IsState": false,
+							"ImplementsEquals": false,
+							"ImplementsEvents": false
+						}
+					],
+					"Results": [
+						{
+							"Name": "result1",
+							"Type": "int",
+							"IsState": false,
+							"ImplementsEquals": false,
+							"ImplementsEvents": false
+						}
+					],
+					"Variadic": false,
+					"Subs": null
+				}
+			]
+		}
+	]
 }

@@ -63,6 +63,18 @@ func {{.Ctor}}() (update {{.Type}}, close func()) {
 			{{range .PublicArgsArrayEquals}}case last{{.Name}}.Equals({{.Name}}): {{end}}
 			{{range .PublicArgsArrayOther}}case last{{.Name}} != {{.Name}}: {{end}}
 			default:
+				{{if .Variadic}}
+				if len(last{{.LastArg.Name}})  != len({{.LastArg.Name}}) { break; }
+				diff := false
+				for kk :=  0; !diff && kk < len({{.LastArg.Name}}); kk ++ {
+					{{if .LastArg.ImplementsEquals}}
+					diff = last{{.LastArg.Name}}[kk].Equals({{.LastArg.Name}}[kk])
+					{{else}}
+					diff = last{{.LastArg.Name}}[kk] == {{.LastArg.Name}}[kk]
+					{{end}}
+				}
+				if diff {  break }
+				{{end}}
 				return {{.LastPublicResults}}
 			}
 		}

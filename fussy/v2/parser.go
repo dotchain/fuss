@@ -143,6 +143,8 @@ func (p *parse) component(name string, fn *types.Signature) (*ComponentInfo, err
 		}
 	}
 
+	ci.Variadic = fn.Variadic()
+
 	seen := 0
 	for kk := 0; kk < fn.Results().Len(); kk++ {
 		arg := fn.Results().At(kk)

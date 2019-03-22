@@ -47,3 +47,9 @@ func (s stateful) On(pfn *func()) {
 func (s stateful) Off(pfn *func()) {
 }
 
+
+// Variadic test
+type VariadicFunc = func(key interface{}, args ...int) int
+func variadic(deps *none, args ...int) int {
+	return 0
+}
