@@ -317,7 +317,3 @@ func NewVariadic() (update VariadicFunc, closeAll func()) {
 
 	return update, closeAll
 }
-
-type equals interface {
-	Equals(o interface{}) bool
-}

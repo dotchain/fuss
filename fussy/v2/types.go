@@ -12,51 +12,7 @@ type Info struct {
 	Generator  string
 	Package    string
 	Imports    [][2]string
-	Streams    []StreamInfo
 	Components []ComponentInfo
-}
-
-// StreamInfo holds the information to generate a single stream type
-type StreamInfo struct {
-	StreamType       string
-	ValueType        string
-	Fields           []FieldInfo
-	EntryStreamType  string
-	EntryConstructor string
-}
-
-// FieldInfo holds info on individual substream fields of the base stream
-type FieldInfo struct {
-	Field            string
-	FieldType        string
-	FieldStreamType  string
-	FieldConstructor string
-	FieldSubstream   string
-}
-
-// ParamInfo has info about arguments
-type ParamInfo struct {
-	Name, Type string
-}
-
-// ResultInfo has info about return values
-type ResultInfo struct {
-	Name, Type string
-}
-
-// ArgInfo holds func arg related info
-type ArgInfo struct {
-	Name, Type       string
-	IsState          bool
-	ImplementsEquals bool
-	ImplementsEvents bool
-	ImplementsClose  bool
-}
-
-// SubComponentInfo holds sub-component related info
-type SubComponentInfo struct {
-	LocalName string
-	ComponentInfo
 }
 
 // ComponentInfo holds info related to a component
@@ -66,6 +22,21 @@ type ComponentInfo struct {
 	Args, Results []ArgInfo
 	Variadic      bool
 	Subs          []SubComponentInfo
+}
+
+// SubComponentInfo holds sub-component related info
+type SubComponentInfo struct {
+	LocalName string
+	ComponentInfo
+}
+
+// ArgInfo holds func arg related info
+type ArgInfo struct {
+	Name, Type       string
+	IsState          bool
+	ImplementsEquals bool
+	ImplementsEvents bool
+	ImplementsClose  bool
 }
 
 // NonContextArgsArgs returns the list of non-context args, including state

@@ -2,7 +2,6 @@
 	"Generator": "",
 	"Package": "datum",
 	"Imports": [],
-	"Streams": null,
 	"Components": [
 		{
 			"Name": "avg",
