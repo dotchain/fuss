@@ -50,6 +50,7 @@ type ArgInfo struct {
 	IsState          bool
 	ImplementsEquals bool
 	ImplementsEvents bool
+	ImplementsClose  bool
 }
 
 // SubComponentInfo holds sub-component related info

@@ -11,7 +11,7 @@ import (
 )
 
 // NewMyTest is the constructor for MyTestFunc
-func NewMyTest() (update MyTestFunc, close func()) {
+func NewMyTest() (update MyTestFunc, closeAll func()) {
 	var refresh func()
 
 	var lasta datum.Array
@@ -31,7 +31,7 @@ func NewMyTest() (update MyTestFunc, close func()) {
 		},
 	}
 
-	close = func() {
+	close := func() {
 		for key := range avgCloseMap {
 			if !avgUsedMap[key] {
 				avgCloseMap[key]()
@@ -40,6 +40,11 @@ func NewMyTest() (update MyTestFunc, close func()) {
 			}
 		}
 		avgUsedMap = map[interface{}]bool{}
+	}
+
+	closeAll = func() {
+		close()
+
 	}
 
 	update = func(deps interface{}, a datum.Array) (result float32) {
@@ -65,7 +70,7 @@ func NewMyTest() (update MyTestFunc, close func()) {
 		return lastresult
 	}
 
-	return update, close
+	return update, closeAll
 }
 
 type equals interface {

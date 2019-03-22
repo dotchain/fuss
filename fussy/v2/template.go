@@ -13,7 +13,7 @@ var componentsTpl = template.Must(template.New("code").Parse(`
 {{- range .Components}}
 
 // {{.Ctor}} is the constructor for {{.Type}}
-func {{.Ctor}}() (update {{.Type}}, close func()) {
+func {{.Ctor}}() (update {{.Type}}, closeAll func()) {
 	var refresh func()
 
 	{{ range .NonContextArgsArray }}var last{{.Name}} {{.Type}};{{end}}
@@ -37,7 +37,7 @@ func {{.Ctor}}() (update {{.Type}}, close func()) {
 		{{end -}}
 	}
 
-	close = func() {
+	close := func() {
 		{{- range  .Subs}}
 		for key := range {{.LocalName}}CloseMap {
 			if !{{.LocalName}}UsedMap[key] {
@@ -48,6 +48,11 @@ func {{.Ctor}}() (update {{.Type}}, close func()) {
 		}
 		{{.LocalName}}UsedMap = map[interface{}]bool{}
 		{{end -}}
+	}
+
+	closeAll = func() {
+		close()
+		{{range .NonContextArgsArray}}{{if .ImplementsClose}}{{if .IsState}}last{{.Name}}.Close(); {{end}}{{end}}{{end}}
 	}
 
 	update = func({{.PublicArgsDecl}}) {{.PublicResultsDecl}} {
@@ -84,7 +89,7 @@ func {{.Ctor}}() (update {{.Type}}, close func()) {
 		return {{.LastPublicResults}}
 	}
 
-	return update, close
+	return update, closeAll
 }
 {{end -}}
 
