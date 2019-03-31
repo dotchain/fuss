@@ -9,9 +9,10 @@ import (
 	"bytes"
 	"fmt"
 	"go/format"
-	"golang.org/x/tools/imports"
 	"sort"
 	"strings"
+
+	"golang.org/x/tools/imports"
 )
 
 // Info contains all the info needed to generate code

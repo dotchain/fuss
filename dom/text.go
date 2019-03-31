@@ -37,7 +37,7 @@ func textEditO(c *textEditOCtx, opt TextEditOptions) Element {
 			Placeholder: opt.Placeholder,
 			TextContent: text,
 			Styles:      opt.Styles,
-			OnChange: &EventHandler{func(e Event) {
+			OnChange: &EventHandler{Handle: func(e Event) {
 				opt.Text = opt.Text.Append(nil, e.Value(), true)
 			}},
 		},

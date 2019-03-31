@@ -14,7 +14,7 @@ func checkboxEdit(c *cbEditCtx, styles Styles, checked *BoolStream, id string) E
 			Type:    "checkbox",
 			Checked: checked.Value,
 			Styles:  styles,
-			OnChange: &EventHandler{func(e Event) {
+			OnChange: &EventHandler{Handle: func(e Event) {
 				checked = checked.Append(nil, e.Value() == "on", true)
 			}},
 		},

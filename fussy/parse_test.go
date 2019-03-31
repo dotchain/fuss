@@ -6,10 +6,11 @@ package fussy_test
 
 import (
 	"encoding/json"
-	"github.com/andreyvit/diff"
-	"github.com/dotchain/fuss/fussy"
 	"strings"
 	"testing"
+
+	"github.com/andreyvit/diff"
+	"github.com/dotchain/fuss/fussy"
 )
 
 func TestParse(t *testing.T) {

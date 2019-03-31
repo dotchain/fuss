@@ -34,7 +34,7 @@ func filter(c *filterCtx, selected *dom.TextStream) dom.Element {
 // clicked will automatically append the provided key to the selected
 // stream.
 func filterOption(c *filterOptionCtx, selected *dom.TextStream, key string) dom.Element {
-	h := &dom.EventHandler{func(e dom.Event) {
+	h := &dom.EventHandler{Handle: func(e dom.Event) {
 		if e.Value() == "click" {
 			selected = selected.Append(nil, key, true)
 		}

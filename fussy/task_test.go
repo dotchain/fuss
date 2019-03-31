@@ -5,10 +5,11 @@
 package fussy_test
 
 import (
-	"github.com/andreyvit/diff"
-	"github.com/dotchain/fuss/fussy"
 	"strings"
 	"testing"
+
+	"github.com/andreyvit/diff"
+	"github.com/dotchain/fuss/fussy"
 )
 
 func TestTodoTasks(t *testing.T) {
