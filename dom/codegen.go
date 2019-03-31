@@ -9,14 +9,14 @@ package main
 import (
 	"github.com/dotchain/fuss/fussy"
 	"io/ioutil"
-	"path"
+	"filepath"
 	"runtime"
 )
 
 func main() {
 	_, self, _, _ := runtime.Caller(0)
 	output := "generated.go"
-	info := fussy.ParseDir(path.Dir(self), output)
+	info := fussy.ParseDir(filepath.Dir(self), output)
 	info.Generator = "github.com/dotchain/fuss/dom/codegen.go"
 	info.Streams = []fussy.StreamInfo{
 		{StreamType: "BoolStream", ValueType: "bool"},

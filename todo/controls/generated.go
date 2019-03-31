@@ -7,414 +7,354 @@
 package controls
 
 import (
-	"github.com/dotchain/fuss/core"
-	"github.com/dotchain/fuss/dom"
+	streams "github.com/dotchain/dot/streams"
+	dom "github.com/dotchain/fuss/dom/v2"
 )
 
-type chromeCtx struct {
-	core.Cache
-	finalizer func()
+// NewChrome is the constructor for ChromeFunc
+func NewChrome() (update ChromeFunc, closeAll func()) {
+	var refresh func()
 
-	initialized  bool
-	stateHandler core.Handler
+	var lastheader dom.Element
+	var lastbody dom.Element
+	var lastfooter dom.Element
+	var lastresult dom.Element
+	var initialized bool
+	vRunFnMap := map[interface{}]dom.VRunFunc{}
+	vRunCloseMap := map[interface{}]func(){}
+	vRunUsedMap := map[interface{}]bool{}
 
-	dom struct {
-		dom.FixedStruct
-		dom.StretchStruct
-		dom.VRunStruct
-	}
-	memoized struct {
-		body    dom.Element
-		footer  dom.Element
-		header  dom.Element
-		result1 dom.Element
-	}
-}
+	fixedFnMap := map[interface{}]dom.FixedFunc{}
+	fixedCloseMap := map[interface{}]func(){}
+	fixedUsedMap := map[interface{}]bool{}
 
-func (c *chromeCtx) areArgsSame(header dom.Element, body dom.Element, footer dom.Element) bool {
+	stretchFnMap := map[interface{}]dom.StretchFunc{}
+	stretchCloseMap := map[interface{}]func(){}
+	stretchUsedMap := map[interface{}]bool{}
 
-	if header != c.memoized.header {
-		return false
-	}
+	depsLocal := &chromeDeps{
+		vRun: func(key interface{}, styles dom.Styles, cells ...dom.Element) (result dom.Element) {
+			vRunUsedMap[key] = true
+			if vRunFnMap[key] == nil {
+				vRunFnMap[key], vRunCloseMap[key] = dom.NewVRun()
+			}
+			return vRunFnMap[key](key, styles, cells...)
+		},
 
-	if body != c.memoized.body {
-		return false
-	}
+		fixed: func(key interface{}, styles dom.Styles, cells ...dom.Element) (result dom.Element) {
+			fixedUsedMap[key] = true
+			if fixedFnMap[key] == nil {
+				fixedFnMap[key], fixedCloseMap[key] = dom.NewFixed()
+			}
+			return fixedFnMap[key](key, styles, cells...)
+		},
 
-	return footer == c.memoized.footer
-
-}
-
-func (c *chromeCtx) refreshIfNeeded(header dom.Element, body dom.Element, footer dom.Element) (result1 dom.Element) {
-	if !c.initialized || !c.areArgsSame(header, body, footer) {
-		return c.refresh(header, body, footer)
-	}
-	return c.memoized.result1
-}
-
-func (c *chromeCtx) refresh(header dom.Element, body dom.Element, footer dom.Element) (result1 dom.Element) {
-	c.initialized = true
-	c.stateHandler.Handle = func() {
-		c.refresh(header, body, footer)
-	}
-
-	c.memoized.header, c.memoized.body, c.memoized.footer = header, body, footer
-
-	c.Cache.Begin()
-	defer c.Cache.End()
-
-	c.dom.FixedStruct.Begin()
-	defer c.dom.FixedStruct.End()
-
-	c.dom.StretchStruct.Begin()
-	defer c.dom.StretchStruct.End()
-
-	c.dom.VRunStruct.Begin()
-	defer c.dom.VRunStruct.End()
-	c.memoized.result1 = chrome(c, header, body, footer)
-
-	return c.memoized.result1
-}
-
-func (c *chromeCtx) close() {
-	c.Cache.Begin()
-	c.Cache.End()
-
-	c.dom.FixedStruct.Begin()
-	c.dom.FixedStruct.End()
-
-	c.dom.StretchStruct.Begin()
-	c.dom.StretchStruct.End()
-
-	c.dom.VRunStruct.Begin()
-	c.dom.VRunStruct.End()
-	if c.finalizer != nil {
-		c.finalizer()
-	}
-}
-
-// ChromeStruct is a cache for Chrome
-// Chrome renders the app chrome
-type ChromeStruct struct {
-	old, current map[interface{}]*chromeCtx
-}
-
-// Begin starts a round
-func (c *ChromeStruct) Begin() {
-	c.old, c.current = c.current, map[interface{}]*chromeCtx{}
-}
-
-// End finishes the round cleaning up any unused components
-func (c *ChromeStruct) End() {
-	for _, ctx := range c.old {
-		ctx.close()
-	}
-	c.old = nil
-}
-
-// Chrome - see the type for details
-func (c *ChromeStruct) Chrome(cKey interface{}, header dom.Element, body dom.Element, footer dom.Element) (result1 dom.Element) {
-	cOld, ok := c.old[cKey]
-	if ok {
-		delete(c.old, cKey)
-	} else {
-		cOld = &chromeCtx{}
-	}
-	c.current[cKey] = cOld
-	return cOld.refreshIfNeeded(header, body, footer)
-}
-
-type filterCtx struct {
-	core.Cache
-	finalizer func()
-
-	FilterOptionStruct
-	initialized  bool
-	stateHandler core.Handler
-
-	dom struct {
-		dom.RunStruct
-	}
-	memoized struct {
-		result1  dom.Element
-		selected *dom.TextStream
-	}
-}
-
-func (c *filterCtx) areArgsSame(selected *dom.TextStream) bool {
-
-	return selected == c.memoized.selected
-
-}
-
-func (c *filterCtx) refreshIfNeeded(selected *dom.TextStream) (result1 dom.Element) {
-	if !c.initialized || !c.areArgsSame(selected) {
-		return c.refresh(selected)
-	}
-	return c.memoized.result1
-}
-
-func (c *filterCtx) refresh(selected *dom.TextStream) (result1 dom.Element) {
-	c.initialized = true
-	c.stateHandler.Handle = func() {
-		c.refresh(selected)
+		stretch: func(key interface{}, styles dom.Styles, cells ...dom.Element) (result dom.Element) {
+			stretchUsedMap[key] = true
+			if stretchFnMap[key] == nil {
+				stretchFnMap[key], stretchCloseMap[key] = dom.NewStretch()
+			}
+			return stretchFnMap[key](key, styles, cells...)
+		},
 	}
 
-	c.memoized.selected = selected
+	close := func() {
+		for key := range vRunCloseMap {
+			if !vRunUsedMap[key] {
+				vRunCloseMap[key]()
+				delete(vRunCloseMap, key)
+				delete(vRunFnMap, key)
+			}
+		}
+		vRunUsedMap = map[interface{}]bool{}
 
-	c.Cache.Begin()
-	defer c.Cache.End()
+		for key := range fixedCloseMap {
+			if !fixedUsedMap[key] {
+				fixedCloseMap[key]()
+				delete(fixedCloseMap, key)
+				delete(fixedFnMap, key)
+			}
+		}
+		fixedUsedMap = map[interface{}]bool{}
 
-	c.FilterOptionStruct.Begin()
-	defer c.FilterOptionStruct.End()
-
-	c.dom.RunStruct.Begin()
-	defer c.dom.RunStruct.End()
-	c.memoized.result1 = filter(c, selected)
-
-	return c.memoized.result1
-}
-
-func (c *filterCtx) close() {
-	c.Cache.Begin()
-	c.Cache.End()
-
-	c.FilterOptionStruct.Begin()
-	c.FilterOptionStruct.End()
-
-	c.dom.RunStruct.Begin()
-	c.dom.RunStruct.End()
-	if c.finalizer != nil {
-		c.finalizer()
-	}
-}
-
-// FilterStruct is a cache for Filter
-// Filter renders a row of options for "All", "Active" or "Done"
-//
-// This is reflected in the selected stream (which is both input and output).
-type FilterStruct struct {
-	old, current map[interface{}]*filterCtx
-}
-
-// Begin starts a round
-func (c *FilterStruct) Begin() {
-	c.old, c.current = c.current, map[interface{}]*filterCtx{}
-}
-
-// End finishes the round cleaning up any unused components
-func (c *FilterStruct) End() {
-	for _, ctx := range c.old {
-		ctx.close()
-	}
-	c.old = nil
-}
-
-// Filter - see the type for details
-func (c *FilterStruct) Filter(cKey interface{}, selected *dom.TextStream) (result1 dom.Element) {
-	cOld, ok := c.old[cKey]
-	if ok {
-		delete(c.old, cKey)
-	} else {
-		cOld = &filterCtx{}
-	}
-	c.current[cKey] = cOld
-	return cOld.refreshIfNeeded(selected)
-}
-
-type filterOptionCtx struct {
-	core.Cache
-	finalizer func()
-
-	initialized  bool
-	stateHandler core.Handler
-
-	dom struct {
-		dom.FocusableStruct
-		dom.LabelViewStruct
-	}
-	memoized struct {
-		key      string
-		result1  dom.Element
-		selected *dom.TextStream
-	}
-}
-
-func (c *filterOptionCtx) areArgsSame(selected *dom.TextStream, key string) bool {
-
-	if selected != c.memoized.selected {
-		return false
+		for key := range stretchCloseMap {
+			if !stretchUsedMap[key] {
+				stretchCloseMap[key]()
+				delete(stretchCloseMap, key)
+				delete(stretchFnMap, key)
+			}
+		}
+		stretchUsedMap = map[interface{}]bool{}
 	}
 
-	return key == c.memoized.key
+	closeAll = func() {
+		close()
 
-}
-
-func (c *filterOptionCtx) refreshIfNeeded(selected *dom.TextStream, key string) (result1 dom.Element) {
-	if !c.initialized || !c.areArgsSame(selected, key) {
-		return c.refresh(selected, key)
-	}
-	return c.memoized.result1
-}
-
-func (c *filterOptionCtx) refresh(selected *dom.TextStream, key string) (result1 dom.Element) {
-	c.initialized = true
-	c.stateHandler.Handle = func() {
-		c.refresh(selected, key)
 	}
 
-	c.memoized.selected, c.memoized.key = selected, key
+	update = func(deps interface{}, header dom.Element, body dom.Element, footer dom.Element) (result dom.Element) {
+		refresh = func() {
 
-	c.Cache.Begin()
-	defer c.Cache.End()
+			lastresult = chrome(depsLocal, header, body, footer)
 
-	c.dom.FocusableStruct.Begin()
-	defer c.dom.FocusableStruct.End()
+			close()
+		}
 
-	c.dom.LabelViewStruct.Begin()
-	defer c.dom.LabelViewStruct.End()
-	c.memoized.result1 = filterOption(c, selected, key)
+		if initialized {
+			switch {
 
-	return c.memoized.result1
-}
+			case lastheader != header:
+			case lastbody != body:
+			case lastfooter != footer:
+			default:
 
-func (c *filterOptionCtx) close() {
-	c.Cache.Begin()
-	c.Cache.End()
-
-	c.dom.FocusableStruct.Begin()
-	c.dom.FocusableStruct.End()
-
-	c.dom.LabelViewStruct.Begin()
-	c.dom.LabelViewStruct.End()
-	if c.finalizer != nil {
-		c.finalizer()
-	}
-}
-
-// FilterOptionStruct is a cache for FilterOption
-// FilterOption renders a filter option as a focusable which when
-// clicked will automatically append the provided key to the selected
-// stream.
-type FilterOptionStruct struct {
-	old, current map[interface{}]*filterOptionCtx
-}
-
-// Begin starts a round
-func (c *FilterOptionStruct) Begin() {
-	c.old, c.current = c.current, map[interface{}]*filterOptionCtx{}
-}
-
-// End finishes the round cleaning up any unused components
-func (c *FilterOptionStruct) End() {
-	for _, ctx := range c.old {
-		ctx.close()
-	}
-	c.old = nil
-}
-
-// FilterOption - see the type for details
-func (c *FilterOptionStruct) FilterOption(cKey interface{}, selected *dom.TextStream, key string) (result1 dom.Element) {
-	cOld, ok := c.old[cKey]
-	if ok {
-		delete(c.old, cKey)
-	} else {
-		cOld = &filterOptionCtx{}
-	}
-	c.current[cKey] = cOld
-	return cOld.refreshIfNeeded(selected, key)
-}
-
-type textResetCtx struct {
-	core.Cache
-	finalizer func()
-
-	initialized  bool
-	stateHandler core.Handler
-
-	dom struct {
-		dom.TextEditOStruct
-	}
-	memoized struct {
-		ph      string
-		result1 dom.Element
-		text    *dom.TextStream
-	}
-}
-
-func (c *textResetCtx) areArgsSame(text *dom.TextStream, ph string) bool {
-
-	if text != c.memoized.text {
-		return false
+				return lastresult
+			}
+		}
+		initialized = true
+		lastheader = header
+		lastbody = body
+		lastfooter = footer
+		refresh()
+		return lastresult
 	}
 
-	return ph == c.memoized.ph
-
+	return update, closeAll
 }
 
-func (c *textResetCtx) refreshIfNeeded(text *dom.TextStream, ph string) (result1 dom.Element) {
-	if !c.initialized || !c.areArgsSame(text, ph) {
-		return c.refresh(text, ph)
+// NewFilter is the constructor for FilterFunc
+func NewFilter() (update FilterFunc, closeAll func()) {
+	var refresh func()
+
+	var lastselected *streams.S16
+	var lastresult dom.Element
+	var initialized bool
+	runFnMap := map[interface{}]dom.RunFunc{}
+	runCloseMap := map[interface{}]func(){}
+	runUsedMap := map[interface{}]bool{}
+
+	filterOptionFnMap := map[interface{}]filterOptionFunc{}
+	filterOptionCloseMap := map[interface{}]func(){}
+	filterOptionUsedMap := map[interface{}]bool{}
+
+	depsLocal := &filterDeps{
+		run: func(key interface{}, styles dom.Styles, cells ...dom.Element) (result dom.Element) {
+			runUsedMap[key] = true
+			if runFnMap[key] == nil {
+				runFnMap[key], runCloseMap[key] = dom.NewRun()
+			}
+			return runFnMap[key](key, styles, cells...)
+		},
+
+		filterOption: func(key interface{}, selected *streams.S16, s string) (result dom.Element) {
+			filterOptionUsedMap[key] = true
+			if filterOptionFnMap[key] == nil {
+				filterOptionFnMap[key], filterOptionCloseMap[key] = newfilterOption()
+			}
+			return filterOptionFnMap[key](key, selected, s)
+		},
 	}
-	return c.memoized.result1
-}
 
-func (c *textResetCtx) refresh(text *dom.TextStream, ph string) (result1 dom.Element) {
-	c.initialized = true
-	c.stateHandler.Handle = func() {
-		c.refresh(text, ph)
+	close := func() {
+		for key := range runCloseMap {
+			if !runUsedMap[key] {
+				runCloseMap[key]()
+				delete(runCloseMap, key)
+				delete(runFnMap, key)
+			}
+		}
+		runUsedMap = map[interface{}]bool{}
+
+		for key := range filterOptionCloseMap {
+			if !filterOptionUsedMap[key] {
+				filterOptionCloseMap[key]()
+				delete(filterOptionCloseMap, key)
+				delete(filterOptionFnMap, key)
+			}
+		}
+		filterOptionUsedMap = map[interface{}]bool{}
 	}
 
-	c.memoized.text, c.memoized.ph = text, ph
+	closeAll = func() {
+		close()
 
-	c.Cache.Begin()
-	defer c.Cache.End()
-
-	c.dom.TextEditOStruct.Begin()
-	defer c.dom.TextEditOStruct.End()
-	c.memoized.result1 = textReset(c, text, ph)
-
-	return c.memoized.result1
-}
-
-func (c *textResetCtx) close() {
-	c.Cache.Begin()
-	c.Cache.End()
-
-	c.dom.TextEditOStruct.Begin()
-	c.dom.TextEditOStruct.End()
-	if c.finalizer != nil {
-		c.finalizer()
 	}
-}
 
-// TextResetStruct is a cache for TextReset
-// TextReset renders a text input that resets when input is submitted
-type TextResetStruct struct {
-	old, current map[interface{}]*textResetCtx
-}
+	update = func(deps interface{}, selected *streams.S16) (result dom.Element) {
+		refresh = func() {
 
-// Begin starts a round
-func (c *TextResetStruct) Begin() {
-	c.old, c.current = c.current, map[interface{}]*textResetCtx{}
-}
+			lastresult = filter(depsLocal, selected)
 
-// End finishes the round cleaning up any unused components
-func (c *TextResetStruct) End() {
-	for _, ctx := range c.old {
-		ctx.close()
+			close()
+		}
+
+		if initialized {
+			switch {
+
+			case lastselected != selected:
+			default:
+
+				return lastresult
+			}
+		}
+		initialized = true
+		lastselected = selected
+		refresh()
+		return lastresult
 	}
-	c.old = nil
+
+	return update, closeAll
 }
 
-// TextReset - see the type for details
-func (c *TextResetStruct) TextReset(cKey interface{}, text *dom.TextStream, ph string) (result1 dom.Element) {
-	cOld, ok := c.old[cKey]
-	if ok {
-		delete(c.old, cKey)
-	} else {
-		cOld = &textResetCtx{}
+// newfilterOption is the constructor for filterOptionFunc
+func newfilterOption() (update filterOptionFunc, closeAll func()) {
+	var refresh func()
+
+	var lastselected *streams.S16
+	var lastkey string
+	var lastresult dom.Element
+	var initialized bool
+	focusableFnMap := map[interface{}]dom.FocusableFunc{}
+	focusableCloseMap := map[interface{}]func(){}
+	focusableUsedMap := map[interface{}]bool{}
+
+	labelViewFnMap := map[interface{}]dom.LabelViewFunc{}
+	labelViewCloseMap := map[interface{}]func(){}
+	labelViewUsedMap := map[interface{}]bool{}
+
+	depsLocal := &filterOptionDeps{
+		focusable: func(key interface{}, eh *dom.EventHandler, children ...dom.Element) (result dom.Element) {
+			focusableUsedMap[key] = true
+			if focusableFnMap[key] == nil {
+				focusableFnMap[key], focusableCloseMap[key] = dom.NewFocusable()
+			}
+			return focusableFnMap[key](key, eh, children...)
+		},
+
+		labelView: func(key interface{}, styles dom.Styles, text string, inputID string) (result dom.Element) {
+			labelViewUsedMap[key] = true
+			if labelViewFnMap[key] == nil {
+				labelViewFnMap[key], labelViewCloseMap[key] = dom.NewLabelView()
+			}
+			return labelViewFnMap[key](key, styles, text, inputID)
+		},
 	}
-	c.current[cKey] = cOld
-	return cOld.refreshIfNeeded(text, ph)
+
+	close := func() {
+		for key := range focusableCloseMap {
+			if !focusableUsedMap[key] {
+				focusableCloseMap[key]()
+				delete(focusableCloseMap, key)
+				delete(focusableFnMap, key)
+			}
+		}
+		focusableUsedMap = map[interface{}]bool{}
+
+		for key := range labelViewCloseMap {
+			if !labelViewUsedMap[key] {
+				labelViewCloseMap[key]()
+				delete(labelViewCloseMap, key)
+				delete(labelViewFnMap, key)
+			}
+		}
+		labelViewUsedMap = map[interface{}]bool{}
+	}
+
+	closeAll = func() {
+		close()
+
+	}
+
+	update = func(deps interface{}, selected *streams.S16, key string) (result dom.Element) {
+		refresh = func() {
+
+			lastresult = filterOption(depsLocal, selected, key)
+
+			close()
+		}
+
+		if initialized {
+			switch {
+
+			case lastselected != selected:
+			case lastkey != key:
+			default:
+
+				return lastresult
+			}
+		}
+		initialized = true
+		lastselected = selected
+		lastkey = key
+		refresh()
+		return lastresult
+	}
+
+	return update, closeAll
+}
+
+// NewTextReset is the constructor for TextResetFunc
+func NewTextReset() (update TextResetFunc, closeAll func()) {
+	var refresh func()
+
+	var lasttext *streams.S16
+	var lastplaceholder string
+	var lastresult dom.Element
+	var initialized bool
+	textEditOFnMap := map[interface{}]dom.TextEditOFunc{}
+	textEditOCloseMap := map[interface{}]func(){}
+	textEditOUsedMap := map[interface{}]bool{}
+
+	depsLocal := &textResetDeps{
+		textEditO: func(key interface{}, opt dom.TextEditOptions) (result dom.Element) {
+			textEditOUsedMap[key] = true
+			if textEditOFnMap[key] == nil {
+				textEditOFnMap[key], textEditOCloseMap[key] = dom.NewTextEditO()
+			}
+			return textEditOFnMap[key](key, opt)
+		},
+	}
+
+	close := func() {
+		for key := range textEditOCloseMap {
+			if !textEditOUsedMap[key] {
+				textEditOCloseMap[key]()
+				delete(textEditOCloseMap, key)
+				delete(textEditOFnMap, key)
+			}
+		}
+		textEditOUsedMap = map[interface{}]bool{}
+	}
+
+	closeAll = func() {
+		close()
+
+	}
+
+	update = func(deps interface{}, text *streams.S16, placeholder string) (result dom.Element) {
+		refresh = func() {
+
+			lastresult = textReset(depsLocal, text, placeholder)
+
+			close()
+		}
+
+		if initialized {
+			switch {
+
+			case lasttext != text:
+			case lastplaceholder != placeholder:
+			default:
+
+				return lastresult
+			}
+		}
+		initialized = true
+		lasttext = text
+		lastplaceholder = placeholder
+		refresh()
+		return lastresult
+	}
+
+	return update, closeAll
 }

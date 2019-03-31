@@ -56,11 +56,13 @@ func {{.Ctor}}() (update {{.Type}}, closeAll func()) {
 		refresh = func() { 
 			{{range .StreamStateArgs}}
 			if last{{.Name}} != nil {
+				last{{.Name}} = last{{.Name}}.Latest()
 				last{{.Name}}.Stream.Nextf(&initialized, nil)
 			} {{end}}
 			{{.Invoke}}
 			{{range .StreamStateArgs}}
 			if last{{.Name}} != nil  {
+				last{{.Name}} = last{{.Name}}.Latest()
 				last{{.Name}}.Stream.Nextf(&initialized, refresh)
 			} {{end}}
 			close() 

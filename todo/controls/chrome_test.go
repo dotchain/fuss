@@ -6,32 +6,31 @@ package controls_test
 
 import (
 	"fmt"
-	"github.com/dotchain/fuss/dom"
 	"github.com/dotchain/fuss/dom/html"
+	"github.com/dotchain/fuss/dom/v2"
 	"github.com/dotchain/fuss/todo/controls"
 	"github.com/yosssi/gohtml"
 )
 
 func Example_renderFilteredTasks() {
-	cache := controls.ChromeStruct{}
-	texts := dom.TextViewStruct{}
+	header, closeh := dom.NewTextView()
+	body, closeb := dom.NewTextView()
+	footer, closef := dom.NewTextView()
+	chrome, close := controls.NewChrome()
 
-	cache.Begin()
-	texts.Begin()
-	root := cache.Chrome(
+	root := chrome(
 		"root",
-		texts.TextView("header", dom.Styles{}, "Header"),
-		texts.TextView("body", dom.Styles{}, "Body"),
-		texts.TextView("footer", dom.Styles{}, "Footer"),
+		header("header", dom.Styles{}, "Header"),
+		body("body", dom.Styles{}, "Body"),
+		footer("footer", dom.Styles{}, "Footer"),
 	)
-	cache.End()
 
 	fmt.Println(gohtml.Format(fmt.Sprint(root)))
 
-	cache.Begin()
-	cache.End()
-	texts.Begin()
-	texts.End()
+	close()
+	closeb()
+	closeh()
+	closef()
 	leaks := html.GetCurrentResources()
 	if n := len(leaks); n > 0 {
 		fmt.Println("Leaked", n, "resources\n", leaks)

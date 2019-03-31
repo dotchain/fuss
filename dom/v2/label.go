@@ -5,7 +5,7 @@
 package dom
 
 // LabelViewFunc represents a label control.
-type LabelViewFunc = func(interface{}, Styles, string, string) Element
+type LabelViewFunc = func(key interface{}, styles Styles, text, inputID string) Element
 
 // LabelView implements a label control.
 func labelView(c *eltDep, styles Styles, text, inputID string) Element {

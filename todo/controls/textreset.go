@@ -4,12 +4,20 @@
 
 package controls
 
-import "github.com/dotchain/fuss/dom"
+import (
+	"github.com/dotchain/dot/streams"
+	"github.com/dotchain/fuss/dom/v2"
+)
 
 var empty = ""
 
 // TextReset renders a text input that resets when input is submitted
-func textReset(c *textResetCtx, text *dom.TextStream, ph string) dom.Element {
-	opt := dom.TextEditOptions{RawText: &empty, Text: text, Placeholder: ph}
-	return c.dom.TextEditO(text, opt)
+func textReset(deps *textResetDeps, text *streams.S16, placeholder string) dom.Element {
+	opt := dom.TextEditOptions{RawText: &empty, Text: text, Placeholder: placeholder}
+	return deps.textEditO(text, opt)
+}
+
+type TextResetFunc = func(key interface{}, text *streams.S16, placeholder string) dom.Element
+type textResetDeps struct {
+	textEditO dom.TextEditOFunc
 }

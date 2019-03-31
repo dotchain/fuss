@@ -43,6 +43,7 @@ func textEditO(c *eltDep, opt TextEditOptions) Element {
 	if opt.RawText != nil {
 		text = *opt.RawText
 	}
+
 	return c.elt(
 		"root",
 		Props{

@@ -7,7 +7,7 @@ package dom
 import "github.com/dotchain/dot/streams"
 
 // CheckboxEditFunc represents a checkbox control.
-type CheckboxEditFunc = func(interface{}, Styles, *streams.Bool, string) Element
+type CheckboxEditFunc = func(key interface{}, styles Styles, checked *streams.Bool, id string) Element
 
 // checkboxEdit implements a checkbox control.
 func checkboxEdit(c *eltDep, styles Styles, checked *streams.Bool, id string) Element {

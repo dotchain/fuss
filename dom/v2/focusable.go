@@ -4,7 +4,7 @@
 
 package dom
 
-type FocusableFunc = func(interface{}, *EventHandler, ...Element) Element
+type FocusableFunc = func(key interface{}, eh *EventHandler, children...Element) Element
 
 // Focusable is a basic control which can receive focus and be
 // selected by clicks.

@@ -7,16 +7,21 @@
 package main
 
 import (
-	"github.com/dotchain/fuss/fussy"
+	"github.com/dotchain/fuss/fussy/v2"
 	"io/ioutil"
-	"path"
+	"path/filepath"
 	"runtime"
 )
 
 func main() {
-	output := "generated.go"
 	_, self, _, _ := runtime.Caller(0)
-	info := fussy.ParseDir(path.Dir(self), output)
+	output := "generated.go"
+	skip := []string{"generated.go"}
+	info, err := fussy.ParseDir(filepath.Dir(self), "controls", skip)
+	if err != nil {
+		panic(err)
+	}
 	info.Generator = self
-	ioutil.WriteFile(output, []byte(fussy.Generate(info)), 0644)
+
+	ioutil.WriteFile(output, []byte(fussy.Generate(*info)), 0644)
 }

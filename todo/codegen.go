@@ -7,43 +7,64 @@
 package main
 
 import (
-	"github.com/dotchain/fuss/fussy"
 	"io/ioutil"
-	"path"
+	"path/filepath"
 	"runtime"
+
+	"github.com/dotchain/dot/x/dotc"
+	"github.com/dotchain/fuss/fussy/v2"
 )
 
 func main() {
-	output := "generated.go"
+	generateTypes()
+	generateComponents()
+}
+
+func generateTypes() {
 	_, self, _, _ := runtime.Caller(0)
-	info := fussy.ParseDir(path.Dir(self), output)
-	info.Generator = self
-	info.Streams = []fussy.StreamInfo{
-		{
-			StreamType: "TaskStream",
-			ValueType:  "Task",
-			Fields: []fussy.FieldInfo{{
-				Field:            "Done",
-				FieldType:        "bool",
-				FieldStreamType:  "dom.BoolStream",
-				FieldConstructor: "dom.NewBoolStream",
-				FieldSubstream:   "DoneSubstream",
+	output := filepath.Join(filepath.Dir(self), "generated1.go")
+
+	info := dotc.Info{
+		Package: "todo",
+		Structs: []dotc.Struct{{
+			Recv: "t",
+			Type: "Todo",
+			Fields: []dotc.Field{{
+				Name: "Complete",
+				Key:  "complete",
+				Type: "bool",
 			}, {
-				Field:            "Description",
-				FieldType:        "string",
-				FieldStreamType:  "dom.TextStream",
-				FieldConstructor: "dom.NewTextStream",
-				FieldSubstream:   "DescriptionSubstream",
+				Name: "Description",
+				Key:  "desc",
+				Type: "string",
 			}},
-			EntryStreamType: "",
-		},
-		{
-			StreamType:       "TasksStream",
-			ValueType:        "Tasks",
-			Fields:           nil,
-			EntryStreamType:  "TaskStream",
-			EntryConstructor: "NewTaskStream",
-		},
+		}},
+		Slices: []dotc.Slice{{
+			Recv:     "t",
+			Type:     "TodoList",
+			ElemType: "Todo",
+		}},
 	}
-	ioutil.WriteFile(output, []byte(fussy.Generate(info)), 0644)
+	code, err := info.Generate()
+	if err != nil {
+		panic(err)
+	}
+	err = ioutil.WriteFile(output, []byte(code), 0644)
+	if err != nil {
+		panic(err)
+	}
+}
+
+func generateComponents() {
+	_, self, _, _ := runtime.Caller(0)
+	output := filepath.Join(filepath.Dir(self), "generated2.go")
+	skip := []string{"generated2.go"}
+	info, err := fussy.ParseDir(filepath.Dir(self), "todo", skip)
+	if err != nil {
+		panic(err)
+	}
+	err = ioutil.WriteFile(output, []byte(fussy.Generate(*info)), 0644)
+	if err != nil {
+		panic(err)
+	}
 }

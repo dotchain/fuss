@@ -6,19 +6,17 @@ package controls_test
 
 import (
 	"fmt"
-	"github.com/dotchain/fuss/dom"
+	"github.com/dotchain/dot/streams"
 	"github.com/dotchain/fuss/dom/html"
 	"github.com/dotchain/fuss/todo/controls"
 	"github.com/yosssi/gohtml"
 )
 
 func Example_textreset() {
-	cache := controls.TextResetStruct{}
-	text := dom.NewTextStream("hello")
+	textReset, close := controls.NewTextReset()
+	text := &streams.S16{Stream: streams.New(), Value: "hello"}
 
-	cache.Begin()
-	root := cache.TextReset("root", text, "booya")
-	cache.End()
+	root := textReset("root", text, "booya")
 
 	html.SetValue(root, "singer")
 	text = text.Latest()
@@ -26,14 +24,11 @@ func Example_textreset() {
 		fmt.Println("Unexpected", text.Value)
 	}
 
-	cache.Begin()
-	root = cache.TextReset("root", text, "booya")
-	cache.End()
+	root = textReset("root", text, "booya")
 
 	fmt.Println(gohtml.Format(fmt.Sprint(root)))
 
-	cache.Begin()
-	cache.End()
+	close()
 	leaks := html.GetCurrentResources()
 	if n := len(leaks); n > 0 {
 		fmt.Println("Leaked", n, "resources\n", leaks)
