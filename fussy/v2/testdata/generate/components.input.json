@@ -22,7 +22,7 @@
 					"Type": "*taskCtx",
 					"IsState": false,
 					"ImplementsEquals": false,
-					"ImplementsEvents": false,
+					"ImplementsStream": false,
 					"ImplementsClose": false
 				},
 				{
@@ -30,7 +30,7 @@
 					"Type": "bool",
 					"IsState": false,
 					"ImplementsEquals": false,
-					"ImplementsEvents": false,
+					"ImplementsStream": false,
 					"ImplementsClose": false
 				},
 				{
@@ -38,7 +38,7 @@
 					"Type": "int",
 					"IsState": true,
 					"ImplementsEquals": false,
-					"ImplementsEvents": false,
+					"ImplementsStream": false,
 					"ImplementsClose": false
 				},
 				{
@@ -46,7 +46,7 @@
 					"Type": "*stream",
 					"IsState": false,
 					"ImplementsEquals": true,
-					"ImplementsEvents": true,
+					"ImplementsStream": true,
 					"ImplementsClose": false
 				},
 				{
@@ -54,7 +54,7 @@
 					"Type": "[]bool",
 					"IsState": false,
 					"ImplementsEquals": false,
-					"ImplementsEvents": false,
+					"ImplementsStream": false,
 					"ImplementsClose": false
 				}
 			],
@@ -64,7 +64,7 @@
 					"Type": "int",
 					"IsState": true,
 					"ImplementsEquals": false,
-					"ImplementsEvents": false,
+					"ImplementsStream": false,
 					"ImplementsClose": false
 				},
 				{
@@ -72,7 +72,7 @@
 					"Type": "int",
 					"IsState": false,
 					"ImplementsEquals": false,
-					"ImplementsEvents": false,
+					"ImplementsStream": false,
 					"ImplementsClose": false
 				}
 			],
@@ -89,7 +89,7 @@
 							"Type": "_ctx_",
 							"IsState": false,
 							"ImplementsEquals": false,
-							"ImplementsEvents": false,
+							"ImplementsStream": false,
 							"ImplementsClose": false
 						}
 					],
@@ -99,7 +99,7 @@
 							"Type": "int",
 							"IsState": false,
 							"ImplementsEquals": false,
-							"ImplementsEvents": false,
+							"ImplementsStream": false,
 							"ImplementsClose": false
 						}
 					],

@@ -8,8 +8,9 @@ package fussy_test
 
 import (
 	"encoding/json"
-	"github.com/dotchain/fuss/fussy/v2"
 	"testing"
+
+	"github.com/dotchain/fuss/fussy/v2"
 )
 
 func TestComponents(t *testing.T) {

@@ -18,7 +18,7 @@
 					"Type": "*testDeps",
 					"IsState": false,
 					"ImplementsEquals": false,
-					"ImplementsEvents": false,
+					"ImplementsStream": false,
 					"ImplementsClose": false
 				},
 				{
@@ -26,7 +26,7 @@
 					"Type": "datum.Array",
 					"IsState": false,
 					"ImplementsEquals": true,
-					"ImplementsEvents": false,
+					"ImplementsStream": false,
 					"ImplementsClose": false
 				}
 			],
@@ -36,7 +36,7 @@
 					"Type": "float32",
 					"IsState": false,
 					"ImplementsEquals": false,
-					"ImplementsEvents": false,
+					"ImplementsStream": false,
 					"ImplementsClose": false
 				}
 			],
@@ -53,7 +53,7 @@
 							"Type": "interface{}",
 							"IsState": false,
 							"ImplementsEquals": false,
-							"ImplementsEvents": false,
+							"ImplementsStream": false,
 							"ImplementsClose": false
 						},
 						{
@@ -61,7 +61,7 @@
 							"Type": "datum.Array",
 							"IsState": false,
 							"ImplementsEquals": true,
-							"ImplementsEvents": false,
+							"ImplementsStream": false,
 							"ImplementsClose": false
 						}
 					],
@@ -71,7 +71,7 @@
 							"Type": "float32",
 							"IsState": false,
 							"ImplementsEquals": false,
-							"ImplementsEvents": false,
+							"ImplementsStream": false,
 							"ImplementsClose": false
 						}
 					],

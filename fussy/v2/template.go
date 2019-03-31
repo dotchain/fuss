@@ -54,9 +54,15 @@ func {{.Ctor}}() (update {{.Type}}, closeAll func()) {
 
 	update = func({{.PublicArgsDecl}}) {{.PublicResultsDecl}} {
 		refresh = func() { 
-			{{range .EventedStateArgs}} last{{.Name}}.Off(&refresh); {{end}}
+			{{range .StreamStateArgs}}
+			if last{{.Name}} != nil {
+				last{{.Name}}.Stream.Nextf(&initialized, nil)
+			} {{end}}
 			{{.Invoke}}
-			{{range .EventedStateArgs}} last{{.Name}}.On(&refresh); {{end}}
+			{{range .StreamStateArgs}}
+			if last{{.Name}} != nil  {
+				last{{.Name}}.Stream.Nextf(&initialized, refresh)
+			} {{end}}
 			close() 
 		}
 

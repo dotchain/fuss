@@ -35,7 +35,7 @@ type ArgInfo struct {
 	Name, Type       string
 	IsState          bool
 	ImplementsEquals bool
-	ImplementsEvents bool
+	ImplementsStream bool
 	ImplementsClose  bool
 }
 
@@ -44,11 +44,11 @@ func (c *ComponentInfo) NonContextArgsArray() []ArgInfo {
 	return c.Args[1:]
 }
 
-// EventedStateArgs returns all state args that implement events
-func (c *ComponentInfo) EventedStateArgs() []ArgInfo {
+// StreamStateArgs returns all state args that implement events
+func (c *ComponentInfo) StreamStateArgs() []ArgInfo {
 	result := []ArgInfo{}
 	for kk, a := range c.Args {
-		if kk > 0 && a.IsState && a.ImplementsEvents {
+		if kk > 0 && a.IsState && a.ImplementsStream {
 			result = append(result, a)
 		}
 	}

@@ -6,12 +6,13 @@ package fussy_test
 
 import (
 	"flag"
-	"github.com/andreyvit/diff"
 	"io/ioutil"
 	"log"
 	"path"
 	"runtime"
 	"testing"
+
+	"github.com/andreyvit/diff"
 )
 
 func testFile(t *testing.T, input, golden string, fn func(string) (string, error)) {
