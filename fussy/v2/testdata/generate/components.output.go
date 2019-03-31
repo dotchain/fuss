@@ -66,7 +66,7 @@ func NewTaskView() (update TaskViewF, closeAll func()) {
 				diff := false
 				for kk := 0; !diff && kk < len(boo); kk++ {
 
-					diff = lastboo[kk] == boo[kk]
+					diff = lastboo[kk] != boo[kk]
 
 				}
 				if diff {

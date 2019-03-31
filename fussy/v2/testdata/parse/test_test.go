@@ -13,3 +13,8 @@ func myTest(deps *testDeps, a datum.Array) float32 {
 type testDeps struct {
 	avg datum.AvgFunc
 }
+
+// skipping missing types with name = newXYZ() or NewXY()
+var something = newboo()
+var somethingElse = NewBoo()
+
