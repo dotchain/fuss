@@ -309,7 +309,7 @@ func NewVariadic() (update VariadicFunc, closeAll func()) {
 				diff := false
 				for kk := 0; !diff && kk < len(args); kk++ {
 
-					diff = lastargs[kk] == args[kk]
+					diff = lastargs[kk] != args[kk]
 
 				}
 				if diff {

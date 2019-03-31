@@ -132,7 +132,11 @@ func (p *parse) component(name string, fn *types.Signature) (*ComponentInfo, err
 	if ctor == "" {
 		return nil, nil
 	}
-	fName := strings.Replace(ctor, "New", "", 1) + "Func"
+	fName := ctor + "Func"
+	if strings.HasPrefix(fName, "new") || strings.HasPrefix(fName, "New") {
+		fName = fName[3:]
+	}
+	fName = strings.ReplaceAll(strings.ReplaceAll(fName, ".New", "."), ".new", ".")
 
 	stateArgs := []ArgInfo{}
 	ci := &ComponentInfo{Name: name, Type: fName, Ctor: ctor}
@@ -220,17 +224,17 @@ func (p *parse) argInfo(arg *types.Var) ArgInfo {
 func (p *parse) isStream(v types.Type) bool {
 	ptr, ok := v.(*types.Pointer)
 	if !ok {
-		fmt.Printf("%v is not a pointer\n", v)
+		log.Printf("%v is not a pointer\n", v)
 		return false
 	}
 	named, ok := ptr.Elem().(*types.Named)
 	if !ok {
-		fmt.Printf("%v is not a named\n", ptr.Elem())
+		log.Printf("%v is not a named\n", ptr.Elem())
 		return false
 	}
 	s, ok := named.Underlying().(*types.Struct)
 	if !ok {
-		fmt.Printf("%v is not a struct\n", named)
+		log.Printf("%v is not a struct\n", named)
 		return false
 	}
 	found := map[string]bool{}
@@ -238,7 +242,6 @@ func (p *parse) isStream(v types.Type) bool {
 		f := s.Field(kk)
 		found[f.Name()] = true
 	}
-	fmt.Println("Got", found)
 	return found["Stream"] && found["Value"]
 }
 

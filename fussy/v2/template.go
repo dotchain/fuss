@@ -76,9 +76,9 @@ func {{.Ctor}}() (update {{.Type}}, closeAll func()) {
 				diff := false
 				for kk :=  0; !diff && kk < len({{.LastArg.Name}}); kk ++ {
 					{{if .LastArg.ImplementsEquals}}
-					diff = last{{.LastArg.Name}}[kk].Equals({{.LastArg.Name}}[kk])
+					diff = !last{{.LastArg.Name}}[kk].Equals({{.LastArg.Name}}[kk])
 					{{else}}
-					diff = last{{.LastArg.Name}}[kk] == {{.LastArg.Name}}[kk]
+					diff = last{{.LastArg.Name}}[kk] != {{.LastArg.Name}}[kk]
 					{{end}}
 				}
 				if diff {  break }
