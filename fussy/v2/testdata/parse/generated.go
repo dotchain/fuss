@@ -6,6 +6,10 @@
 
 package datum
 
+import (
+	streams "github.com/dotchain/dot/streams"
+)
+
 // NewAvg is the constructor for AvgFunc
 func NewAvg() (update AvgFunc, closeAll func()) {
 	var refresh func()
@@ -179,7 +183,7 @@ func NewCount() (update CountFunc, closeAll func()) {
 func NewEdgeTrigger() (update EdgeTriggerFunc, closeAll func()) {
 	var refresh func()
 
-	var laststate stateful
+	var laststate *streams.Bool
 	var lastinput int
 	var lastr1 int
 	var lastr2 int
@@ -196,9 +200,15 @@ func NewEdgeTrigger() (update EdgeTriggerFunc, closeAll func()) {
 
 	update = func(deps interface{}, input int) (r1 int, r2 int) {
 		refresh = func() {
-			laststate.Off(&refresh)
+
+			if laststate != nil {
+				laststate.Stream.Nextf(&initialized, nil)
+			}
 			laststate, lastr1, lastr2 = edgeTrigger(depsLocal, laststate, input)
-			laststate.On(&refresh)
+
+			if laststate != nil {
+				laststate.Stream.Nextf(&initialized, refresh)
+			}
 			close()
 		}
 

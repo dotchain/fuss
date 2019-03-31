@@ -4,7 +4,8 @@ package datum_test
 
 import "github.com/dotchain/fuss/fussy/v2/testdata/parse"
 
-type MyTestFunc = func(key interface{}, a datum.Array ) float32
+type MyTestFunc = func(key interface{}, a datum.Array) float32
+
 func myTest(deps *testDeps, a datum.Array) float32 {
 	return deps.avg("key", a)
 }
@@ -12,4 +13,3 @@ func myTest(deps *testDeps, a datum.Array) float32 {
 type testDeps struct {
 	avg datum.AvgFunc
 }
-

@@ -5,12 +5,15 @@
 package task
 
 type TaskViewF func(key interface{}, boova bool, goop *stream, boo ...bool) int
-func taskView(key  *taskCtx, boova bool, state1 int, goop *stream, boo ...bool) (int, int) {
+
+func taskView(key *taskCtx, boova bool, state1 int, goop *stream, boo ...bool) (int, int) {
 	return 0, 0
 }
 
-type stream struct {}
-func (*stream) Equals(o *stream) bool {
+// fake stream by simply having Stream and Value fields
+type stream struct{ Stream, Value int }
+
+func (x *stream) Equals(o *stream) bool {
 	return false
 }
 
@@ -19,6 +22,7 @@ type taskCtx struct {
 }
 
 type CheckboxF = func(key interface{}) int
+
 func NewCheckbox() (CheckboxF, func()) {
-	return nil,  nil
+	return nil, nil
 }

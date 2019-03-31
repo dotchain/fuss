@@ -25,10 +25,10 @@ func newParser(pkg *types.Package, files []*ast.File, fset *token.FileSet) *pars
 type parse struct {
 	*types.Package
 	*types.Scope
-	files      []*ast.File
-	fset       *token.FileSet
-	imports    map[*types.Package]string
-	eq, ev, cl *types.Interface
+	files   []*ast.File
+	fset    *token.FileSet
+	imports map[*types.Package]string
+	eq, cl  *types.Interface
 }
 
 func (p *parse) components() ([]ComponentInfo, [][2]string, error) {
@@ -207,14 +207,39 @@ func (p *parse) isStateArg(s string) bool {
 func (p *parse) argInfo(arg *types.Var) ArgInfo {
 	name, typ := arg.Name(), arg.Type()
 	eq := types.Implements(typ, p.equals())
-	ev := types.Implements(typ, p.eventSource())
 	isState := p.isStateArg(name)
+	isStream := isState && p.isStream(typ)
 	cl := isState && types.Implements(typ, p.closeInterface())
 	typs := types.TypeString(typ, p.qualify)
 	if !eq && !types.Comparable(typ) {
 		log.Println("args must be comparable or implement equals", name, typs)
 	}
-	return ArgInfo{name, typs, isState, eq, ev, cl}
+	return ArgInfo{name, typs, isState, eq, isStream, cl}
+}
+
+func (p *parse) isStream(v types.Type) bool {
+	ptr, ok := v.(*types.Pointer)
+	if !ok {
+		fmt.Printf("%v is not a pointer\n", v)
+		return false
+	}
+	named, ok := ptr.Elem().(*types.Named)
+	if !ok {
+		fmt.Printf("%v is not a named\n", ptr.Elem())
+		return false
+	}
+	s, ok := named.Underlying().(*types.Struct)
+	if !ok {
+		fmt.Printf("%v is not a struct\n", named)
+		return false
+	}
+	found := map[string]bool{}
+	for kk := 0; kk < s.NumFields(); kk++ {
+		f := s.Field(kk)
+		found[f.Name()] = true
+	}
+	fmt.Println("Got", found)
+	return found["Stream"] && found["Value"]
 }
 
 func (p *parse) equals() *types.Interface {
@@ -250,18 +275,6 @@ func (p *parse) method(name string, retType types.Type, args ...types.Type) *typ
 	}
 	sig := types.NewSignature(nil, types.NewTuple(params...), result, false)
 	return types.NewFunc(token.NoPos, nil, name, sig)
-}
-
-func (p *parse) eventSource() *types.Interface {
-	if p.ev != nil {
-		return p.ev
-	}
-
-	fptr := types.NewPointer(p.method("", nil).Type())
-	on := p.method("On", nil, fptr)
-	off := p.method("Off", nil, fptr)
-	p.ev = types.NewInterfaceType([]*types.Func{on, off}, nil).Complete()
-	return p.ev
 }
 
 func (p *parse) qualify(pkg *types.Package) string {
