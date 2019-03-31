@@ -13,7 +13,7 @@ import (
 func (s *TasksStream) addTaskStream(cache core.Cache) (entry *dom.TextStream) {
 	key := "next"
 	n := s.Notifier
-	handler := &core.Handler{nil}
+	handler := &core.Handler{}
 	if f, h, ok := cache.GetSubstream(n, key); ok {
 		entry, handler = f.(*dom.TextStream), h
 	} else {
