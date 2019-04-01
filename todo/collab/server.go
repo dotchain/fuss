@@ -9,7 +9,7 @@ package main
 import (
 	"encoding/gob"
 	"net/http"
-	
+
 	"github.com/dotchain/dot"
 	"github.com/dotchain/fuss/todo"
 	"github.com/rs/cors"

@@ -6,7 +6,6 @@ package controls
 
 import "github.com/dotchain/fuss/dom"
 
-// Chrome renders the app chrome
 func chrome(deps *chromeDeps, header, body, footer dom.Element) dom.Element {
 	return deps.vRun(
 		"root",
@@ -17,6 +16,7 @@ func chrome(deps *chromeDeps, header, body, footer dom.Element) dom.Element {
 	)
 }
 
+// ChromeFunc defines the App Chrome
 type ChromeFunc = func(key interface{}, header, body, footer dom.Element) dom.Element
 type chromeDeps struct {
 	vRun    dom.VRunFunc

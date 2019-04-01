@@ -5,9 +5,10 @@
 package core_test
 
 import (
-	"github.com/dotchain/fuss/core"
 	"reflect"
 	"testing"
+
+	"github.com/dotchain/fuss/core"
 )
 
 func TestDiffRotate(t *testing.T) {

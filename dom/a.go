@@ -4,9 +4,9 @@
 
 package dom
 
+// AFunc implements the simplified anchor tag
 type AFunc = func(key interface{}, styles Styles, href string, children ...Element) Element
 
-// A implements the simplified anchor tag
 func a(c *eltDep, styles Styles, href string, children ...Element) Element {
 	return c.elt("root", Props{Tag: "a", Href: href, Styles: styles}, children...)
 }

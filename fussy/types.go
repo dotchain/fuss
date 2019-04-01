@@ -39,7 +39,7 @@ type ArgInfo struct {
 	ImplementsClose  bool
 }
 
-// NonContextArgsArgs returns the list of non-context args, including state
+// NonContextArgsArray returns the list of non-context args, including state
 func (c *ComponentInfo) NonContextArgsArray() []ArgInfo {
 	return c.Args[1:]
 }
@@ -134,7 +134,7 @@ func (c *ComponentInfo) PublicResultsArray() []ArgInfo {
 	return result
 }
 
-// PublicArgsArrayEqualsNotNilable returns all non-state args
+// PublicArgsArrayEquals returns all non-state args
 // implementing Equals
 func (c *ComponentInfo) PublicArgsArrayEquals() []ArgInfo {
 	result := []ArgInfo{}

@@ -17,6 +17,8 @@ func textReset(deps *textResetDeps, text *streams.S16, placeholder string) dom.E
 	return deps.textEditO(text, opt)
 }
 
+// TextResetFunc defines the shape of the a text input component whose
+// value resets to the empty string after every submission
 type TextResetFunc = func(key interface{}, text *streams.S16, placeholder string) dom.Element
 type textResetDeps struct {
 	textEditO dom.TextEditOFunc

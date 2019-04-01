@@ -8,13 +8,12 @@ package main
 
 import (
 	"encoding/gob"
-	
-	"github.com/dotchain/dot"	
-	"github.com/dotchain/dot/ops"	
+
+	"github.com/dotchain/dot"
+	"github.com/dotchain/dot/ops"
 	"github.com/dotchain/fuss/dom/js"
 	"github.com/dotchain/fuss/todo"
 )
-
 
 func SaveSession(version int, pending []ops.Op, todos todo.TodoList) {
 	// this is not yet implemented. if it were, then
@@ -31,7 +30,6 @@ func main() {
 	gob.Register(todo.Todo{})
 	gob.Register(todo.TodoList{})
 
-
 	url := "http://localhost:8080/todo/"
 	version, pending, todos := SavedSession()
 
@@ -47,7 +45,7 @@ func main() {
 		SaveSession(version, pending, todos)
 	}()
 	**/
-	
+
 	collab, _ := todo.NewCollab()
 	js.QuerySelector("#container").InsertChild(0, collab("root", todosStream))
 
@@ -56,4 +54,3 @@ func main() {
 		collab("root", todosStream)
 	})
 }
-

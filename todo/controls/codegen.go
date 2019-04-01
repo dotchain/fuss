@@ -7,10 +7,11 @@
 package main
 
 import (
-	"github.com/dotchain/fuss/fussy"
 	"io/ioutil"
 	"path/filepath"
 	"runtime"
+
+	"github.com/dotchain/fuss/fussy"
 )
 
 func main() {
