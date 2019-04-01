@@ -7,7 +7,7 @@
 package datum_test
 
 import (
-	datum "github.com/dotchain/fuss/fussy/v2/testdata/parse"
+	datum "github.com/dotchain/fuss/fussy/testdata/parse"
 )
 
 // NewMyTest is the constructor for MyTestFunc

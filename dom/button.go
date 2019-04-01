@@ -4,9 +4,12 @@
 
 package dom
 
+// ButtonFunc implements a button control.
+type ButtonFunc = func(interface{}, Styles, *EventHandler, ...Element) Element
+
 // Button implements a button control.
-func button(c *buttonCtx, styles Styles, onClick *EventHandler, children ...Element) Element {
-	return c.Elt(
+func button(c *eltDep, styles Styles, onClick *EventHandler, children ...Element) Element {
+	return c.elt(
 		"root",
 		Props{Tag: "button", Styles: styles, OnClick: onClick},
 		children...,

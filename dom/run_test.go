@@ -6,84 +6,70 @@ package dom_test
 
 import (
 	"fmt"
-	"github.com/dotchain/fuss/dom"
 	"testing"
+
+	"github.com/dotchain/fuss/dom"
 )
 
 func TestRun(t *testing.T) {
-	var e dom.EltStruct
-	e.Begin()
-	cell1 := e.Elt(1, dom.Props{ID: "one"})
-	cell2 := e.Elt(2, dom.Props{ID: "two"})
-	e.End()
+	run, close := dom.NewRun()
+	text1, close1 := dom.NewTextView()
+	text2, close2 := dom.NewTextView()
 
-	var r dom.RunStruct
-	r.Begin()
-	elt := r.Run("root", dom.Styles{Color: "red"}, cell1, cell2)
-	r.End()
+	cell1 := text1(1, dom.Styles{}, "one")
+	cell2 := text2(2, dom.Styles{}, "two")
 
-	if x := fmt.Sprint(elt); x != "<div style=\"color: red; display: flex; flex-direction: row\"><div id=\"one\"></div><div id=\"two\"></div></div>" {
+	elt := run("root", dom.Styles{Color: "red"}, cell1, cell2)
+
+	if x := fmt.Sprint(elt); x != "<div style=\"color: red; display: flex; flex-direction: row\"><span>one</span><span>two</span></div>" {
 		t.Error(x)
 	}
 
 	// cleanup
-	r.Begin()
-	r.End()
-	e.Begin()
-	e.End()
+	close()
+	close1()
+	close2()
 	reportDriverLeaks(t)
 }
 
 func TestVRun(t *testing.T) {
-	var e dom.EltStruct
-	e.Begin()
-	cell1 := e.Elt(1, dom.Props{ID: "one"})
-	cell2 := e.Elt(2, dom.Props{ID: "two"})
-	e.End()
+	vrun, close := dom.NewVRun()
+	text1, close1 := dom.NewTextView()
+	text2, close2 := dom.NewTextView()
 
-	var r dom.VRunStruct
-	r.Begin()
-	elt := r.VRun("root", dom.Styles{Color: "red"}, cell1, cell2)
-	r.End()
+	cell1 := text1(1, dom.Styles{}, "one")
+	cell2 := text2(2, dom.Styles{}, "two")
 
-	if x := fmt.Sprint(elt); x != "<div style=\"color: red; display: flex; flex-direction: column\"><div id=\"one\"></div><div id=\"two\"></div></div>" {
+	elt := vrun("root", dom.Styles{Color: "red"}, cell1, cell2)
+
+	if x := fmt.Sprint(elt); x != "<div style=\"color: red; display: flex; flex-direction: column\"><span>one</span><span>two</span></div>" {
 		t.Error(x)
 	}
 
 	// cleanup
-	r.Begin()
-	r.End()
-	e.Begin()
-	e.End()
+	close()
+	close1()
+	close2()
 	reportDriverLeaks(t)
 }
 
 func TestFixedStretch(t *testing.T) {
-	var f dom.FixedStruct
-	var s dom.StretchStruct
+	vrun, close := dom.NewVRun()
+	fixed1, close1 := dom.NewFixed()
+	stretch2, close2 := dom.NewStretch()
 
-	f.Begin()
-	s.Begin()
-	cell1 := f.Fixed(1, dom.Styles{})
-	cell2 := s.Stretch(2, dom.Styles{})
-	f.End()
-	s.End()
+	cell1 := fixed1(1, dom.Styles{})
+	cell2 := stretch2(2, dom.Styles{})
 
-	var r dom.VRunStruct
-	r.Begin()
-	elt := r.VRun("root", dom.Styles{Color: "red"}, cell1, cell2)
-	r.End()
+	elt := vrun("root", dom.Styles{Color: "red"}, cell1, cell2)
 
 	if x := fmt.Sprint(elt); x != "<div style=\"color: red; display: flex; flex-direction: column\"><div style=\"flex-shrink: 0\"></div><div style=\"flex-grow: 1\"></div></div>" {
 		t.Error(x)
 	}
 
 	// cleanup
-	r.Begin()
-	r.End()
-	f.Begin()
-	f.End()
-	s.Begin()
-	s.End()
+	close()
+	close1()
+	close2()
 	reportDriverLeaks(t)
 }

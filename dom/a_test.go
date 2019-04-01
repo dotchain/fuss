@@ -6,29 +6,24 @@ package dom_test
 
 import (
 	"fmt"
-	"github.com/dotchain/fuss/dom"
 	"testing"
+
+	"github.com/dotchain/fuss/dom"
 )
 
 func TestA(t *testing.T) {
-	var view dom.AStruct
-	var texts dom.TextViewStruct
+	textView, closeTextView := dom.NewTextView()
+	anchor, closeA := dom.NewA()
 
-	view.Begin()
-	texts.Begin()
-	child := texts.TextView("t", dom.Styles{}, "hello")
-	elt := view.A("root", dom.Styles{Color: "red"}, "Hello", child)
-	texts.End()
-	view.End()
+	child := textView("t", dom.Styles{}, "hello")
+	elt := anchor("root", dom.Styles{Color: "red"}, "Hello", child)
 
 	if x := fmt.Sprint(elt); x != "<a href=\"Hello\" style=\"color: red\"><span>hello</span></a>" {
 		t.Error(x)
 	}
 
 	// cleanup
-	view.Begin()
-	view.End()
-	texts.Begin()
-	texts.End()
+	closeTextView()
+	closeA()
 	reportDriverLeaks(t)
 }

@@ -4,6 +4,8 @@
 
 package dom
 
+type FocusableFunc = func(key interface{}, eh *EventHandler, children...Element) Element
+
 // Focusable is a basic control which can receive focus and be
 // selected by clicks.
 //
@@ -12,6 +14,6 @@ package dom
 // keyboard events.
 //
 // Note that there is no programmatic way to focus this element
-func focusable(c *fCtx, eh *EventHandler, children ...Element) Element {
-	return c.Elt("root", Props{OnFocus: eh, OnClick: eh}, children...)
+func focusable(c *eltDep, eh *EventHandler, children ...Element) Element {
+	return c.elt("root", Props{OnFocus: eh, OnClick: eh}, children...)
 }

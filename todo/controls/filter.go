@@ -6,7 +6,7 @@ package controls
 
 import (
 	"github.com/dotchain/dot/streams"
-	"github.com/dotchain/fuss/dom/v2"
+	"github.com/dotchain/fuss/dom"
 )
 
 const (

@@ -6,23 +6,21 @@ package dom_test
 
 import (
 	"fmt"
-	"github.com/dotchain/fuss/dom"
 	"testing"
+
+	"github.com/dotchain/fuss/dom"
 )
 
 func TestLabelView(t *testing.T) {
-	var l dom.LabelViewStruct
+	labelView, close := dom.NewLabelView()
 
-	l.Begin()
-	elt := l.LabelView("root", dom.Styles{Color: "red"}, "description", "cb")
-	l.End()
+	elt := labelView("root", dom.Styles{Color: "red"}, "description", "cb")
 
 	if x := fmt.Sprint(elt); x != "<label for=\"cb\" style=\"color: red\">description</label>" {
 		t.Error(x)
 	}
 
 	// cleanup
-	l.Begin()
-	l.End()
+	close()
 	reportDriverLeaks(t)
 }

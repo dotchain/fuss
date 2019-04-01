@@ -10,7 +10,7 @@ import (
 	"encoding/json"
 	"testing"
 
-	"github.com/dotchain/fuss/fussy/v2"
+	"github.com/dotchain/fuss/fussy"
 )
 
 func TestComponents(t *testing.T) {

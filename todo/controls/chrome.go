@@ -4,7 +4,7 @@
 
 package controls
 
-import "github.com/dotchain/fuss/dom/v2"
+import "github.com/dotchain/fuss/dom"
 
 // Chrome renders the app chrome
 func chrome(deps *chromeDeps, header, body, footer dom.Element) dom.Element {

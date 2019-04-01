@@ -6,29 +6,33 @@ package dom_test
 
 import (
 	"fmt"
-	"github.com/dotchain/fuss/dom"
-	"github.com/dotchain/fuss/dom/html"
 	"testing"
+
+	"github.com/dotchain/dot/streams"
+	"github.com/dotchain/fuss/dom/html"
+	"github.com/dotchain/fuss/dom"
 )
 
-func TestFocusable(t *testing.T) {
-	var f dom.FocusableStruct
+func NewBoolStream(v bool) *streams.Bool {
+	return &streams.Bool{Stream: streams.New(), Value: v}
+}
 
-	focused, selected := dom.NewBoolStream(false), dom.NewBoolStream(false)
+func TestFocusable(t *testing.T) {
+	focusable, close := dom.NewFocusable()
+
+	focused, selected := NewBoolStream(false), NewBoolStream(false)
 	h := &dom.EventHandler{func(e dom.Event) {
 		switch e.Value() {
 		case "click":
-			selected.Append(nil, true, true)
+			selected.Update(true)
 		case "focus":
-			focused.Append(nil, true, true)
+			focused.Update(true)
 		case "blur":
-			focused.Append(nil, false, true)
+			focused.Update(false)
 		}
 	}}
 
-	f.Begin()
-	elt := f.Focusable("root", h)
-	f.End()
+	elt := focusable("root", h)
 
 	if x := fmt.Sprint(elt); x != "<div tabindex=\"0\"></div>" {
 		t.Error(x)
@@ -48,8 +52,8 @@ func TestFocusable(t *testing.T) {
 		t.Error("Focus did not take effect")
 	}
 
-	if selected.Next != nil {
-		t.Error("Focus ended up selecting!")
+	if v, _ := selected.Next(); v != nil {
+		t.Fatal("Focus ended up selecting!")
 	}
 	html.Click(elt)
 	selected = selected.Latest()
@@ -57,12 +61,11 @@ func TestFocusable(t *testing.T) {
 	if !selected.Value {
 		t.Error("Click did not take effect")
 	}
-	if focused.Next != nil {
+	if v, _ := focused.Next(); v != nil {
 		t.Error("Click ended up doing some focusing!")
 	}
 
 	// cleanup
-	f.Begin()
-	f.End()
+	close()
 	reportDriverLeaks(t)
 }

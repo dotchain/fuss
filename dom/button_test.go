@@ -6,20 +6,19 @@ package dom_test
 
 import (
 	"fmt"
-	"github.com/dotchain/fuss/dom"
-	"github.com/dotchain/fuss/dom/html"
 	"testing"
+
+	"github.com/dotchain/fuss/dom/html"
+	"github.com/dotchain/fuss/dom"
 )
 
 func TestButton(t *testing.T) {
-	var b dom.ButtonStruct
-	count := 0
+	button, close := dom.NewButton()
 
+	count := 0
 	onClick := &dom.EventHandler{func(dom.Event) { count++ }}
 
-	b.Begin()
-	elt := b.Button("root", dom.Styles{Color: "red"}, onClick)
-	b.End()
+	elt := button("root", dom.Styles{Color: "red"}, onClick)
 
 	if x := fmt.Sprint(elt); x != "<button style=\"color: red\"></button>" {
 		t.Error(x)
@@ -34,8 +33,6 @@ func TestButton(t *testing.T) {
 		t.Error("Click count = ", count)
 	}
 
-	// cleanup
-	b.Begin()
-	b.End()
+	close()
 	reportDriverLeaks(t)
 }

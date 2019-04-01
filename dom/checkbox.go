@@ -4,9 +4,14 @@
 
 package dom
 
-// CheckboxEdit implements a checkbox control.
-func checkboxEdit(c *cbEditCtx, styles Styles, checked *BoolStream, id string) Element {
-	return c.Elt(
+import "github.com/dotchain/dot/streams"
+
+// CheckboxEditFunc represents a checkbox control.
+type CheckboxEditFunc = func(key interface{}, styles Styles, checked *streams.Bool, id string) Element
+
+// checkboxEdit implements a checkbox control.
+func checkboxEdit(c *eltDep, styles Styles, checked *streams.Bool, id string) Element {
+	return c.elt(
 		"root",
 		Props{
 			ID:      id,
@@ -15,7 +20,7 @@ func checkboxEdit(c *cbEditCtx, styles Styles, checked *BoolStream, id string) E
 			Checked: checked.Value,
 			Styles:  styles,
 			OnChange: &EventHandler{Handle: func(e Event) {
-				checked = checked.Append(nil, e.Value() == "on", true)
+				checked = checked.Update(e.Value() == "on")
 			}},
 		},
 	)

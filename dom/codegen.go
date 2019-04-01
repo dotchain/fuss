@@ -7,21 +7,29 @@
 package main
 
 import (
-	"github.com/dotchain/fuss/fussy"
 	"io/ioutil"
-	"filepath"
+	"path/filepath"
 	"runtime"
+
+	"github.com/dotchain/fuss/fussy"
 )
 
 func main() {
 	_, self, _, _ := runtime.Caller(0)
-	output := "generated.go"
-	info := fussy.ParseDir(filepath.Dir(self), output)
-	info.Generator = "github.com/dotchain/fuss/dom/codegen.go"
-	info.Streams = []fussy.StreamInfo{
-		{StreamType: "BoolStream", ValueType: "bool"},
-		{StreamType: "TextStream", ValueType: "string"},
-		{StreamType: "EventStream", ValueType: "Event"},
+	skip := []string{"generated.go", "generated_test.go"}
+	info, err := fussy.ParseDir(filepath.Dir(self), "dom", skip)
+	if err != nil {
+		panic(err)
 	}
-	ioutil.WriteFile(output, []byte(fussy.Generate(info)), 0644)
+
+	info.Generator = self
+	ioutil.WriteFile(skip[0], []byte(fussy.Generate(*info)), 0644)
+
+	info, err = fussy.ParseDir(filepath.Dir(self), "dom_test", skip)
+	if err != nil {
+		panic(err)
+	}
+
+	info.Generator = self
+	ioutil.WriteFile(skip[1], []byte(fussy.Generate(*info)), 0644)
 }

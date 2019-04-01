@@ -7,1600 +7,957 @@
 package dom
 
 import (
-	"github.com/dotchain/dot/changes"
-	"github.com/dotchain/fuss/core"
+	streams "github.com/dotchain/dot/streams"
 )
 
-// BoolStream is a stream of bool values.
-type BoolStream struct {
-	// Notifier provides On/Off/Notify support. New instances of
-	// BoolStream created via the AppendLocal or AppendRemote
-	// share the same Notifier value.
-	*core.Notifier
+// NewA is the constructor for AFunc
+func NewA() (update AFunc, closeAll func()) {
+	var refresh func()
 
-	// Value holds the current value. The latest value may be
-	// fetched via the Latest() method.
-	Value bool
+	var laststyles Styles
+	var lasthref string
+	var lastchildren []Element
+	var lastresult Element
+	var initialized bool
+	eltFnMap := map[interface{}]eltFunc{}
+	eltCloseMap := map[interface{}]func(){}
+	eltUsedMap := map[interface{}]bool{}
 
-	// Change tracks the change that leads to the next value.
-	Change changes.Change
-
-	// Next tracks the next value in the stream.
-	Next *BoolStream
-}
-
-// NewBoolStream creates a new bool stream
-func NewBoolStream(value bool) *BoolStream {
-	return &BoolStream{&core.Notifier{}, value, nil, nil}
-}
-
-// Latest returns the latest value in the stream
-func (s *BoolStream) Latest() *BoolStream {
-	for s.Next != nil {
-		s = s.Next
-	}
-	return s
-}
-
-// Append appends a local change. isLocal identifies if the caller is
-// local or remote. It returns the updated stream whose value matches
-// the provided value and whose Latest() converges to the latest of
-// the stream.
-func (s *BoolStream) Append(c changes.Change, value bool, isLocal bool) *BoolStream {
-	if c == nil {
-		c = changes.Replace{Before: s.wrapValue(s.Value), After: s.wrapValue(value)}
+	cLocal := &eltDep{
+		elt: func(key interface{}, props Props, children ...Element) (result Element) {
+			eltUsedMap[key] = true
+			if eltFnMap[key] == nil {
+				eltFnMap[key], eltCloseMap[key] = newelt()
+			}
+			return eltFnMap[key](key, props, children...)
+		},
 	}
 
-	// return value: after is correctly set to provided value
-	result := &BoolStream{Notifier: s.Notifier, Value: value}
+	close := func() {
+		for key := range eltCloseMap {
+			if !eltUsedMap[key] {
+				eltCloseMap[key]()
+				delete(eltCloseMap, key)
+				delete(eltFnMap, key)
+			}
+		}
+		eltUsedMap = map[interface{}]bool{}
+	}
 
-	// before tracks s, after tracks result, v tracks latest value
-	// of after chain
-	before := s
-	var v changes.Value = changes.Atomic{value}
+	closeAll = func() {
+		close()
 
-	// walk the chain of Next and find corresponding values to
-	// add to after so that both s annd after converge
-	after := result
-	for ; before.Next != nil; before = before.Next {
-		var afterChange changes.Change
+	}
 
-		if isLocal {
-			c, afterChange = before.Change.Merge(c)
-		} else {
-			afterChange, c = c.Merge(before.Change)
+	update = func(c interface{}, styles Styles, href string, children ...Element) (result Element) {
+		refresh = func() {
+
+			lastresult = a(cLocal, styles, href, children...)
+
+			close()
 		}
 
-		if c == nil {
-			// the convergence point is before.Next
-			after.Change, after.Next = afterChange, before.Next
-			return result
+		if initialized {
+			switch {
+
+			case laststyles != styles:
+			case lasthref != href:
+			default:
+
+				if len(lastchildren) != len(children) {
+					break
+				}
+				diff := false
+				for kk := 0; !diff && kk < len(children); kk++ {
+
+					diff = lastchildren[kk] != children[kk]
+
+				}
+				if diff {
+					break
+				}
+
+				return lastresult
+			}
+		}
+		initialized = true
+		laststyles = styles
+		lasthref = href
+		lastchildren = children
+		refresh()
+		return lastresult
+	}
+
+	return update, closeAll
+}
+
+// NewButton is the constructor for ButtonFunc
+func NewButton() (update ButtonFunc, closeAll func()) {
+	var refresh func()
+
+	var laststyles Styles
+	var lastonClick *EventHandler
+	var lastchildren []Element
+	var lastresult Element
+	var initialized bool
+	eltFnMap := map[interface{}]eltFunc{}
+	eltCloseMap := map[interface{}]func(){}
+	eltUsedMap := map[interface{}]bool{}
+
+	cLocal := &eltDep{
+		elt: func(key interface{}, props Props, children ...Element) (result Element) {
+			eltUsedMap[key] = true
+			if eltFnMap[key] == nil {
+				eltFnMap[key], eltCloseMap[key] = newelt()
+			}
+			return eltFnMap[key](key, props, children...)
+		},
+	}
+
+	close := func() {
+		for key := range eltCloseMap {
+			if !eltUsedMap[key] {
+				eltCloseMap[key]()
+				delete(eltCloseMap, key)
+				delete(eltFnMap, key)
+			}
+		}
+		eltUsedMap = map[interface{}]bool{}
+	}
+
+	closeAll = func() {
+		close()
+
+	}
+
+	update = func(c interface{}, styles Styles, onClick *EventHandler, children ...Element) (result Element) {
+		refresh = func() {
+
+			lastresult = button(cLocal, styles, onClick, children...)
+
+			close()
 		}
 
-		if afterChange == nil {
-			continue
+		if initialized {
+			switch {
+
+			case laststyles != styles:
+			case lastonClick != onClick:
+			default:
+
+				if len(lastchildren) != len(children) {
+					break
+				}
+				diff := false
+				for kk := 0; !diff && kk < len(children); kk++ {
+
+					diff = lastchildren[kk] != children[kk]
+
+				}
+				if diff {
+					break
+				}
+
+				return lastresult
+			}
+		}
+		initialized = true
+		laststyles = styles
+		lastonClick = onClick
+		lastchildren = children
+		refresh()
+		return lastresult
+	}
+
+	return update, closeAll
+}
+
+// NewCheckboxEdit is the constructor for CheckboxEditFunc
+func NewCheckboxEdit() (update CheckboxEditFunc, closeAll func()) {
+	var refresh func()
+
+	var laststyles Styles
+	var lastchecked *streams.Bool
+	var lastid string
+	var lastresult Element
+	var initialized bool
+	eltFnMap := map[interface{}]eltFunc{}
+	eltCloseMap := map[interface{}]func(){}
+	eltUsedMap := map[interface{}]bool{}
+
+	cLocal := &eltDep{
+		elt: func(key interface{}, props Props, children ...Element) (result Element) {
+			eltUsedMap[key] = true
+			if eltFnMap[key] == nil {
+				eltFnMap[key], eltCloseMap[key] = newelt()
+			}
+			return eltFnMap[key](key, props, children...)
+		},
+	}
+
+	close := func() {
+		for key := range eltCloseMap {
+			if !eltUsedMap[key] {
+				eltCloseMap[key]()
+				delete(eltCloseMap, key)
+				delete(eltFnMap, key)
+			}
+		}
+		eltUsedMap = map[interface{}]bool{}
+	}
+
+	closeAll = func() {
+		close()
+
+	}
+
+	update = func(c interface{}, styles Styles, checked *streams.Bool, id string) (result Element) {
+		refresh = func() {
+
+			lastresult = checkboxEdit(cLocal, styles, checked, id)
+
+			close()
 		}
 
-		// append this to after and continue with that
-		v = v.Apply(nil, afterChange)
-		after.Change = afterChange
-		after.Next = &BoolStream{Notifier: s.Notifier, Value: s.unwrapValue(v)}
-		after = after.Next
+		if initialized {
+			switch {
+
+			case laststyles != styles:
+			case lastchecked != checked:
+			case lastid != id:
+			default:
+
+				return lastresult
+			}
+		}
+		initialized = true
+		laststyles = styles
+		lastchecked = checked
+		lastid = id
+		refresh()
+		return lastresult
 	}
 
-	// append the residual change (c) to converge to wherever
-	// after has landed. Notify since s.Latest() has now changed
-	before.Change, before.Next = c, after
-	s.Notify()
-	return result
+	return update, closeAll
 }
 
-func (s *BoolStream) wrapValue(i interface{}) changes.Value {
-	if x, ok := i.(changes.Value); ok {
-		return x
-	}
-	return changes.Atomic{i}
-}
+// newelt is the constructor for eltFunc
+func newelt() (update eltFunc, closeAll func()) {
+	var refresh func()
 
-func (s *BoolStream) unwrapValue(v changes.Value) bool {
-	if x, ok := v.(interface{}).(bool); ok {
-		return x
-	}
-	return v.(changes.Atomic).Value.(bool)
-}
+	var lastlastState *nodeStream
+	var lastprops Props
+	var lastchildren []Element
+	var lastresult Element
+	var initialized bool
 
-// TextStream is a stream of string values.
-type TextStream struct {
-	// Notifier provides On/Off/Notify support. New instances of
-	// TextStream created via the AppendLocal or AppendRemote
-	// share the same Notifier value.
-	*core.Notifier
+	cLocal := &noDeps{}
 
-	// Value holds the current value. The latest value may be
-	// fetched via the Latest() method.
-	Value string
+	close := func() {}
 
-	// Change tracks the change that leads to the next value.
-	Change changes.Change
-
-	// Next tracks the next value in the stream.
-	Next *TextStream
-}
-
-// NewTextStream creates a new string stream
-func NewTextStream(value string) *TextStream {
-	return &TextStream{&core.Notifier{}, value, nil, nil}
-}
-
-// Latest returns the latest value in the stream
-func (s *TextStream) Latest() *TextStream {
-	for s.Next != nil {
-		s = s.Next
-	}
-	return s
-}
-
-// Append appends a local change. isLocal identifies if the caller is
-// local or remote. It returns the updated stream whose value matches
-// the provided value and whose Latest() converges to the latest of
-// the stream.
-func (s *TextStream) Append(c changes.Change, value string, isLocal bool) *TextStream {
-	if c == nil {
-		c = changes.Replace{Before: s.wrapValue(s.Value), After: s.wrapValue(value)}
+	closeAll = func() {
+		close()
+		lastlastState.Close()
 	}
 
-	// return value: after is correctly set to provided value
-	result := &TextStream{Notifier: s.Notifier, Value: value}
+	update = func(c interface{}, props Props, children ...Element) (result Element) {
+		refresh = func() {
 
-	// before tracks s, after tracks result, v tracks latest value
-	// of after chain
-	before := s
-	var v changes.Value = changes.Atomic{value}
+			if lastlastState != nil {
+				lastlastState = lastlastState.Latest()
+				lastlastState.Stream.Nextf(&initialized, nil)
+			}
+			lastlastState, lastresult = elt(cLocal, lastlastState, props, children...)
 
-	// walk the chain of Next and find corresponding values to
-	// add to after so that both s annd after converge
-	after := result
-	for ; before.Next != nil; before = before.Next {
-		var afterChange changes.Change
-
-		if isLocal {
-			c, afterChange = before.Change.Merge(c)
-		} else {
-			afterChange, c = c.Merge(before.Change)
+			if lastlastState != nil {
+				lastlastState = lastlastState.Latest()
+				lastlastState.Stream.Nextf(&initialized, refresh)
+			}
+			close()
 		}
 
-		if c == nil {
-			// the convergence point is before.Next
-			after.Change, after.Next = afterChange, before.Next
-			return result
+		if initialized {
+			switch {
+
+			case lastprops != props:
+			default:
+
+				if len(lastchildren) != len(children) {
+					break
+				}
+				diff := false
+				for kk := 0; !diff && kk < len(children); kk++ {
+
+					diff = lastchildren[kk] != children[kk]
+
+				}
+				if diff {
+					break
+				}
+
+				return lastresult
+			}
+		}
+		initialized = true
+		lastprops = props
+		lastchildren = children
+		refresh()
+		return lastresult
+	}
+
+	return update, closeAll
+}
+
+// NewFixed is the constructor for FixedFunc
+func NewFixed() (update FixedFunc, closeAll func()) {
+	var refresh func()
+
+	var laststyles Styles
+	var lastcells []Element
+	var lastresult Element
+	var initialized bool
+	eltFnMap := map[interface{}]eltFunc{}
+	eltCloseMap := map[interface{}]func(){}
+	eltUsedMap := map[interface{}]bool{}
+
+	cLocal := &eltDep{
+		elt: func(key interface{}, props Props, children ...Element) (result Element) {
+			eltUsedMap[key] = true
+			if eltFnMap[key] == nil {
+				eltFnMap[key], eltCloseMap[key] = newelt()
+			}
+			return eltFnMap[key](key, props, children...)
+		},
+	}
+
+	close := func() {
+		for key := range eltCloseMap {
+			if !eltUsedMap[key] {
+				eltCloseMap[key]()
+				delete(eltCloseMap, key)
+				delete(eltFnMap, key)
+			}
+		}
+		eltUsedMap = map[interface{}]bool{}
+	}
+
+	closeAll = func() {
+		close()
+
+	}
+
+	update = func(c interface{}, styles Styles, cells ...Element) (result Element) {
+		refresh = func() {
+
+			lastresult = fixed(cLocal, styles, cells...)
+
+			close()
 		}
 
-		if afterChange == nil {
-			continue
+		if initialized {
+			switch {
+
+			case laststyles != styles:
+			default:
+
+				if len(lastcells) != len(cells) {
+					break
+				}
+				diff := false
+				for kk := 0; !diff && kk < len(cells); kk++ {
+
+					diff = lastcells[kk] != cells[kk]
+
+				}
+				if diff {
+					break
+				}
+
+				return lastresult
+			}
+		}
+		initialized = true
+		laststyles = styles
+		lastcells = cells
+		refresh()
+		return lastresult
+	}
+
+	return update, closeAll
+}
+
+// NewFocusable is the constructor for FocusableFunc
+func NewFocusable() (update FocusableFunc, closeAll func()) {
+	var refresh func()
+
+	var lasteh *EventHandler
+	var lastchildren []Element
+	var lastresult Element
+	var initialized bool
+	eltFnMap := map[interface{}]eltFunc{}
+	eltCloseMap := map[interface{}]func(){}
+	eltUsedMap := map[interface{}]bool{}
+
+	cLocal := &eltDep{
+		elt: func(key interface{}, props Props, children ...Element) (result Element) {
+			eltUsedMap[key] = true
+			if eltFnMap[key] == nil {
+				eltFnMap[key], eltCloseMap[key] = newelt()
+			}
+			return eltFnMap[key](key, props, children...)
+		},
+	}
+
+	close := func() {
+		for key := range eltCloseMap {
+			if !eltUsedMap[key] {
+				eltCloseMap[key]()
+				delete(eltCloseMap, key)
+				delete(eltFnMap, key)
+			}
+		}
+		eltUsedMap = map[interface{}]bool{}
+	}
+
+	closeAll = func() {
+		close()
+
+	}
+
+	update = func(c interface{}, eh *EventHandler, children ...Element) (result Element) {
+		refresh = func() {
+
+			lastresult = focusable(cLocal, eh, children...)
+
+			close()
 		}
 
-		// append this to after and continue with that
-		v = v.Apply(nil, afterChange)
-		after.Change = afterChange
-		after.Next = &TextStream{Notifier: s.Notifier, Value: s.unwrapValue(v)}
-		after = after.Next
+		if initialized {
+			switch {
+
+			case lasteh != eh:
+			default:
+
+				if len(lastchildren) != len(children) {
+					break
+				}
+				diff := false
+				for kk := 0; !diff && kk < len(children); kk++ {
+
+					diff = lastchildren[kk] != children[kk]
+
+				}
+				if diff {
+					break
+				}
+
+				return lastresult
+			}
+		}
+		initialized = true
+		lasteh = eh
+		lastchildren = children
+		refresh()
+		return lastresult
 	}
 
-	// append the residual change (c) to converge to wherever
-	// after has landed. Notify since s.Latest() has now changed
-	before.Change, before.Next = c, after
-	s.Notify()
-	return result
+	return update, closeAll
 }
 
-func (s *TextStream) wrapValue(i interface{}) changes.Value {
-	if x, ok := i.(changes.Value); ok {
-		return x
-	}
-	return changes.Atomic{i}
-}
+// NewLabelView is the constructor for LabelViewFunc
+func NewLabelView() (update LabelViewFunc, closeAll func()) {
+	var refresh func()
 
-func (s *TextStream) unwrapValue(v changes.Value) string {
-	if x, ok := v.(interface{}).(string); ok {
-		return x
-	}
-	return v.(changes.Atomic).Value.(string)
-}
+	var laststyles Styles
+	var lasttext string
+	var lastinputID string
+	var lastresult Element
+	var initialized bool
+	eltFnMap := map[interface{}]eltFunc{}
+	eltCloseMap := map[interface{}]func(){}
+	eltUsedMap := map[interface{}]bool{}
 
-// EventStream is a stream of Event values.
-type EventStream struct {
-	// Notifier provides On/Off/Notify support. New instances of
-	// EventStream created via the AppendLocal or AppendRemote
-	// share the same Notifier value.
-	*core.Notifier
-
-	// Value holds the current value. The latest value may be
-	// fetched via the Latest() method.
-	Value Event
-
-	// Change tracks the change that leads to the next value.
-	Change changes.Change
-
-	// Next tracks the next value in the stream.
-	Next *EventStream
-}
-
-// NewEventStream creates a new Event stream
-func NewEventStream(value Event) *EventStream {
-	return &EventStream{&core.Notifier{}, value, nil, nil}
-}
-
-// Latest returns the latest value in the stream
-func (s *EventStream) Latest() *EventStream {
-	for s.Next != nil {
-		s = s.Next
-	}
-	return s
-}
-
-// Append appends a local change. isLocal identifies if the caller is
-// local or remote. It returns the updated stream whose value matches
-// the provided value and whose Latest() converges to the latest of
-// the stream.
-func (s *EventStream) Append(c changes.Change, value Event, isLocal bool) *EventStream {
-	if c == nil {
-		c = changes.Replace{Before: s.wrapValue(s.Value), After: s.wrapValue(value)}
+	cLocal := &eltDep{
+		elt: func(key interface{}, props Props, children ...Element) (result Element) {
+			eltUsedMap[key] = true
+			if eltFnMap[key] == nil {
+				eltFnMap[key], eltCloseMap[key] = newelt()
+			}
+			return eltFnMap[key](key, props, children...)
+		},
 	}
 
-	// return value: after is correctly set to provided value
-	result := &EventStream{Notifier: s.Notifier, Value: value}
+	close := func() {
+		for key := range eltCloseMap {
+			if !eltUsedMap[key] {
+				eltCloseMap[key]()
+				delete(eltCloseMap, key)
+				delete(eltFnMap, key)
+			}
+		}
+		eltUsedMap = map[interface{}]bool{}
+	}
 
-	// before tracks s, after tracks result, v tracks latest value
-	// of after chain
-	before := s
-	var v changes.Value = changes.Atomic{value}
+	closeAll = func() {
+		close()
 
-	// walk the chain of Next and find corresponding values to
-	// add to after so that both s annd after converge
-	after := result
-	for ; before.Next != nil; before = before.Next {
-		var afterChange changes.Change
+	}
 
-		if isLocal {
-			c, afterChange = before.Change.Merge(c)
-		} else {
-			afterChange, c = c.Merge(before.Change)
+	update = func(c interface{}, styles Styles, text string, inputID string) (result Element) {
+		refresh = func() {
+
+			lastresult = labelView(cLocal, styles, text, inputID)
+
+			close()
 		}
 
-		if c == nil {
-			// the convergence point is before.Next
-			after.Change, after.Next = afterChange, before.Next
-			return result
+		if initialized {
+			switch {
+
+			case laststyles != styles:
+			case lasttext != text:
+			case lastinputID != inputID:
+			default:
+
+				return lastresult
+			}
+		}
+		initialized = true
+		laststyles = styles
+		lasttext = text
+		lastinputID = inputID
+		refresh()
+		return lastresult
+	}
+
+	return update, closeAll
+}
+
+// NewRun is the constructor for RunFunc
+func NewRun() (update RunFunc, closeAll func()) {
+	var refresh func()
+
+	var laststyles Styles
+	var lastcells []Element
+	var lastresult Element
+	var initialized bool
+	eltFnMap := map[interface{}]eltFunc{}
+	eltCloseMap := map[interface{}]func(){}
+	eltUsedMap := map[interface{}]bool{}
+
+	cLocal := &eltDep{
+		elt: func(key interface{}, props Props, children ...Element) (result Element) {
+			eltUsedMap[key] = true
+			if eltFnMap[key] == nil {
+				eltFnMap[key], eltCloseMap[key] = newelt()
+			}
+			return eltFnMap[key](key, props, children...)
+		},
+	}
+
+	close := func() {
+		for key := range eltCloseMap {
+			if !eltUsedMap[key] {
+				eltCloseMap[key]()
+				delete(eltCloseMap, key)
+				delete(eltFnMap, key)
+			}
+		}
+		eltUsedMap = map[interface{}]bool{}
+	}
+
+	closeAll = func() {
+		close()
+
+	}
+
+	update = func(c interface{}, styles Styles, cells ...Element) (result Element) {
+		refresh = func() {
+
+			lastresult = run(cLocal, styles, cells...)
+
+			close()
 		}
 
-		if afterChange == nil {
-			continue
+		if initialized {
+			switch {
+
+			case laststyles != styles:
+			default:
+
+				if len(lastcells) != len(cells) {
+					break
+				}
+				diff := false
+				for kk := 0; !diff && kk < len(cells); kk++ {
+
+					diff = lastcells[kk] != cells[kk]
+
+				}
+				if diff {
+					break
+				}
+
+				return lastresult
+			}
+		}
+		initialized = true
+		laststyles = styles
+		lastcells = cells
+		refresh()
+		return lastresult
+	}
+
+	return update, closeAll
+}
+
+// NewStretch is the constructor for StretchFunc
+func NewStretch() (update StretchFunc, closeAll func()) {
+	var refresh func()
+
+	var laststyles Styles
+	var lastcells []Element
+	var lastresult Element
+	var initialized bool
+	eltFnMap := map[interface{}]eltFunc{}
+	eltCloseMap := map[interface{}]func(){}
+	eltUsedMap := map[interface{}]bool{}
+
+	cLocal := &eltDep{
+		elt: func(key interface{}, props Props, children ...Element) (result Element) {
+			eltUsedMap[key] = true
+			if eltFnMap[key] == nil {
+				eltFnMap[key], eltCloseMap[key] = newelt()
+			}
+			return eltFnMap[key](key, props, children...)
+		},
+	}
+
+	close := func() {
+		for key := range eltCloseMap {
+			if !eltUsedMap[key] {
+				eltCloseMap[key]()
+				delete(eltCloseMap, key)
+				delete(eltFnMap, key)
+			}
+		}
+		eltUsedMap = map[interface{}]bool{}
+	}
+
+	closeAll = func() {
+		close()
+
+	}
+
+	update = func(c interface{}, styles Styles, cells ...Element) (result Element) {
+		refresh = func() {
+
+			lastresult = stretch(cLocal, styles, cells...)
+
+			close()
 		}
 
-		// append this to after and continue with that
-		v = v.Apply(nil, afterChange)
-		after.Change = afterChange
-		after.Next = &EventStream{Notifier: s.Notifier, Value: s.unwrapValue(v)}
-		after = after.Next
-	}
+		if initialized {
+			switch {
 
-	// append the residual change (c) to converge to wherever
-	// after has landed. Notify since s.Latest() has now changed
-	before.Change, before.Next = c, after
-	s.Notify()
-	return result
-}
+			case laststyles != styles:
+			default:
 
-func (s *EventStream) wrapValue(i interface{}) changes.Value {
-	if x, ok := i.(changes.Value); ok {
-		return x
-	}
-	return changes.Atomic{i}
-}
+				if len(lastcells) != len(cells) {
+					break
+				}
+				diff := false
+				for kk := 0; !diff && kk < len(cells); kk++ {
 
-func (s *EventStream) unwrapValue(v changes.Value) Event {
-	if x, ok := v.(interface{}).(Event); ok {
-		return x
-	}
-	return v.(changes.Atomic).Value.(Event)
-}
+					diff = lastcells[kk] != cells[kk]
 
-type aCtx struct {
-	core.Cache
-	finalizer func()
+				}
+				if diff {
+					break
+				}
 
-	EltStruct
-	initialized  bool
-	stateHandler core.Handler
-
-	memoized struct {
-		children []Element
-		href     string
-		result1  Element
-		styles   Styles
-	}
-}
-
-func (c *aCtx) areArgsSame(styles Styles, href string, children []Element) bool {
-
-	if styles != c.memoized.styles {
-		return false
-	}
-
-	if href != c.memoized.href {
-		return false
-	}
-
-	if len(children) != len(c.memoized.children) {
-		return false
-	}
-	for childrenIdx := range children {
-		if children[childrenIdx] != c.memoized.children[childrenIdx] {
-			return false
+				return lastresult
+			}
 		}
+		initialized = true
+		laststyles = styles
+		lastcells = cells
+		refresh()
+		return lastresult
 	}
-	return true
 
+	return update, closeAll
 }
 
-func (c *aCtx) refreshIfNeeded(styles Styles, href string, children []Element) (result1 Element) {
-	if !c.initialized || !c.areArgsSame(styles, href, children) {
-		return c.refresh(styles, href, children)
-	}
-	return c.memoized.result1
-}
+// NewTextEdit is the constructor for TextEditFunc
+func NewTextEdit() (update TextEditFunc, closeAll func()) {
+	var refresh func()
 
-func (c *aCtx) refresh(styles Styles, href string, children []Element) (result1 Element) {
-	c.initialized = true
-	c.stateHandler.Handle = func() {
-		c.refresh(styles, href, children)
-	}
+	var laststyles Styles
+	var lasttext *streams.S16
+	var lastresult Element
+	var initialized bool
+	textEditOFnMap := map[interface{}]TextEditOFunc{}
+	textEditOCloseMap := map[interface{}]func(){}
+	textEditOUsedMap := map[interface{}]bool{}
 
-	c.memoized.styles, c.memoized.href, c.memoized.children = styles, href, children
-
-	c.Cache.Begin()
-	defer c.Cache.End()
-
-	c.EltStruct.Begin()
-	defer c.EltStruct.End()
-	c.memoized.result1 = A(c, styles, href, children...)
-
-	return c.memoized.result1
-}
-
-func (c *aCtx) close() {
-	c.Cache.Begin()
-	c.Cache.End()
-
-	c.EltStruct.Begin()
-	c.EltStruct.End()
-	if c.finalizer != nil {
-		c.finalizer()
-	}
-}
-
-// AStruct is a cache for A
-// A implements the simplified anchor tag
-type AStruct struct {
-	old, current map[interface{}]*aCtx
-}
-
-// Begin starts a round
-func (c *AStruct) Begin() {
-	c.old, c.current = c.current, map[interface{}]*aCtx{}
-}
-
-// End finishes the round cleaning up any unused components
-func (c *AStruct) End() {
-	for _, ctx := range c.old {
-		ctx.close()
-	}
-	c.old = nil
-}
-
-// A - see the type for details
-func (c *AStruct) A(cKey interface{}, styles Styles, href string, children ...Element) (result1 Element) {
-	cOld, ok := c.old[cKey]
-	if ok {
-		delete(c.old, cKey)
-	} else {
-		cOld = &aCtx{}
-	}
-	c.current[cKey] = cOld
-	return cOld.refreshIfNeeded(styles, href, children)
-}
-
-type buttonCtx struct {
-	core.Cache
-	finalizer func()
-
-	EltStruct
-	initialized  bool
-	stateHandler core.Handler
-
-	memoized struct {
-		children []Element
-		onClick  *EventHandler
-		result1  Element
-		styles   Styles
-	}
-}
-
-func (c *buttonCtx) areArgsSame(styles Styles, onClick *EventHandler, children []Element) bool {
-
-	if styles != c.memoized.styles {
-		return false
+	cLocal := &textEditDep{
+		textEditO: func(key interface{}, opt TextEditOptions) (result Element) {
+			textEditOUsedMap[key] = true
+			if textEditOFnMap[key] == nil {
+				textEditOFnMap[key], textEditOCloseMap[key] = NewTextEditO()
+			}
+			return textEditOFnMap[key](key, opt)
+		},
 	}
 
-	if onClick != c.memoized.onClick {
-		return false
-	}
-
-	if len(children) != len(c.memoized.children) {
-		return false
-	}
-	for childrenIdx := range children {
-		if children[childrenIdx] != c.memoized.children[childrenIdx] {
-			return false
+	close := func() {
+		for key := range textEditOCloseMap {
+			if !textEditOUsedMap[key] {
+				textEditOCloseMap[key]()
+				delete(textEditOCloseMap, key)
+				delete(textEditOFnMap, key)
+			}
 		}
-	}
-	return true
-
-}
-
-func (c *buttonCtx) refreshIfNeeded(styles Styles, onClick *EventHandler, children []Element) (result1 Element) {
-	if !c.initialized || !c.areArgsSame(styles, onClick, children) {
-		return c.refresh(styles, onClick, children)
-	}
-	return c.memoized.result1
-}
-
-func (c *buttonCtx) refresh(styles Styles, onClick *EventHandler, children []Element) (result1 Element) {
-	c.initialized = true
-	c.stateHandler.Handle = func() {
-		c.refresh(styles, onClick, children)
+		textEditOUsedMap = map[interface{}]bool{}
 	}
 
-	c.memoized.styles, c.memoized.onClick, c.memoized.children = styles, onClick, children
+	closeAll = func() {
+		close()
 
-	c.Cache.Begin()
-	defer c.Cache.End()
-
-	c.EltStruct.Begin()
-	defer c.EltStruct.End()
-	c.memoized.result1 = button(c, styles, onClick, children...)
-
-	return c.memoized.result1
-}
-
-func (c *buttonCtx) close() {
-	c.Cache.Begin()
-	c.Cache.End()
-
-	c.EltStruct.Begin()
-	c.EltStruct.End()
-	if c.finalizer != nil {
-		c.finalizer()
-	}
-}
-
-// ButtonStruct is a cache for Button
-// Button implements a button control.
-type ButtonStruct struct {
-	old, current map[interface{}]*buttonCtx
-}
-
-// Begin starts a round
-func (c *ButtonStruct) Begin() {
-	c.old, c.current = c.current, map[interface{}]*buttonCtx{}
-}
-
-// End finishes the round cleaning up any unused components
-func (c *ButtonStruct) End() {
-	for _, ctx := range c.old {
-		ctx.close()
-	}
-	c.old = nil
-}
-
-// Button - see the type for details
-func (c *ButtonStruct) Button(cKey interface{}, styles Styles, onClick *EventHandler, children ...Element) (result1 Element) {
-	cOld, ok := c.old[cKey]
-	if ok {
-		delete(c.old, cKey)
-	} else {
-		cOld = &buttonCtx{}
-	}
-	c.current[cKey] = cOld
-	return cOld.refreshIfNeeded(styles, onClick, children)
-}
-
-type cbEditCtx struct {
-	core.Cache
-	finalizer func()
-
-	EltStruct
-	initialized  bool
-	stateHandler core.Handler
-
-	memoized struct {
-		checked *BoolStream
-		id      string
-		result1 Element
-		styles  Styles
-	}
-}
-
-func (c *cbEditCtx) areArgsSame(styles Styles, checked *BoolStream, id string) bool {
-
-	if styles != c.memoized.styles {
-		return false
 	}
 
-	if checked != c.memoized.checked {
-		return false
-	}
+	update = func(c interface{}, styles Styles, text *streams.S16) (result Element) {
+		refresh = func() {
 
-	return id == c.memoized.id
+			lastresult = textEdit(cLocal, styles, text)
 
-}
-
-func (c *cbEditCtx) refreshIfNeeded(styles Styles, checked *BoolStream, id string) (result1 Element) {
-	if !c.initialized || !c.areArgsSame(styles, checked, id) {
-		return c.refresh(styles, checked, id)
-	}
-	return c.memoized.result1
-}
-
-func (c *cbEditCtx) refresh(styles Styles, checked *BoolStream, id string) (result1 Element) {
-	c.initialized = true
-	c.stateHandler.Handle = func() {
-		c.refresh(styles, checked, id)
-	}
-
-	c.memoized.styles, c.memoized.checked, c.memoized.id = styles, checked, id
-
-	c.Cache.Begin()
-	defer c.Cache.End()
-
-	c.EltStruct.Begin()
-	defer c.EltStruct.End()
-	c.memoized.result1 = checkboxEdit(c, styles, checked, id)
-
-	return c.memoized.result1
-}
-
-func (c *cbEditCtx) close() {
-	c.Cache.Begin()
-	c.Cache.End()
-
-	c.EltStruct.Begin()
-	c.EltStruct.End()
-	if c.finalizer != nil {
-		c.finalizer()
-	}
-}
-
-// CheckboxEditStruct is a cache for CheckboxEdit
-// CheckboxEdit implements a checkbox control.
-type CheckboxEditStruct struct {
-	old, current map[interface{}]*cbEditCtx
-}
-
-// Begin starts a round
-func (c *CheckboxEditStruct) Begin() {
-	c.old, c.current = c.current, map[interface{}]*cbEditCtx{}
-}
-
-// End finishes the round cleaning up any unused components
-func (c *CheckboxEditStruct) End() {
-	for _, ctx := range c.old {
-		ctx.close()
-	}
-	c.old = nil
-}
-
-// CheckboxEdit - see the type for details
-func (c *CheckboxEditStruct) CheckboxEdit(cKey interface{}, styles Styles, checked *BoolStream, id string) (result1 Element) {
-	cOld, ok := c.old[cKey]
-	if ok {
-		delete(c.old, cKey)
-	} else {
-		cOld = &cbEditCtx{}
-	}
-	c.current[cKey] = cOld
-	return cOld.refreshIfNeeded(styles, checked, id)
-}
-
-type nodeCtx struct {
-	core.Cache
-	finalizer func()
-
-	initialized  bool
-	stateHandler core.Handler
-
-	memoized struct {
-		children  []Element
-		lastState *nodeStream
-		props     Props
-		result1   *nodeStream
-		result2   Element
-	}
-}
-
-func (c *nodeCtx) areArgsSame(props Props, children []Element) bool {
-
-	if props != c.memoized.props {
-		return false
-	}
-
-	if len(children) != len(c.memoized.children) {
-		return false
-	}
-	for childrenIdx := range children {
-		if children[childrenIdx] != c.memoized.children[childrenIdx] {
-			return false
+			close()
 		}
-	}
-	return true
 
-}
+		if initialized {
+			switch {
 
-func (c *nodeCtx) refreshIfNeeded(props Props, children []Element) (result2 Element) {
-	if !c.initialized || !c.areArgsSame(props, children) {
-		return c.refresh(props, children)
-	}
-	return c.memoized.result2
-}
+			case laststyles != styles:
+			case lasttext != text:
+			default:
 
-func (c *nodeCtx) refresh(props Props, children []Element) (result2 Element) {
-	c.initialized = true
-	c.stateHandler.Handle = func() {
-		c.refresh(props, children)
-	}
-
-	if c.memoized.lastState != nil {
-		c.memoized.lastState = c.memoized.lastState.Latest()
-	}
-	c.memoized.props, c.memoized.children = props, children
-
-	c.Cache.Begin()
-	defer c.Cache.End()
-
-	c.memoized.result1, c.memoized.result2 = elt(c, c.memoized.lastState, props, children...)
-
-	if c.memoized.lastState != c.memoized.result1 {
-		if c.memoized.lastState != nil {
-			c.memoized.lastState.Off(&c.stateHandler)
+				return lastresult
+			}
 		}
-		if c.memoized.result1 != nil {
-			c.memoized.result1.On(&c.stateHandler)
+		initialized = true
+		laststyles = styles
+		lasttext = text
+		refresh()
+		return lastresult
+	}
+
+	return update, closeAll
+}
+
+// NewTextEditO is the constructor for TextEditOFunc
+func NewTextEditO() (update TextEditOFunc, closeAll func()) {
+	var refresh func()
+
+	var lastopt TextEditOptions
+	var lastresult Element
+	var initialized bool
+	eltFnMap := map[interface{}]eltFunc{}
+	eltCloseMap := map[interface{}]func(){}
+	eltUsedMap := map[interface{}]bool{}
+
+	cLocal := &eltDep{
+		elt: func(key interface{}, props Props, children ...Element) (result Element) {
+			eltUsedMap[key] = true
+			if eltFnMap[key] == nil {
+				eltFnMap[key], eltCloseMap[key] = newelt()
+			}
+			return eltFnMap[key](key, props, children...)
+		},
+	}
+
+	close := func() {
+		for key := range eltCloseMap {
+			if !eltUsedMap[key] {
+				eltCloseMap[key]()
+				delete(eltCloseMap, key)
+				delete(eltFnMap, key)
+			}
 		}
-		c.memoized.lastState = c.memoized.result1
-	}
-	return c.memoized.result2
-}
-
-func (c *nodeCtx) close() {
-	c.Cache.Begin()
-	c.Cache.End()
-
-	if c.memoized.result1 != nil {
-		c.memoized.result1.Off(&c.stateHandler)
-	}
-	if c.finalizer != nil {
-		c.finalizer()
-	}
-}
-
-// EltStruct is a cache for Elt
-// Elt implements a reactive Element control.
-//
-// Usage:
-//
-// func myComponent(c *myComponentCtx, ...) controls.Element {
-// return c.dom.Elt("root", props, children...)
-// }
-type EltStruct struct {
-	old, current map[interface{}]*nodeCtx
-}
-
-// Begin starts a round
-func (c *EltStruct) Begin() {
-	c.old, c.current = c.current, map[interface{}]*nodeCtx{}
-}
-
-// End finishes the round cleaning up any unused components
-func (c *EltStruct) End() {
-	for _, ctx := range c.old {
-		ctx.close()
-	}
-	c.old = nil
-}
-
-// Elt - see the type for details
-func (c *EltStruct) Elt(cKey interface{}, props Props, children ...Element) (result2 Element) {
-	cOld, ok := c.old[cKey]
-	if ok {
-		delete(c.old, cKey)
-	} else {
-		cOld = &nodeCtx{}
-	}
-	c.current[cKey] = cOld
-	return cOld.refreshIfNeeded(props, children)
-}
-
-type fixedCtx struct {
-	core.Cache
-	finalizer func()
-
-	EltStruct
-	initialized  bool
-	stateHandler core.Handler
-
-	memoized struct {
-		cells   []Element
-		result1 Element
-		styles  Styles
-	}
-}
-
-func (c *fixedCtx) areArgsSame(styles Styles, cells []Element) bool {
-
-	if styles != c.memoized.styles {
-		return false
+		eltUsedMap = map[interface{}]bool{}
 	}
 
-	if len(cells) != len(c.memoized.cells) {
-		return false
+	closeAll = func() {
+		close()
+
 	}
-	for cellsIdx := range cells {
-		if cells[cellsIdx] != c.memoized.cells[cellsIdx] {
-			return false
+
+	update = func(c interface{}, opt TextEditOptions) (result Element) {
+		refresh = func() {
+
+			lastresult = textEditO(cLocal, opt)
+
+			close()
 		}
-	}
-	return true
 
-}
+		if initialized {
+			switch {
 
-func (c *fixedCtx) refreshIfNeeded(styles Styles, cells []Element) (result1 Element) {
-	if !c.initialized || !c.areArgsSame(styles, cells) {
-		return c.refresh(styles, cells)
-	}
-	return c.memoized.result1
-}
+			case lastopt != opt:
+			default:
 
-func (c *fixedCtx) refresh(styles Styles, cells []Element) (result1 Element) {
-	c.initialized = true
-	c.stateHandler.Handle = func() {
-		c.refresh(styles, cells)
-	}
-
-	c.memoized.styles, c.memoized.cells = styles, cells
-
-	c.Cache.Begin()
-	defer c.Cache.End()
-
-	c.EltStruct.Begin()
-	defer c.EltStruct.End()
-	c.memoized.result1 = fixed(c, styles, cells...)
-
-	return c.memoized.result1
-}
-
-func (c *fixedCtx) close() {
-	c.Cache.Begin()
-	c.Cache.End()
-
-	c.EltStruct.Begin()
-	c.EltStruct.End()
-	if c.finalizer != nil {
-		c.finalizer()
-	}
-}
-
-// FixedStruct is a cache for Fixed
-// Fixed implements a non-shrinkable container
-type FixedStruct struct {
-	old, current map[interface{}]*fixedCtx
-}
-
-// Begin starts a round
-func (c *FixedStruct) Begin() {
-	c.old, c.current = c.current, map[interface{}]*fixedCtx{}
-}
-
-// End finishes the round cleaning up any unused components
-func (c *FixedStruct) End() {
-	for _, ctx := range c.old {
-		ctx.close()
-	}
-	c.old = nil
-}
-
-// Fixed - see the type for details
-func (c *FixedStruct) Fixed(cKey interface{}, styles Styles, cells ...Element) (result1 Element) {
-	cOld, ok := c.old[cKey]
-	if ok {
-		delete(c.old, cKey)
-	} else {
-		cOld = &fixedCtx{}
-	}
-	c.current[cKey] = cOld
-	return cOld.refreshIfNeeded(styles, cells)
-}
-
-type fCtx struct {
-	core.Cache
-	finalizer func()
-
-	EltStruct
-	initialized  bool
-	stateHandler core.Handler
-
-	memoized struct {
-		children []Element
-		eh       *EventHandler
-		result1  Element
-	}
-}
-
-func (c *fCtx) areArgsSame(eh *EventHandler, children []Element) bool {
-
-	if eh != c.memoized.eh {
-		return false
-	}
-
-	if len(children) != len(c.memoized.children) {
-		return false
-	}
-	for childrenIdx := range children {
-		if children[childrenIdx] != c.memoized.children[childrenIdx] {
-			return false
+				return lastresult
+			}
 		}
-	}
-	return true
-
-}
-
-func (c *fCtx) refreshIfNeeded(eh *EventHandler, children []Element) (result1 Element) {
-	if !c.initialized || !c.areArgsSame(eh, children) {
-		return c.refresh(eh, children)
-	}
-	return c.memoized.result1
-}
-
-func (c *fCtx) refresh(eh *EventHandler, children []Element) (result1 Element) {
-	c.initialized = true
-	c.stateHandler.Handle = func() {
-		c.refresh(eh, children)
+		initialized = true
+		lastopt = opt
+		refresh()
+		return lastresult
 	}
 
-	c.memoized.eh, c.memoized.children = eh, children
-
-	c.Cache.Begin()
-	defer c.Cache.End()
-
-	c.EltStruct.Begin()
-	defer c.EltStruct.End()
-	c.memoized.result1 = focusable(c, eh, children...)
-
-	return c.memoized.result1
+	return update, closeAll
 }
 
-func (c *fCtx) close() {
-	c.Cache.Begin()
-	c.Cache.End()
+// NewTextView is the constructor for TextViewFunc
+func NewTextView() (update TextViewFunc, closeAll func()) {
+	var refresh func()
 
-	c.EltStruct.Begin()
-	c.EltStruct.End()
-	if c.finalizer != nil {
-		c.finalizer()
-	}
-}
+	var laststyles Styles
+	var lasttext string
+	var lastresult Element
+	var initialized bool
+	eltFnMap := map[interface{}]eltFunc{}
+	eltCloseMap := map[interface{}]func(){}
+	eltUsedMap := map[interface{}]bool{}
 
-// FocusableStruct is a cache for Focusable
-// Focusable is a basic control which can receive focus and be
-// selected by clicks.
-//
-// This is different from a checbox or input in that there are no
-// specific "values" available and it also does not expose actual
-// keyboard events.
-//
-// Note that there is no programmatic way to focus this element
-type FocusableStruct struct {
-	old, current map[interface{}]*fCtx
-}
-
-// Begin starts a round
-func (c *FocusableStruct) Begin() {
-	c.old, c.current = c.current, map[interface{}]*fCtx{}
-}
-
-// End finishes the round cleaning up any unused components
-func (c *FocusableStruct) End() {
-	for _, ctx := range c.old {
-		ctx.close()
-	}
-	c.old = nil
-}
-
-// Focusable - see the type for details
-func (c *FocusableStruct) Focusable(cKey interface{}, eh *EventHandler, children ...Element) (result1 Element) {
-	cOld, ok := c.old[cKey]
-	if ok {
-		delete(c.old, cKey)
-	} else {
-		cOld = &fCtx{}
-	}
-	c.current[cKey] = cOld
-	return cOld.refreshIfNeeded(eh, children)
-}
-
-type labelViewCtx struct {
-	core.Cache
-	finalizer func()
-
-	EltStruct
-	initialized  bool
-	stateHandler core.Handler
-
-	memoized struct {
-		inputID string
-		result1 Element
-		styles  Styles
-		text    string
-	}
-}
-
-func (c *labelViewCtx) areArgsSame(styles Styles, text string, inputID string) bool {
-
-	if styles != c.memoized.styles {
-		return false
+	cLocal := &eltDep{
+		elt: func(key interface{}, props Props, children ...Element) (result Element) {
+			eltUsedMap[key] = true
+			if eltFnMap[key] == nil {
+				eltFnMap[key], eltCloseMap[key] = newelt()
+			}
+			return eltFnMap[key](key, props, children...)
+		},
 	}
 
-	if text != c.memoized.text {
-		return false
-	}
-
-	return inputID == c.memoized.inputID
-
-}
-
-func (c *labelViewCtx) refreshIfNeeded(styles Styles, text string, inputID string) (result1 Element) {
-	if !c.initialized || !c.areArgsSame(styles, text, inputID) {
-		return c.refresh(styles, text, inputID)
-	}
-	return c.memoized.result1
-}
-
-func (c *labelViewCtx) refresh(styles Styles, text string, inputID string) (result1 Element) {
-	c.initialized = true
-	c.stateHandler.Handle = func() {
-		c.refresh(styles, text, inputID)
-	}
-
-	c.memoized.styles, c.memoized.text, c.memoized.inputID = styles, text, inputID
-
-	c.Cache.Begin()
-	defer c.Cache.End()
-
-	c.EltStruct.Begin()
-	defer c.EltStruct.End()
-	c.memoized.result1 = labelView(c, styles, text, inputID)
-
-	return c.memoized.result1
-}
-
-func (c *labelViewCtx) close() {
-	c.Cache.Begin()
-	c.Cache.End()
-
-	c.EltStruct.Begin()
-	c.EltStruct.End()
-	if c.finalizer != nil {
-		c.finalizer()
-	}
-}
-
-// LabelViewStruct is a cache for LabelView
-// LabelView implements a label control.
-type LabelViewStruct struct {
-	old, current map[interface{}]*labelViewCtx
-}
-
-// Begin starts a round
-func (c *LabelViewStruct) Begin() {
-	c.old, c.current = c.current, map[interface{}]*labelViewCtx{}
-}
-
-// End finishes the round cleaning up any unused components
-func (c *LabelViewStruct) End() {
-	for _, ctx := range c.old {
-		ctx.close()
-	}
-	c.old = nil
-}
-
-// LabelView - see the type for details
-func (c *LabelViewStruct) LabelView(cKey interface{}, styles Styles, text string, inputID string) (result1 Element) {
-	cOld, ok := c.old[cKey]
-	if ok {
-		delete(c.old, cKey)
-	} else {
-		cOld = &labelViewCtx{}
-	}
-	c.current[cKey] = cOld
-	return cOld.refreshIfNeeded(styles, text, inputID)
-}
-
-type runCtx struct {
-	core.Cache
-	finalizer func()
-
-	EltStruct
-	initialized  bool
-	stateHandler core.Handler
-
-	memoized struct {
-		cells   []Element
-		result1 Element
-		styles  Styles
-	}
-}
-
-func (c *runCtx) areArgsSame(styles Styles, cells []Element) bool {
-
-	if styles != c.memoized.styles {
-		return false
-	}
-
-	if len(cells) != len(c.memoized.cells) {
-		return false
-	}
-	for cellsIdx := range cells {
-		if cells[cellsIdx] != c.memoized.cells[cellsIdx] {
-			return false
+	close := func() {
+		for key := range eltCloseMap {
+			if !eltUsedMap[key] {
+				eltCloseMap[key]()
+				delete(eltCloseMap, key)
+				delete(eltFnMap, key)
+			}
 		}
-	}
-	return true
-
-}
-
-func (c *runCtx) refreshIfNeeded(styles Styles, cells []Element) (result1 Element) {
-	if !c.initialized || !c.areArgsSame(styles, cells) {
-		return c.refresh(styles, cells)
-	}
-	return c.memoized.result1
-}
-
-func (c *runCtx) refresh(styles Styles, cells []Element) (result1 Element) {
-	c.initialized = true
-	c.stateHandler.Handle = func() {
-		c.refresh(styles, cells)
+		eltUsedMap = map[interface{}]bool{}
 	}
 
-	c.memoized.styles, c.memoized.cells = styles, cells
+	closeAll = func() {
+		close()
 
-	c.Cache.Begin()
-	defer c.Cache.End()
-
-	c.EltStruct.Begin()
-	defer c.EltStruct.End()
-	c.memoized.result1 = run(c, styles, cells...)
-
-	return c.memoized.result1
-}
-
-func (c *runCtx) close() {
-	c.Cache.Begin()
-	c.Cache.End()
-
-	c.EltStruct.Begin()
-	c.EltStruct.End()
-	if c.finalizer != nil {
-		c.finalizer()
-	}
-}
-
-// RunStruct is a cache for Run
-// Run implements a paragraph-like flex "row" component
-type RunStruct struct {
-	old, current map[interface{}]*runCtx
-}
-
-// Begin starts a round
-func (c *RunStruct) Begin() {
-	c.old, c.current = c.current, map[interface{}]*runCtx{}
-}
-
-// End finishes the round cleaning up any unused components
-func (c *RunStruct) End() {
-	for _, ctx := range c.old {
-		ctx.close()
-	}
-	c.old = nil
-}
-
-// Run - see the type for details
-func (c *RunStruct) Run(cKey interface{}, styles Styles, cells ...Element) (result1 Element) {
-	cOld, ok := c.old[cKey]
-	if ok {
-		delete(c.old, cKey)
-	} else {
-		cOld = &runCtx{}
-	}
-	c.current[cKey] = cOld
-	return cOld.refreshIfNeeded(styles, cells)
-}
-
-type stretchCtx struct {
-	core.Cache
-	finalizer func()
-
-	EltStruct
-	initialized  bool
-	stateHandler core.Handler
-
-	memoized struct {
-		cells   []Element
-		result1 Element
-		styles  Styles
-	}
-}
-
-func (c *stretchCtx) areArgsSame(styles Styles, cells []Element) bool {
-
-	if styles != c.memoized.styles {
-		return false
 	}
 
-	if len(cells) != len(c.memoized.cells) {
-		return false
-	}
-	for cellsIdx := range cells {
-		if cells[cellsIdx] != c.memoized.cells[cellsIdx] {
-			return false
+	update = func(c interface{}, styles Styles, text string) (result Element) {
+		refresh = func() {
+
+			lastresult = textView(cLocal, styles, text)
+
+			close()
 		}
-	}
-	return true
 
-}
+		if initialized {
+			switch {
 
-func (c *stretchCtx) refreshIfNeeded(styles Styles, cells []Element) (result1 Element) {
-	if !c.initialized || !c.areArgsSame(styles, cells) {
-		return c.refresh(styles, cells)
-	}
-	return c.memoized.result1
-}
+			case laststyles != styles:
+			case lasttext != text:
+			default:
 
-func (c *stretchCtx) refresh(styles Styles, cells []Element) (result1 Element) {
-	c.initialized = true
-	c.stateHandler.Handle = func() {
-		c.refresh(styles, cells)
-	}
-
-	c.memoized.styles, c.memoized.cells = styles, cells
-
-	c.Cache.Begin()
-	defer c.Cache.End()
-
-	c.EltStruct.Begin()
-	defer c.EltStruct.End()
-	c.memoized.result1 = stretch(c, styles, cells...)
-
-	return c.memoized.result1
-}
-
-func (c *stretchCtx) close() {
-	c.Cache.Begin()
-	c.Cache.End()
-
-	c.EltStruct.Begin()
-	c.EltStruct.End()
-	if c.finalizer != nil {
-		c.finalizer()
-	}
-}
-
-// StretchStruct is a cache for Stretch
-// Stretch implements a stretchable container
-type StretchStruct struct {
-	old, current map[interface{}]*stretchCtx
-}
-
-// Begin starts a round
-func (c *StretchStruct) Begin() {
-	c.old, c.current = c.current, map[interface{}]*stretchCtx{}
-}
-
-// End finishes the round cleaning up any unused components
-func (c *StretchStruct) End() {
-	for _, ctx := range c.old {
-		ctx.close()
-	}
-	c.old = nil
-}
-
-// Stretch - see the type for details
-func (c *StretchStruct) Stretch(cKey interface{}, styles Styles, cells ...Element) (result1 Element) {
-	cOld, ok := c.old[cKey]
-	if ok {
-		delete(c.old, cKey)
-	} else {
-		cOld = &stretchCtx{}
-	}
-	c.current[cKey] = cOld
-	return cOld.refreshIfNeeded(styles, cells)
-}
-
-type textEditCtx struct {
-	core.Cache
-	finalizer func()
-
-	TextEditOStruct
-	initialized  bool
-	stateHandler core.Handler
-
-	memoized struct {
-		result1 Element
-		styles  Styles
-		text    *TextStream
-	}
-}
-
-func (c *textEditCtx) areArgsSame(styles Styles, text *TextStream) bool {
-
-	if styles != c.memoized.styles {
-		return false
-	}
-
-	return text == c.memoized.text
-
-}
-
-func (c *textEditCtx) refreshIfNeeded(styles Styles, text *TextStream) (result1 Element) {
-	if !c.initialized || !c.areArgsSame(styles, text) {
-		return c.refresh(styles, text)
-	}
-	return c.memoized.result1
-}
-
-func (c *textEditCtx) refresh(styles Styles, text *TextStream) (result1 Element) {
-	c.initialized = true
-	c.stateHandler.Handle = func() {
-		c.refresh(styles, text)
-	}
-
-	c.memoized.styles, c.memoized.text = styles, text
-
-	c.Cache.Begin()
-	defer c.Cache.End()
-
-	c.TextEditOStruct.Begin()
-	defer c.TextEditOStruct.End()
-	c.memoized.result1 = textEdit(c, styles, text)
-
-	return c.memoized.result1
-}
-
-func (c *textEditCtx) close() {
-	c.Cache.Begin()
-	c.Cache.End()
-
-	c.TextEditOStruct.Begin()
-	c.TextEditOStruct.End()
-	if c.finalizer != nil {
-		c.finalizer()
-	}
-}
-
-// TextEditStruct is a cache for TextEdit
-// TextEdit implements a text edit control.
-type TextEditStruct struct {
-	old, current map[interface{}]*textEditCtx
-}
-
-// Begin starts a round
-func (c *TextEditStruct) Begin() {
-	c.old, c.current = c.current, map[interface{}]*textEditCtx{}
-}
-
-// End finishes the round cleaning up any unused components
-func (c *TextEditStruct) End() {
-	for _, ctx := range c.old {
-		ctx.close()
-	}
-	c.old = nil
-}
-
-// TextEdit - see the type for details
-func (c *TextEditStruct) TextEdit(cKey interface{}, styles Styles, text *TextStream) (result1 Element) {
-	cOld, ok := c.old[cKey]
-	if ok {
-		delete(c.old, cKey)
-	} else {
-		cOld = &textEditCtx{}
-	}
-	c.current[cKey] = cOld
-	return cOld.refreshIfNeeded(styles, text)
-}
-
-type textEditOCtx struct {
-	core.Cache
-	finalizer func()
-
-	EltStruct
-	initialized  bool
-	stateHandler core.Handler
-
-	memoized struct {
-		opt     TextEditOptions
-		result1 Element
-	}
-}
-
-func (c *textEditOCtx) areArgsSame(opt TextEditOptions) bool {
-
-	return opt == c.memoized.opt
-
-}
-
-func (c *textEditOCtx) refreshIfNeeded(opt TextEditOptions) (result1 Element) {
-	if !c.initialized || !c.areArgsSame(opt) {
-		return c.refresh(opt)
-	}
-	return c.memoized.result1
-}
-
-func (c *textEditOCtx) refresh(opt TextEditOptions) (result1 Element) {
-	c.initialized = true
-	c.stateHandler.Handle = func() {
-		c.refresh(opt)
-	}
-
-	c.memoized.opt = opt
-
-	c.Cache.Begin()
-	defer c.Cache.End()
-
-	c.EltStruct.Begin()
-	defer c.EltStruct.End()
-	c.memoized.result1 = textEditO(c, opt)
-
-	return c.memoized.result1
-}
-
-func (c *textEditOCtx) close() {
-	c.Cache.Begin()
-	c.Cache.End()
-
-	c.EltStruct.Begin()
-	c.EltStruct.End()
-	if c.finalizer != nil {
-		c.finalizer()
-	}
-}
-
-// TextEditOStruct is a cache for TextEditO
-// TextEditO is like TextEdit but with extended options
-type TextEditOStruct struct {
-	old, current map[interface{}]*textEditOCtx
-}
-
-// Begin starts a round
-func (c *TextEditOStruct) Begin() {
-	c.old, c.current = c.current, map[interface{}]*textEditOCtx{}
-}
-
-// End finishes the round cleaning up any unused components
-func (c *TextEditOStruct) End() {
-	for _, ctx := range c.old {
-		ctx.close()
-	}
-	c.old = nil
-}
-
-// TextEditO - see the type for details
-func (c *TextEditOStruct) TextEditO(cKey interface{}, opt TextEditOptions) (result1 Element) {
-	cOld, ok := c.old[cKey]
-	if ok {
-		delete(c.old, cKey)
-	} else {
-		cOld = &textEditOCtx{}
-	}
-	c.current[cKey] = cOld
-	return cOld.refreshIfNeeded(opt)
-}
-
-type textViewCtx struct {
-	core.Cache
-	finalizer func()
-
-	EltStruct
-	initialized  bool
-	stateHandler core.Handler
-
-	memoized struct {
-		result1 Element
-		styles  Styles
-		text    string
-	}
-}
-
-func (c *textViewCtx) areArgsSame(styles Styles, text string) bool {
-
-	if styles != c.memoized.styles {
-		return false
-	}
-
-	return text == c.memoized.text
-
-}
-
-func (c *textViewCtx) refreshIfNeeded(styles Styles, text string) (result1 Element) {
-	if !c.initialized || !c.areArgsSame(styles, text) {
-		return c.refresh(styles, text)
-	}
-	return c.memoized.result1
-}
-
-func (c *textViewCtx) refresh(styles Styles, text string) (result1 Element) {
-	c.initialized = true
-	c.stateHandler.Handle = func() {
-		c.refresh(styles, text)
-	}
-
-	c.memoized.styles, c.memoized.text = styles, text
-
-	c.Cache.Begin()
-	defer c.Cache.End()
-
-	c.EltStruct.Begin()
-	defer c.EltStruct.End()
-	c.memoized.result1 = textView(c, styles, text)
-
-	return c.memoized.result1
-}
-
-func (c *textViewCtx) close() {
-	c.Cache.Begin()
-	c.Cache.End()
-
-	c.EltStruct.Begin()
-	c.EltStruct.End()
-	if c.finalizer != nil {
-		c.finalizer()
-	}
-}
-
-// TextViewStruct is a cache for TextView
-// TextView implements a text view control.
-type TextViewStruct struct {
-	old, current map[interface{}]*textViewCtx
-}
-
-// Begin starts a round
-func (c *TextViewStruct) Begin() {
-	c.old, c.current = c.current, map[interface{}]*textViewCtx{}
-}
-
-// End finishes the round cleaning up any unused components
-func (c *TextViewStruct) End() {
-	for _, ctx := range c.old {
-		ctx.close()
-	}
-	c.old = nil
-}
-
-// TextView - see the type for details
-func (c *TextViewStruct) TextView(cKey interface{}, styles Styles, text string) (result1 Element) {
-	cOld, ok := c.old[cKey]
-	if ok {
-		delete(c.old, cKey)
-	} else {
-		cOld = &textViewCtx{}
-	}
-	c.current[cKey] = cOld
-	return cOld.refreshIfNeeded(styles, text)
-}
-
-type vrunCtx struct {
-	core.Cache
-	finalizer func()
-
-	EltStruct
-	initialized  bool
-	stateHandler core.Handler
-
-	memoized struct {
-		cells   []Element
-		result1 Element
-		styles  Styles
-	}
-}
-
-func (c *vrunCtx) areArgsSame(styles Styles, cells []Element) bool {
-
-	if styles != c.memoized.styles {
-		return false
-	}
-
-	if len(cells) != len(c.memoized.cells) {
-		return false
-	}
-	for cellsIdx := range cells {
-		if cells[cellsIdx] != c.memoized.cells[cellsIdx] {
-			return false
+				return lastresult
+			}
 		}
-	}
-	return true
-
-}
-
-func (c *vrunCtx) refreshIfNeeded(styles Styles, cells []Element) (result1 Element) {
-	if !c.initialized || !c.areArgsSame(styles, cells) {
-		return c.refresh(styles, cells)
-	}
-	return c.memoized.result1
-}
-
-func (c *vrunCtx) refresh(styles Styles, cells []Element) (result1 Element) {
-	c.initialized = true
-	c.stateHandler.Handle = func() {
-		c.refresh(styles, cells)
+		initialized = true
+		laststyles = styles
+		lasttext = text
+		refresh()
+		return lastresult
 	}
 
-	c.memoized.styles, c.memoized.cells = styles, cells
-
-	c.Cache.Begin()
-	defer c.Cache.End()
-
-	c.EltStruct.Begin()
-	defer c.EltStruct.End()
-	c.memoized.result1 = vrun(c, styles, cells...)
-
-	return c.memoized.result1
+	return update, closeAll
 }
 
-func (c *vrunCtx) close() {
-	c.Cache.Begin()
-	c.Cache.End()
+// NewVRun is the constructor for VRunFunc
+func NewVRun() (update VRunFunc, closeAll func()) {
+	var refresh func()
 
-	c.EltStruct.Begin()
-	c.EltStruct.End()
-	if c.finalizer != nil {
-		c.finalizer()
+	var laststyles Styles
+	var lastcells []Element
+	var lastresult Element
+	var initialized bool
+	eltFnMap := map[interface{}]eltFunc{}
+	eltCloseMap := map[interface{}]func(){}
+	eltUsedMap := map[interface{}]bool{}
+
+	cLocal := &eltDep{
+		elt: func(key interface{}, props Props, children ...Element) (result Element) {
+			eltUsedMap[key] = true
+			if eltFnMap[key] == nil {
+				eltFnMap[key], eltCloseMap[key] = newelt()
+			}
+			return eltFnMap[key](key, props, children...)
+		},
 	}
-}
 
-// VRunStruct is a cache for VRun
-// VRun implements a list-like flex "column" component
-type VRunStruct struct {
-	old, current map[interface{}]*vrunCtx
-}
-
-// Begin starts a round
-func (c *VRunStruct) Begin() {
-	c.old, c.current = c.current, map[interface{}]*vrunCtx{}
-}
-
-// End finishes the round cleaning up any unused components
-func (c *VRunStruct) End() {
-	for _, ctx := range c.old {
-		ctx.close()
+	close := func() {
+		for key := range eltCloseMap {
+			if !eltUsedMap[key] {
+				eltCloseMap[key]()
+				delete(eltCloseMap, key)
+				delete(eltFnMap, key)
+			}
+		}
+		eltUsedMap = map[interface{}]bool{}
 	}
-	c.old = nil
-}
 
-// VRun - see the type for details
-func (c *VRunStruct) VRun(cKey interface{}, styles Styles, cells ...Element) (result1 Element) {
-	cOld, ok := c.old[cKey]
-	if ok {
-		delete(c.old, cKey)
-	} else {
-		cOld = &vrunCtx{}
+	closeAll = func() {
+		close()
+
 	}
-	c.current[cKey] = cOld
-	return cOld.refreshIfNeeded(styles, cells)
+
+	update = func(c interface{}, styles Styles, cells ...Element) (result Element) {
+		refresh = func() {
+
+			lastresult = vRun(cLocal, styles, cells...)
+
+			close()
+		}
+
+		if initialized {
+			switch {
+
+			case laststyles != styles:
+			default:
+
+				if len(lastcells) != len(cells) {
+					break
+				}
+				diff := false
+				for kk := 0; !diff && kk < len(cells); kk++ {
+
+					diff = lastcells[kk] != cells[kk]
+
+				}
+				if diff {
+					break
+				}
+
+				return lastresult
+			}
+		}
+		initialized = true
+		laststyles = styles
+		lastcells = cells
+		refresh()
+		return lastresult
+	}
+
+	return update, closeAll
 }
