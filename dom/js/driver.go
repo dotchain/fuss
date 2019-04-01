@@ -6,10 +6,11 @@
 package js
 
 import (
-	"github.com/dotchain/fuss/dom"
-	"github.com/gopherjs/gopherjs/js"
 	"strings"
 	"unsafe"
+
+	"github.com/dotchain/fuss/dom"
+	"github.com/gopherjs/gopherjs/js"
 )
 
 func init() {

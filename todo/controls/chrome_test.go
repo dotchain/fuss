@@ -6,8 +6,9 @@ package controls_test
 
 import (
 	"fmt"
-	"github.com/dotchain/fuss/dom/html"
+
 	"github.com/dotchain/fuss/dom"
+	"github.com/dotchain/fuss/dom/html"
 	"github.com/dotchain/fuss/todo/controls"
 	"github.com/yosssi/gohtml"
 )

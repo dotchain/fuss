@@ -17,9 +17,14 @@ The main goal is to build a reactive  UX framework which:
 4. Very little magic in the framework
 5. Framework can co-exist with non-reactive or other implementations of reactive code.
 
+## Status
+
+The project is experimental and all interfaces may change
+
 ## Contents
 1. [Goals](#goals)
-2. [TODO MVC Example](#todo-mvc-example)
+2. [Status](#status)
+3. [TODO MVC Example](#todo-mvc-example)
     1. [Todo and TodoList](#todo-and-todolist)
     2. [Generating the streams types](#generating-the-streams-types)
     3. [The Todo View](#the-todo-view)
@@ -28,7 +33,7 @@ The main goal is to build a reactive  UX framework which:
     6. [Change handling and stateful components](#change-handling-and-stateful-components)
     7. [Generating the factory code](#generating-the-factory-code)
     8. [Collaborative demo](#collaborative-demo)
-3. [Limitations](#limitations)
+4. [Limitations](#limitations)
 
 ## TODO MVC Example
 

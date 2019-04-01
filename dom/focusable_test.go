@@ -9,8 +9,8 @@ import (
 	"testing"
 
 	"github.com/dotchain/dot/streams"
-	"github.com/dotchain/fuss/dom/html"
 	"github.com/dotchain/fuss/dom"
+	"github.com/dotchain/fuss/dom/html"
 )
 
 func NewBoolStream(v bool) *streams.Bool {

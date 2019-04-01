@@ -5,8 +5,9 @@
 package core_test
 
 import (
-	"github.com/dotchain/fuss/core"
 	"testing"
+
+	"github.com/dotchain/fuss/core"
 )
 
 func TestNotifier(t *testing.T) {

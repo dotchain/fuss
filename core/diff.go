@@ -42,22 +42,7 @@ type diff struct {
 }
 
 func bestDiff(before, after []int, offset int, ops []diff, eq func(i, j int) bool) []diff {
-outer:
-	for len(before) > 0 {
-		if len(after) > 0 && eq(before[0], after[0]) {
-			offset++
-			before, after = before[1:], after[1:]
-			continue
-		}
-
-		for _, op := range ops {
-			if op.insert && eq(before[0], op.elt) {
-				before = before[1:]
-				continue outer
-			}
-		}
-		break
-	}
+	before, after, offset = filterItems(before, after, offset, ops, eq)
 
 	switch {
 	case len(before) == 0:
@@ -80,6 +65,27 @@ outer:
 	}
 
 	return ops
+}
+
+func filterItems(before, after []int, offset int, ops []diff, eq func(i, j int) bool) (before1, after1 []int, offset1 int) {
+outer:
+	for len(before) > 0 {
+		if len(after) > 0 && eq(before[0], after[0]) {
+			offset++
+			before, after = before[1:], after[1:]
+			continue
+		}
+
+		for _, op := range ops {
+			if op.insert && eq(before[0], op.elt) {
+				before = before[1:]
+				continue outer
+			}
+		}
+		break
+	}
+
+	return before, after, offset
 }
 
 func chooseDiff(before, after []int, offset int, ops []diff, eq func(i, j int) bool) []diff {

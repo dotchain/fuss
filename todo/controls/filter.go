@@ -20,9 +20,11 @@ const (
 	ShowDone = "done"
 )
 
-// Filter renders a row of options for "All", "Active" or "Done"
+// FilterFunc renders a row of options for "All", "Active" or "Done"
 //
 // This is reflected in the selected stream (which is both input and output).
+type FilterFunc = func(key interface{}, selected *streams.S16) dom.Element
+
 func filter(deps *filterDeps, selected *streams.S16) dom.Element {
 	return deps.run(
 		"root",
@@ -33,7 +35,6 @@ func filter(deps *filterDeps, selected *streams.S16) dom.Element {
 	)
 }
 
-type FilterFunc = func(key interface{}, selected *streams.S16) dom.Element
 type filterDeps struct {
 	run          dom.RunFunc
 	filterOption filterOptionFunc

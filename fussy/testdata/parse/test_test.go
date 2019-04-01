@@ -17,4 +17,3 @@ type testDeps struct {
 // skipping missing types with name = newXYZ() or NewXY()
 var something = newboo()
 var somethingElse = NewBoo()
-

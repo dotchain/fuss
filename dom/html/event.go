@@ -5,8 +5,9 @@
 package html
 
 import (
-	"github.com/dotchain/fuss/dom"
 	"time"
+
+	"github.com/dotchain/fuss/dom"
 )
 
 type event struct {

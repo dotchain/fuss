@@ -32,7 +32,9 @@ func (list TodoList) renderTodo(fn func(int, Todo) dom.Element) []dom.Element {
 	return result
 }
 
-// Todo renders a Todo item
+// TodoFunc is the shape of a control that renders a Todo item
+type TodoFunc = func(key interface{}, todoStream *TodoStream) dom.Element
+
 func todo(deps *todoDeps, todoStream *TodoStream) dom.Element {
 	return deps.run(
 		"root",
@@ -42,16 +44,17 @@ func todo(deps *todoDeps, todoStream *TodoStream) dom.Element {
 	)
 }
 
-type TodoFunc = func(key interface{}, todoStream *TodoStream) dom.Element
 type todoDeps struct {
 	run          dom.RunFunc
 	checkboxEdit dom.CheckboxEditFunc
 	textEdit     dom.TextEditFunc
 }
 
-// FilteredList renders  a list of filtered todos
+// FilteredListFunc renders a list of filtered todos
 //
 // Individual tasks can be modified underneath.
+type FilteredListFunc = func(key interface{}, filter *streams.S16, todos *TodoListStream) dom.Element
+
 func filteredList(deps *filteredListDeps, filter *streams.S16, todos *TodoListStream) dom.Element {
 	return deps.vRun(
 		"root",
@@ -68,13 +71,14 @@ func filteredList(deps *filteredListDeps, filter *streams.S16, todos *TodoListSt
 	)
 }
 
-type FilteredListFunc = func(key interface{}, filter *streams.S16, todos *TodoListStream) dom.Element
 type filteredListDeps struct {
 	vRun dom.VRunFunc
 	todo TodoFunc
 }
 
-// ListView renders aa filteredList with a filter to control the behavior
+// ListViewFunc renders aa filteredList with a filter to control the behavior
+type ListViewFunc = func(key interface{}, todos *TodoListStream) dom.Element
+
 func listView(deps *listViewDeps, todos *TodoListStream, filterState *streams.S16) (*streams.S16, dom.Element) {
 	if filterState == nil {
 		filterState = &streams.S16{Stream: streams.New(), Value: controls.ShowAll}
@@ -90,7 +94,6 @@ func listView(deps *listViewDeps, todos *TodoListStream, filterState *streams.S1
 	)
 }
 
-type ListViewFunc = func(key interface{}, todos *TodoListStream) dom.Element
 type listViewDeps struct {
 	vRun         dom.VRunFunc
 	textReset    controls.TextResetFunc
@@ -98,7 +101,9 @@ type listViewDeps struct {
 	filteredList FilteredListFunc
 }
 
-// App hosts the todo MVC app
+// AppFunc hosts the todo MVC app
+type AppFunc = func(key interface{}) dom.Element
+
 func app(deps *appDeps, state *TodoListStream) (*TodoListStream, dom.Element) {
 	if state == nil {
 		// TODO: fetch this from the network
@@ -114,12 +119,13 @@ func app(deps *appDeps, state *TodoListStream) (*TodoListStream, dom.Element) {
 	return state, deps.collab("root", state)
 }
 
-type AppFunc = func(key interface{}) dom.Element
 type appDeps struct {
 	collab CollabFunc
 }
 
-// Collab hosts a collaborative todo MVC app
+// CollabFunc hosts a collaborative todo MVC app
+type CollabFunc = func(key interface{}, todos *TodoListStream) dom.Element
+
 func collab(deps *collabDeps, todos *TodoListStream) dom.Element {
 	return deps.chrome(
 		"root",
@@ -134,7 +140,6 @@ func collab(deps *collabDeps, todos *TodoListStream) dom.Element {
 	)
 }
 
-type CollabFunc = func(key interface{}, todos *TodoListStream) dom.Element
 type collabDeps struct {
 	textView dom.TextViewFunc
 	listView ListViewFunc

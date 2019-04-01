@@ -9,11 +9,12 @@ package html
 
 import (
 	"bytes"
+	"sort"
+	"strings"
+
 	"github.com/dotchain/fuss/dom"
 	"golang.org/x/net/html"
 	"golang.org/x/net/html/atom"
-	"sort"
-	"strings"
 )
 
 var current *driver

@@ -18,7 +18,7 @@ type textEditDep struct {
 	textEditO TextEditOFunc
 }
 
-// TextEdit represents a text edit control.
+// TextEditFunc represents a text edit control.
 type TextEditFunc = func(key interface{}, styles Styles, text *streams.S16) Element
 
 // textEdit implements a text edit control.
