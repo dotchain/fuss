@@ -27,6 +27,7 @@ The main goal is to build a reactive  UX framework which:
     5. [The filtered list](#the-filtered-list)
     6. [Change handling and stateful components](#change-handling-and-stateful-components)
     7. [Generating the factory code](#generating-the-factory-code)
+    8. [Collaborative demo](#collaborative-demo)
 3. [Limitations](#limitations)
 
 ## TODO MVC Example
@@ -329,6 +330,32 @@ See
 [Codegen](https://github.com/dotchain/fuss/blob/master/todo/codegen.go)
 where this is used.
 
+### Collaborative demo
+
+The example in the
+[collab](https://github.com/dotchain/fuss/tree/master/todo/html)
+folder can be used to demonstrate a **collaborative** todo list:
+
+Starting the local server:
+
+```sh
+$ cd github.com/dotchain/fuss/todo/collab
+$ go run server
+```
+
+Starting the gopherjs session:
+
+```sh
+$ gopherjs serve github.com/dotchain/fuss/todo/collab --http=:8081
+```
+
+Now open multiple browser tabs to
+[http://localhost:8081](http://localhost:8081) and see that they all
+share the same TODO list.
+
+The actual todo list is served from a local file (todo.bolt) and so
+the state persists even when the browser session is restarted.
+
 ## Limitations
 
 There are a lot of limitations with this still:
@@ -361,3 +388,5 @@ not deduced from the code yet.  This is rather finicky, particularly
 if dealing with struct of structs and such as it depends on the
 [dot](https://godoc.org/github.com/dotchain/dot) infrastructure.
 
+7. The gopherjs bundle is **huge**.  None of the underlying components
+have been optimized in any way for the bundle.
