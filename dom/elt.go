@@ -4,34 +4,36 @@
 
 package dom
 
-import "github.com/dotchain/fuss/core"
+import (
+	"github.com/dotchain/dot/streams"
+	"github.com/dotchain/fuss/core"
+)
 
-// nodeStream does not implement the full Stream interface
-// because only a minimal version is actually used.
+// nodeStream holds the state for the elt call
 type nodeStream struct {
-	*core.Notifier
-	node
+	Stream streams.Stream
+	Value  node
 }
 
 func (n *nodeStream) Latest() *nodeStream {
 	return n
 }
 
-// Elt implements a reactive Element control.
-//
-// Usage:
-//
-//     func myComponent(c *myComponentCtx, ...) controls.Element {
-//          return c.dom.Elt("root", props, children...)
-//     }
-func elt(c *nodeCtx, lastState *nodeStream, props Props, children ...Element) (*nodeStream, Element) {
-	if lastState == nil {
-		lastState = &nodeStream{Notifier: &core.Notifier{}}
+func (n *nodeStream) Close() {
+	if n != nil {
+		n.Value.root.Close()
 	}
-	elt := lastState.reconcile(props, children)
+}
 
-	c.finalizer = elt.Close
-	return lastState, elt
+type noDeps struct{}
+type eltFunc = func(key interface{}, props Props, children ...Element) Element
+
+// elt implements a reactive Element control.
+func elt(c *noDeps, lastState *nodeStream, props Props, children ...Element) (*nodeStream, Element) {
+	if lastState == nil {
+		lastState = &nodeStream{Stream: streams.New()}
+	}
+	return lastState, lastState.Value.reconcile(props, children)
 }
 
 type node struct {
@@ -81,4 +83,8 @@ func (e *node) filterNil(children []Element) []Element {
 		}
 	}
 	return result
+}
+
+type eltDep struct {
+	elt eltFunc
 }

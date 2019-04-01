@@ -5,8 +5,9 @@
 package dom_test
 
 import (
-	"github.com/dotchain/fuss/dom/html"
 	"testing"
+
+	"github.com/dotchain/fuss/dom/html"
 )
 
 func reportDriverLeaks(t *testing.T) {

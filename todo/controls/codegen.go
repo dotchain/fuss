@@ -7,7 +7,7 @@
 package main
 
 import (
-	"github.com/dotchain/fuss/fussy/v2"
+	"github.com/dotchain/fuss/fussy"
 	"io/ioutil"
 	"path/filepath"
 	"runtime"

@@ -8,7 +8,7 @@ package todo
 
 import (
 	streams "github.com/dotchain/dot/streams"
-	dom "github.com/dotchain/fuss/dom/v2"
+	dom "github.com/dotchain/fuss/dom"
 	"github.com/dotchain/fuss/todo/controls"
 )
 

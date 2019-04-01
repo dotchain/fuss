@@ -9,7 +9,7 @@ package todo
 //go:generate gopherjs build -m html/app.go -o html/app.js
 import (
 	"github.com/dotchain/dot/streams"
-	"github.com/dotchain/fuss/dom/v2"
+	"github.com/dotchain/fuss/dom"
 	"github.com/dotchain/fuss/todo/controls"
 )
 

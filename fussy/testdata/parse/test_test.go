@@ -2,7 +2,7 @@
 
 package datum_test
 
-import "github.com/dotchain/fuss/fussy/v2/testdata/parse"
+import "github.com/dotchain/fuss/fussy/testdata/parse"
 
 type MyTestFunc = func(key interface{}, a datum.Array) float32
 

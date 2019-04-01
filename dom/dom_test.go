@@ -6,8 +6,9 @@ package dom_test
 
 import (
 	"fmt"
-	"github.com/dotchain/fuss/dom"
 	"testing"
+
+	"github.com/dotchain/fuss/dom"
 )
 
 func TestStringify(t *testing.T) {

@@ -12,7 +12,7 @@ import (
 	"runtime"
 
 	"github.com/dotchain/dot/x/dotc"
-	"github.com/dotchain/fuss/fussy/v2"
+	"github.com/dotchain/fuss/fussy"
 )
 
 func main() {

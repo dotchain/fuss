@@ -4,32 +4,47 @@
 
 package dom
 
-// TextView implements a text view control.
-func textView(c *textViewCtx, styles Styles, text string) Element {
-	return c.Elt("root", Props{Tag: "span", TextContent: text, Styles: styles})
+import "github.com/dotchain/dot/streams"
+
+// TextViewFunc represeentns a text view control
+type TextViewFunc = func(key interface{}, styles Styles, text string) Element
+
+// textView implements a text view control.
+func textView(c *eltDep, styles Styles, text string) Element {
+	return c.elt("root", Props{Tag: "span", TextContent: text, Styles: styles})
 }
 
-// TextEdit implements a text edit control.
-func textEdit(c *textEditCtx, styles Styles, text *TextStream) Element {
-	// TODO: make it less expensive to do this type of simple proxying
-	return c.TextEditO("root", TextEditOptions{Styles: styles, Text: text})
+type textEditDep struct {
+	textEditO TextEditOFunc
+}
+
+// TextEdit represents a text edit control.
+type TextEditFunc = func(key interface{}, styles Styles, text *streams.S16) Element
+
+// textEdit implements a text edit control.
+func textEdit(c *textEditDep, styles Styles, text *streams.S16) Element {
+	return c.textEditO("root", TextEditOptions{Styles: styles, Text: text})
 }
 
 // TextEditOptions configures a TextEditO control
 type TextEditOptions struct {
 	Styles
 	Placeholder string
-	Text        *TextStream
+	Text        *streams.S16
 	RawText     *string
 }
 
+// TextEditOFunc is like TextEditFunc but with extended options
+type TextEditOFunc = func(key interface{}, opt TextEditOptions) Element
+
 // TextEditO is like TextEdit but with extended options
-func textEditO(c *textEditOCtx, opt TextEditOptions) Element {
+func textEditO(c *eltDep, opt TextEditOptions) Element {
 	text := opt.Text.Value
 	if opt.RawText != nil {
 		text = *opt.RawText
 	}
-	return c.Elt(
+
+	return c.elt(
 		"root",
 		Props{
 			Tag:         "input",
@@ -38,7 +53,7 @@ func textEditO(c *textEditOCtx, opt TextEditOptions) Element {
 			TextContent: text,
 			Styles:      opt.Styles,
 			OnChange: &EventHandler{Handle: func(e Event) {
-				opt.Text = opt.Text.Append(nil, e.Value(), true)
+				opt.Text = opt.Text.Update(e.Value())
 			}},
 		},
 	)

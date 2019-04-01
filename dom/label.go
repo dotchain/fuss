@@ -4,7 +4,10 @@
 
 package dom
 
+// LabelViewFunc represents a label control.
+type LabelViewFunc = func(key interface{}, styles Styles, text, inputID string) Element
+
 // LabelView implements a label control.
-func labelView(c *labelViewCtx, styles Styles, text, inputID string) Element {
-	return c.Elt("root", Props{Tag: "label", For: inputID, Styles: styles, TextContent: text})
+func labelView(c *eltDep, styles Styles, text, inputID string) Element {
+	return c.elt("root", Props{Tag: "label", For: inputID, Styles: styles, TextContent: text})
 }

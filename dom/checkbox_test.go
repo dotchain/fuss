@@ -6,19 +6,18 @@ package dom_test
 
 import (
 	"fmt"
-	"github.com/dotchain/fuss/dom"
-	"github.com/dotchain/fuss/dom/html"
 	"testing"
+
+	"github.com/dotchain/dot/streams"
+	"github.com/dotchain/fuss/dom/html"
+	"github.com/dotchain/fuss/dom"
 )
 
 func TestCheckboxEdit(t *testing.T) {
-	var cb dom.CheckboxEditStruct
+	checkbox, close := dom.NewCheckboxEdit()
+	checked := &streams.Bool{Stream: streams.New(), Value: true}
 
-	checked := dom.NewBoolStream(true)
-
-	cb.Begin()
-	elt := cb.CheckboxEdit("root", dom.Styles{Color: "red"}, checked, "cb")
-	cb.End()
+	elt := checkbox("root", dom.Styles{Color: "red"}, checked, "cb")
 
 	if x := fmt.Sprint(elt); x != "<input checked=\"\" id=\"cb\" style=\"color: red\" type=\"checkbox\"/>" {
 		t.Error(x)
@@ -30,7 +29,6 @@ func TestCheckboxEdit(t *testing.T) {
 	}
 
 	// cleanup
-	cb.Begin()
-	cb.End()
+	close()
 	reportDriverLeaks(t)
 }

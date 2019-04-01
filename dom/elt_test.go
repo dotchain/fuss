@@ -6,62 +6,98 @@ package dom_test
 
 import (
 	"fmt"
-	"github.com/dotchain/fuss/dom"
-	_ "github.com/dotchain/fuss/dom/html"
+	"reflect"
 	"testing"
+
+	"github.com/dotchain/fuss/dom"
 )
 
+// var newtestElt func() (testEltFunc, func())
+
+type testeltDep struct {
+	span dom.TextViewFunc
+	run  dom.RunFunc
+}
+
+type testEltFunc = func(key interface{}, kind string) dom.Element
+
+func testElt(c *testeltDep, kind string) dom.Element {
+	switch kind {
+	case "empty":
+		return c.span("root", dom.Styles{}, "")
+	case "boouya":
+		return c.span("root", dom.Styles{}, "boouya")
+	case "children 1 2":
+		return c.run(
+			"root", dom.Styles{},
+			c.span("inner1", dom.Styles{}, "inner1"),
+			c.span("inner2", dom.Styles{}, "inner2"))
+	case "children 3 1":
+		return c.run(
+			"root", dom.Styles{},
+			c.span("inner3", dom.Styles{}, "inner3"),
+			c.span("inner1", dom.Styles{}, "inner1"))
+	case "children 3":
+		return c.run(
+			"root", dom.Styles{},
+			c.span("inner3", dom.Styles{}, "inner3"))
+	case "children 1 2 3":
+		return c.run(
+			"root", dom.Styles{},
+			c.span("inner1", dom.Styles{}, "inner1"),
+			c.span("inner2", dom.Styles{}, "inner2"),
+			c.span("inner3", dom.Styles{}, "inner3"))
+	case "children 3 1 2":
+		return c.run(
+			"root", dom.Styles{},
+			c.span("inner3", dom.Styles{}, "inner3"),
+			c.span("inner1", dom.Styles{}, "inner1"),
+			c.span("inner2", dom.Styles{}, "inner2"))
+	case "children 2 3 1":
+		return c.run(
+			"root", dom.Styles{},
+			c.span("inner2", dom.Styles{}, "inner2"),
+			c.span("inner3", dom.Styles{}, "inner3"),
+			c.span("inner1", dom.Styles{}, "inner1"))
+	case "children 1 2 4":
+		return c.run(
+			"root", dom.Styles{},
+			c.span("inner1", dom.Styles{}, "inner1"),
+			c.span("inner2", dom.Styles{}, "inner2"),
+			c.span("inner4", dom.Styles{}, "inner4"))
+	}
+	panic("unexpected test elt type")
+}
+
 func TestElt(t *testing.T) {
-	var e dom.EltStruct
+	elt, close := newtestElt()
 
-	elt := func(key string, props dom.Props, fn ...func() dom.Element) dom.Element {
-		e.Begin()
-		defer e.End()
-		c := []dom.Element{}
-		for _, f := range fn {
-			c = append(c, f())
-		}
-		return e.Elt(key, props, c...)
-	}
-
-	one := elt("one", dom.Props{})
-	if x := fmt.Sprint(one); x != "<div></div>" {
+	one := elt("one", "empty")
+	if x := fmt.Sprint(one); x != "<span></span>" {
 		t.Error(x)
 	}
 
-	if x := elt("one", dom.Props{TextContent: "boouya"}); x != one {
+	if x := elt("one", "boouya"); x != one {
 		t.Error("node changed", x)
 	}
 
-	if x := fmt.Sprint(one); x != "<div>boouya</div>" {
+	if x := fmt.Sprint(one); x != "<span>boouya</span>" {
 		t.Error(x)
 	}
 
-	inner1 := func() dom.Element {
-		return e.Elt("inner1", dom.Props{TextContent: "inner1"})
-	}
-	inner2 := func() dom.Element {
-		return e.Elt("inner2", dom.Props{TextContent: "inner2"})
-	}
-	inner3 := func() dom.Element {
-		return e.Elt("inner3", dom.Props{TextContent: "inner3"})
-	}
-
-	if x := elt("one", dom.Props{}, inner1, inner2); x != one {
-		t.Error("node changed", x)
-	}
-
-	if x := fmt.Sprint(one); x != "<div><div>inner1</div><div>inner2</div></div>" {
+	one = elt("one", "children 1 2")
+	prefix := "<div style=\"display: flex; flex-direction: row\">"
+	if x := fmt.Sprint(one); x != prefix+"<span>inner1</span><span>inner2</span></div>" {
 		t.Error(x)
 	}
 
 	in1 := one.Children()[0]
 
-	if x := elt("one", dom.Props{}, inner3, inner1); x != one {
+	if x := elt("one", "children 3 1"); x != one {
 		t.Error("node changed", x)
 	}
 
-	if x := fmt.Sprint(one); x != "<div><div>inner3</div><div>inner1</div></div>" {
+	if x := fmt.Sprint(one); x != prefix+"<span>inner3</span><span>inner1</span></div>" {
 		t.Error(x)
 	}
 
@@ -69,108 +105,71 @@ func TestElt(t *testing.T) {
 		t.Error("node child not reused")
 	}
 
-	if x := elt("one", dom.Props{}, inner3); x != one {
+	if x := elt("one", "children 3"); x != one {
 		t.Error("node changed", x)
 	}
 
-	if x := fmt.Sprint(one); x != "<div><div>inner3</div></div>" {
+	if x := fmt.Sprint(one); x != prefix+"<span>inner3</span></div>" {
 		t.Error(x)
 	}
 
-	// cleanup
-	e.Begin()
-	e.End()
+	close()
 	reportDriverLeaks(t)
 }
 
 func TestEltLastChildChanging(t *testing.T) {
-	var e dom.EltStruct
+	elt, close := newtestElt()
 
-	e.Begin()
-	one := e.Elt("one", dom.Props{})
-	two := e.Elt("two", dom.Props{})
-	three := e.Elt("three", dom.Props{})
-	parent := e.Elt("parent", dom.Props{}, one, two, three)
-	e.End()
+	parent := elt("parent", "children 1 2 3")
+	c1 := parent.Children()
+	parent2 := elt("parent", "children 1 2 4")
+	c2 := parent2.Children()
 
-	e.Begin()
-	one2 := e.Elt("one", dom.Props{})
-	two2 := e.Elt("two", dom.Props{})
-	three2 := e.Elt("three-new", dom.Props{})
-	parent2 := e.Elt("parent", dom.Props{}, one2, two2, three2)
-	e.End()
-
-	if parent2 != parent || one2 != one || two2 != two || three2 == three {
-		t.Fatal("Failed", parent2 != parent, one2 != one, two2 != two, three2 == three)
+	if parent2 != parent || !reflect.DeepEqual(c1[:2], c2[:2]) {
+		t.Fatal("Failed", parent2 != parent)
 	}
 
-	children := parent2.Children()
-	if children[0] != one || children[1] != two || children[2] == three {
-		t.Fatal("Unexpected children change", children[0] == one2, children[1] != two, children[2] == three)
+	if reflect.DeepEqual(c1, c2) {
+		t.Fatal("Unexpected children change", c1, c2)
 	}
 
 	// cleanup
-	e.Begin()
-	e.End()
+	close()
 	reportDriverLeaks(t)
 }
 
 func TestEltRotateRight(t *testing.T) {
-	var e dom.EltStruct
+	elt, close := newtestElt()
 
-	e.Begin()
-	one := e.Elt("one", dom.Props{})
-	two := e.Elt("two", dom.Props{})
-	three := e.Elt("three", dom.Props{})
-	parent := e.Elt("parent", dom.Props{}, one, two, three)
-	e.End()
+	parent := elt("parent", "children 1 2 3")
+	c1 := parent.Children()
+	parent2 := elt("parent", "children 3 1 2")
+	c2 := parent2.Children()
+	expected := []dom.Element{c1[2], c1[0], c1[1]}
 
-	e.Begin()
-	one = e.Elt("one", dom.Props{})
-	two = e.Elt("two", dom.Props{})
-	three = e.Elt("three", dom.Props{})
-	parent2 := e.Elt("parent", dom.Props{}, three, one, two)
-	e.End()
-
-	children := parent2.Children()
-	c1, c2, c3 := children[0], children[1], children[2]
-
-	if parent2 != parent || c1 != three || c2 != one || c3 != two {
-		t.Fatal("Failed", parent2 != parent, c1 != three, c2 != one, c3 != two)
+	if !reflect.DeepEqual(c2, expected) {
+		t.Fatal("Failed", c2, expected)
 	}
 
 	// cleanup
-	e.Begin()
-	e.End()
+	close()
 	reportDriverLeaks(t)
 }
 
 func TestEltRotateLeft(t *testing.T) {
-	var e dom.EltStruct
+	elt, close := newtestElt()
 
-	e.Begin()
-	one := e.Elt("one", dom.Props{})
-	two := e.Elt("two", dom.Props{})
-	three := e.Elt("three", dom.Props{})
-	parent := e.Elt("parent", dom.Props{}, one, two, three)
-	e.End()
+	parent := elt("parent", "children 1 2 3")
+	c1 := parent.Children()
+	parent2 := elt("parent", "children 2 3 1")
+	c2 := parent2.Children()
+	expected := []dom.Element{c1[1], c1[2], c1[0]}
 
-	e.Begin()
-	one = e.Elt("one", dom.Props{})
-	two = e.Elt("two", dom.Props{})
-	three = e.Elt("three", dom.Props{})
-	parent2 := e.Elt("parent", dom.Props{}, two, three, one)
-	e.End()
-
-	children := parent2.Children()
-	c1, c2, c3 := children[0], children[1], children[2]
-
-	if parent2 != parent || c1 != two || c2 != three || c3 != one {
-		t.Fatal("Failed", parent2 != parent, c1 != two, c2 != three, c3 != one)
+	if !reflect.DeepEqual(c2, expected) {
+		t.Fatal("Failed", c2, expected)
 	}
 
 	// cleanup
-	e.Begin()
-	e.End()
+	close()
 	reportDriverLeaks(t)
 }
