@@ -6,7 +6,7 @@
 package todo
 
 //go:generate go run codegen.go
-
+//go:generate gopherjs build -m html/app.go -o html/app.js
 import (
 	"github.com/dotchain/dot/streams"
 	"github.com/dotchain/fuss/dom/v2"

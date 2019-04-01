@@ -13,9 +13,6 @@ import (
 )
 
 func main() {
-	var app todo.AppStruct
-	app.Begin()
-	root := app.App("root")
-	app.End()
-	js.QuerySelector("#container").InsertChild(0, root)
+	app, _ := todo.NewApp()
+	js.QuerySelector("#container").InsertChild(0, app("root"))
 }
