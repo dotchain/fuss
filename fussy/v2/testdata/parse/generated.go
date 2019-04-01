@@ -202,11 +202,13 @@ func NewEdgeTrigger() (update EdgeTriggerFunc, closeAll func()) {
 		refresh = func() {
 
 			if laststate != nil {
+				laststate = laststate.Latest()
 				laststate.Stream.Nextf(&initialized, nil)
 			}
 			laststate, lastr1, lastr2 = edgeTrigger(depsLocal, laststate, input)
 
 			if laststate != nil {
+				laststate = laststate.Latest()
 				laststate.Stream.Nextf(&initialized, refresh)
 			}
 			close()

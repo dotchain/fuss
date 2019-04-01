@@ -4,7 +4,10 @@
 
 package controls
 
-import "github.com/dotchain/fuss/dom"
+import (
+	"github.com/dotchain/dot/streams"
+	"github.com/dotchain/fuss/dom/v2"
+)
 
 const (
 	// ShowAll = show both active and done
@@ -20,23 +23,29 @@ const (
 // Filter renders a row of options for "All", "Active" or "Done"
 //
 // This is reflected in the selected stream (which is both input and output).
-func filter(c *filterCtx, selected *dom.TextStream) dom.Element {
-	return c.dom.Run(
+func filter(deps *filterDeps, selected *streams.S16) dom.Element {
+	return deps.run(
 		"root",
 		dom.Styles{},
-		c.FilterOption("all", selected, ShowAll),
-		c.FilterOption("active", selected, ShowActive),
-		c.FilterOption("done", selected, ShowDone),
+		deps.filterOption("all", selected, ShowAll),
+		deps.filterOption("active", selected, ShowActive),
+		deps.filterOption("done", selected, ShowDone),
 	)
 }
 
-// FilterOption renders a filter option as a focusable which when
+type FilterFunc = func(key interface{}, selected *streams.S16) dom.Element
+type filterDeps struct {
+	run          dom.RunFunc
+	filterOption filterOptionFunc
+}
+
+// filterOption renders a filter option as a focusable which when
 // clicked will automatically append the provided key to the selected
 // stream.
-func filterOption(c *filterOptionCtx, selected *dom.TextStream, key string) dom.Element {
+func filterOption(deps *filterOptionDeps, selected *streams.S16, key string) dom.Element {
 	h := &dom.EventHandler{Handle: func(e dom.Event) {
 		if e.Value() == "click" {
-			selected = selected.Append(nil, key, true)
+			selected = selected.Update(key)
 		}
 	}}
 
@@ -46,7 +55,13 @@ func filterOption(c *filterOptionCtx, selected *dom.TextStream, key string) dom.
 	}
 	label := filterLabels[key]
 
-	return c.dom.Focusable("root", h, c.dom.LabelView(key, styles, label, ""))
+	return deps.focusable("root", h, deps.labelView(key, styles, label, ""))
+}
+
+type filterOptionFunc = func(key interface{}, selected *streams.S16, s string) dom.Element
+type filterOptionDeps struct {
+	focusable dom.FocusableFunc
+	labelView dom.LabelViewFunc
 }
 
 var filterLabels = map[string]string{ShowAll: "All", ShowActive: "Active", ShowDone: "Done"}

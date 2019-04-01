@@ -6,42 +6,43 @@
 package todo
 
 import (
-	"github.com/dotchain/fuss/core"
-	"github.com/dotchain/fuss/dom"
+	"github.com/dotchain/dot/changes"
+	"github.com/dotchain/dot/changes/types"
+	"github.com/dotchain/dot/streams"
 )
 
-func (s *TasksStream) addTaskStream(cache core.Cache) (entry *dom.TextStream) {
-	key := "next"
-	n := s.Notifier
-	handler := &core.Handler{}
-	if f, h, ok := cache.GetSubstream(n, key); ok {
-		entry, handler = f.(*dom.TextStream), h
-	} else {
-		entry = dom.NewTextStream("")
-		parent, merging := s, false
-		handler.Handle = func() {
-			if merging {
-				return
-			}
-			merging = true
-			parent = parent.Latest()
-			result := parent.Value
-			for entry.Next != nil {
-				entry = entry.Next
-				result = append(result, Task{Description: entry.Value, ID: newID()})
-			}
+func (s *TodoListStream) appendStream() *streams.S16 {
+	return &streams.S16{Stream: &appender{s}, Value: ""}
+}
 
-			parent = parent.Append(nil, result, true)
-			merging = false
-		}
-		entry.On(handler)
-		parent.On(handler)
+type appender struct {
+	s *TodoListStream
+}
+
+func (a *appender) Append(c changes.Change) streams.Stream {
+	switch c := c.(type) {
+	case nil:
+		return a
+	case changes.Replace:
+		todo := Todo{ID: newID(), Description: string(c.After.(types.S16))}
+		s := a.s.Splice(len(a.s.Value), 0, todo)
+		return &appender{s}
 	}
+	panic("unexpected text stream change")
+}
 
-	entry = entry.Latest()
-	n2 := entry.Notifier
-	close := func() { n.Off(handler); n2.Off(handler) }
-	cache.SetSubstream(n, key, entry, handler, close)
+func (a *appender) ReverseAppend(c changes.Change) streams.Stream {
+	panic("Not yet implemented")
+}
 
-	return entry
+func (a *appender) Next() (streams.Stream, changes.Change) {
+	latest := a.s.Latest()
+	if latest == a.s {
+		return nil, nil
+	}
+	return &appender{latest}, nil
+}
+
+func (a appender) Nextf(key interface{}, fn func()) {
+	a.s.Stream.Nextf(key, fn)
 }

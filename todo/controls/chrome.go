@@ -4,15 +4,22 @@
 
 package controls
 
-import "github.com/dotchain/fuss/dom"
+import "github.com/dotchain/fuss/dom/v2"
 
 // Chrome renders the app chrome
-func chrome(c *chromeCtx, header dom.Element, body dom.Element, footer dom.Element) dom.Element {
-	return c.dom.VRun(
+func chrome(deps *chromeDeps, header, body, footer dom.Element) dom.Element {
+	return deps.vRun(
 		"root",
 		dom.Styles{},
-		c.dom.Fixed("h", dom.Styles{}, header),
-		c.dom.Stretch("b", dom.Styles{OverflowY: "auto"}, body),
-		c.dom.Fixed("f", dom.Styles{}, footer),
+		deps.fixed("h", dom.Styles{}, header),
+		deps.stretch("b", dom.Styles{OverflowY: "auto"}, body),
+		deps.fixed("f", dom.Styles{}, footer),
 	)
+}
+
+type ChromeFunc = func(key interface{}, header, body, footer dom.Element) dom.Element
+type chromeDeps struct {
+	vRun    dom.VRunFunc
+	fixed   dom.FixedFunc
+	stretch dom.StretchFunc
 }

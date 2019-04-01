@@ -5,100 +5,128 @@
 // Package todo demonstrates a simple todo mvc app built with FUSS
 package todo
 
+//go:generate go run codegen.go
+
 import (
-	"github.com/dotchain/fuss/dom"
+	"github.com/dotchain/dot/streams"
+	"github.com/dotchain/fuss/dom/v2"
 	"github.com/dotchain/fuss/todo/controls"
 )
 
-// Task represents an item in the TODO list.
-type Task struct {
+// Todo represents an item in the TODO list.
+type Todo struct {
 	ID          string
-	Done        bool
+	Complete    bool
 	Description string
 }
 
-// Tasks represents a collection of tasks
-type Tasks []Task
+// TodoList represents a collection of todos
+type TodoList []Todo
 
-// TaskEdit is a control that displays a task as well as allowing it
-// to be edited. The current value of the data is available in the
-// Task field (which is a stream and so supports On/Off methods).
-func taskEdit(c *taskEditCtx, task *TaskStream) dom.Element {
-	done := task.DoneSubstream(c.Cache)
-	desc := task.DescriptionSubstream(c.Cache)
-	return c.dom.Run(
-		"root",
-		dom.Styles{},
-		c.dom.CheckboxEdit("cb", dom.Styles{}, done, ""),
-		c.dom.TextEdit("textedit", dom.Styles{}, desc),
-	)
-}
-
-// TasksView is a control that renders tasks using TaskEdit.
-//
-// Individual tasks can be modified underneath. The current list of
-// tasks is available via Tasks field which supports On/Off to receive
-// notifications.
-func tasksView(c *tasksViewCtx, styles dom.Styles, filter *dom.TextStream, tasks *TasksStream) dom.Element {
-	return c.dom.VRun(
-		"root",
-		styles,
-		renderTasks(tasks.Value, func(index int, t Task) dom.Element {
-			done := filter.Value == controls.ShowDone
-			active := filter.Value == controls.ShowActive
-			if t.Done && active || !t.Done && done {
-				return nil
-			}
-
-			return c.TaskEdit(t.ID, tasks.Substream(c.Cache, index))
-		})...,
-	)
-}
-
-func renderTasks(t Tasks, fn func(int, Task) dom.Element) []dom.Element {
-	result := make([]dom.Element, len(t))
-	for kk, elt := range t {
+func (list TodoList) renderTodo(fn func(int, Todo) dom.Element) []dom.Element {
+	result := make([]dom.Element, len(list))
+	for kk, elt := range list {
 		result[kk] = fn(kk, elt)
 	}
 	return result
 }
 
-// FilteredTasks is a thin wrapper on top of TasksView with checkboxes for ShowDone and ShowUndone
-//
-func filteredTasks(c *filteredCtx, styles dom.Styles, tasks *TasksStream, filterState *dom.TextStream) (*dom.TextStream, dom.Element) {
-	if filterState == nil {
-		filterState = dom.NewTextStream(controls.ShowAll)
-	}
-
-	addTaskStream := tasks.addTaskStream(c.Cache)
-	return filterState, c.dom.VRun(
+// Todo renders a Todo item
+func todo(deps *todoDeps, todoStream *TodoStream) dom.Element {
+	return deps.run(
 		"root",
-		styles,
-		c.controls.TextReset("input", addTaskStream, "Add a task"),
-		c.controls.Filter("f", filterState),
-		c.TasksView("tasks", dom.Styles{}, filterState, tasks),
+		dom.Styles{},
+		deps.checkboxEdit("cb", dom.Styles{}, todoStream.Complete(), ""),
+		deps.textEdit("textedit", dom.Styles{}, todoStream.Description()),
 	)
 }
 
-// App hosts the todo MVC app
-func app(c *appCtx, tasksState *TasksStream) (*TasksStream, dom.Element) {
-	if tasksState == nil {
-		// TODO: fetch this from the network
-		tasksState = NewTasksStream(Tasks{
-			Task{"one", true, "First task"},
-			Task{"two", false, "Second task"},
-		})
-	}
-	root := c.controls.Chrome(
+type TodoFunc = func(key interface{}, todoStream *TodoStream) dom.Element
+type todoDeps struct {
+	run          dom.RunFunc
+	checkboxEdit dom.CheckboxEditFunc
+	textEdit     dom.TextEditFunc
+}
+
+// FilteredList renders  a list of filtered todos
+//
+// Individual tasks can be modified underneath.
+func filteredList(deps *filteredListDeps, filter *streams.S16, todos *TodoListStream) dom.Element {
+	return deps.vRun(
 		"root",
-		c.dom.TextView("h", dom.Styles{}, "FUSS TODO"),
-		c.FilteredTasks("root", dom.Styles{}, tasksState),
-		c.dom.A(
+		dom.Styles{},
+		todos.Value.renderTodo(func(index int, t Todo) dom.Element {
+			done := filter.Value == controls.ShowDone
+			active := filter.Value == controls.ShowActive
+			if t.Complete && active || !t.Complete && done {
+				return nil
+			}
+
+			return deps.todo(t.ID, todos.Item(index))
+		})...,
+	)
+}
+
+type FilteredListFunc = func(key interface{}, filter *streams.S16, todos *TodoListStream) dom.Element
+type filteredListDeps struct {
+	vRun dom.VRunFunc
+	todo TodoFunc
+}
+
+// ListView renders aa filteredList with a filter to control the behavior
+func listView(deps *listViewDeps, todos *TodoListStream, filterState *streams.S16) (*streams.S16, dom.Element) {
+	if filterState == nil {
+		filterState = &streams.S16{Stream: streams.New(), Value: controls.ShowAll}
+	}
+
+	appendStream := todos.appendStream()
+	return filterState, deps.vRun(
+		"root",
+		dom.Styles{},
+		deps.textReset("input", appendStream, "Add a todo"),
+		deps.filter("f", filterState),
+		deps.filteredList("todos", filterState, todos),
+	)
+}
+
+type ListViewFunc = func(key interface{}, todos *TodoListStream) dom.Element
+type listViewDeps struct {
+	vRun         dom.VRunFunc
+	textReset    controls.TextResetFunc
+	filter       controls.FilterFunc
+	filteredList FilteredListFunc
+}
+
+// App hosts the todo MVC app
+func app(deps *appDeps, state *TodoListStream) (*TodoListStream, dom.Element) {
+	if state == nil {
+		// TODO: fetch this from the network
+		state = &TodoListStream{
+			Stream: streams.New(),
+			Value: TodoList{
+				Todo{"one", true, "First task"},
+				Todo{"two", false, "Second task"},
+			},
+		}
+	}
+
+	return state, deps.chrome(
+		"root",
+		deps.textView("h", dom.Styles{}, "FUSS TODO"),
+		deps.listView("root", state),
+		deps.a(
 			"a",
 			dom.Styles{},
 			"https://github.com/dotchain/fuss",
-			c.dom.TextView("tv", dom.Styles{}, "github"),
+			deps.textView("tv", dom.Styles{}, "github"),
 		),
 	)
-	return tasksState, root
+}
+
+type AppFunc = func(key interface{}) dom.Element
+type appDeps struct {
+	textView dom.TextViewFunc
+	listView ListViewFunc
+	a        dom.AFunc
+	chrome   controls.ChromeFunc
 }

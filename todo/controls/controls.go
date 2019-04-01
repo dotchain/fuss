@@ -4,3 +4,5 @@
 
 // Package controls implements app-specific controls
 package controls
+
+//go:generate go run codegen.go

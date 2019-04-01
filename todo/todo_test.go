@@ -6,7 +6,8 @@ package todo_test
 
 import (
 	"fmt"
-	"github.com/dotchain/fuss/dom"
+
+	"github.com/dotchain/dot/streams"
 	"github.com/dotchain/fuss/dom/html"
 	"github.com/dotchain/fuss/todo"
 	"github.com/dotchain/fuss/todo/controls"
@@ -14,19 +15,16 @@ import (
 )
 
 func Example_app() {
-	cache := todo.AppStruct{}
+	app, close := todo.NewApp()
 
-	cache.Begin()
-	root := cache.App("root")
-	cache.End()
+	root := app("root")
 
 	// add a "Third task" via the input control
 	html.SetValue(root.Children()[1].Children()[0].Children()[0], "Third task")
 
 	fmt.Println(gohtml.Format(fmt.Sprint(root)))
 
-	cache.Begin()
-	cache.End()
+	close()
 	leaks := html.GetCurrentResources()
 	if n := len(leaks); n > 0 {
 		fmt.Println("Leaked", n, "resources\n", leaks)
@@ -41,7 +39,7 @@ func Example_app() {
 	//   </div>
 	//   <div style="overflow-y: auto; flex-grow: 1">
 	//     <div style="display: flex; flex-direction: column">
-	//       <input placeholder="Add a task" type="text"/>
+	//       <input placeholder="Add a todo" type="text"/>
 	//       <div style="display: flex; flex-direction: row">
 	//         <div tabindex="0">
 	//           <label style="border-radius: 4px; border-color: blue; border-width: 1px">
@@ -85,16 +83,15 @@ func Example_app() {
 	// </div>
 }
 
-func Example_renderFilteredTasks() {
-	tasks := todo.Tasks{
+func Example_renderListView() {
+	todos := todo.TodoList{
 		{"one", false, "first task"},
 		{"two", true, "second task"},
 	}
-	cache := todo.FilteredTasksStruct{}
+	stream := &todo.TodoListStream{Stream: streams.New(), Value: todos}
 
-	cache.Begin()
-	root := cache.FilteredTasks("root", dom.Styles{}, todo.NewTasksStream(tasks))
-	cache.End()
+	listView, close := todo.NewListView()
+	root := listView("root", stream)
 
 	fmt.Println(gohtml.Format(fmt.Sprint(root)))
 
@@ -104,8 +101,7 @@ func Example_renderFilteredTasks() {
 	html.Click(root.Children()[1].Children()[1])
 	fmt.Println(gohtml.Format(fmt.Sprint(root)))
 
-	cache.Begin()
-	cache.End()
+	close()
 	leaks := html.GetCurrentResources()
 	if n := len(leaks); n > 0 {
 		fmt.Println("Leaked", n, "resources\n", leaks)
@@ -113,7 +109,7 @@ func Example_renderFilteredTasks() {
 
 	// Output:
 	// <div style="display: flex; flex-direction: column">
-	//   <input placeholder="Add a task" type="text"/>
+	//   <input placeholder="Add a todo" type="text"/>
 	//   <div style="display: flex; flex-direction: row">
 	//     <div tabindex="0">
 	//       <label style="border-radius: 4px; border-color: blue; border-width: 1px">
@@ -143,7 +139,7 @@ func Example_renderFilteredTasks() {
 	//   </div>
 	// </div>
 	// <div style="display: flex; flex-direction: column">
-	//   <input placeholder="Add a task" type="text"/>
+	//   <input placeholder="Add a todo" type="text"/>
 	//   <div style="display: flex; flex-direction: row">
 	//     <div tabindex="0">
 	//       <label style="border-radius: 4px; border-color: lightgrey; border-width: 1px">
@@ -170,35 +166,28 @@ func Example_renderFilteredTasks() {
 	// </div>
 }
 
-func Example_renderTasks() {
-	cache := todo.TasksViewStruct{}
-
-	tasks := todo.Tasks{
+func Example_renderFilteredList() {
+	todos := todo.TodoList{
 		{"one", false, "first task"},
 		{"two", true, "second task"},
 	}
-	s := todo.NewTasksStream(tasks)
-	selected := dom.NewTextStream(controls.ShowDone)
+	stream := &todo.TodoListStream{Stream: streams.New(), Value: todos}
+	filter := &streams.S16{Stream: streams.New(), Value: controls.ShowDone}
 
-	cache.Begin()
-	root := cache.TasksView("root", dom.Styles{}, selected, s)
-	cache.End()
+	filteredList, close := todo.NewFilteredList()
+
+	root := filteredList("root", filter, stream)
 	fmt.Println(gohtml.Format(fmt.Sprint(root)))
 
-	selected = selected.Append(nil, controls.ShowActive, true)
-	cache.Begin()
-	root = cache.TasksView("root", dom.Styles{Color: "red"}, selected, s)
-	cache.End()
+	filter = filter.Update(controls.ShowActive)
+	root = filteredList("root", filter, stream)
 	fmt.Println(gohtml.Format(fmt.Sprint(root)))
 
-	selected = selected.Append(nil, controls.ShowAll, true)
-	cache.Begin()
-	root = cache.TasksView("root", dom.Styles{}, selected, s)
-	cache.End()
+	filter = filter.Update(controls.ShowAll)
+	root = filteredList("root", filter, stream)
 	fmt.Println(gohtml.Format(fmt.Sprint(root)))
 
-	cache.Begin()
-	cache.End()
+	close()
 	leaks := html.GetCurrentResources()
 	if n := len(leaks); n > 0 {
 		fmt.Println("Leaked", n, "resources\n", leaks)
@@ -211,7 +200,7 @@ func Example_renderTasks() {
 	//     <input type="text" value="second task"/>
 	//   </div>
 	// </div>
-	// <div style="color: red; display: flex; flex-direction: column">
+	// <div style="display: flex; flex-direction: column">
 	//   <div style="display: flex; flex-direction: row">
 	//     <input type="checkbox"/>
 	//     <input type="text" value="first task"/>
@@ -230,23 +219,18 @@ func Example_renderTasks() {
 }
 
 func Example_renderTask() {
-	task := todo.NewTaskStream(todo.Task{Done: false, Description: "first task"})
-	cache := todo.TaskEditStruct{}
-	cache.Begin()
-	root := cache.TaskEdit("root", task)
-	cache.End()
+	item := &todo.TodoStream{Stream: streams.New(), Value: todo.Todo{Description: "first task"}}
+	render, close := todo.NewTodo()
+
+	root := render("root", item)
 	fmt.Println(gohtml.Format(fmt.Sprint(root)))
 
-	next := task.Value
-	next.Done = true
-	task = task.Append(nil, next, true)
-	cache.Begin()
-	root = cache.TaskEdit("root", task)
-	cache.End()
+	item.Complete().Update(true)
+	item = item.Latest()
+	root = render("root", item)
 	fmt.Println(gohtml.Format(fmt.Sprint(root)))
 
-	cache.Begin()
-	cache.End()
+	close()
 	leaks := html.GetCurrentResources()
 	if n := len(leaks); n > 0 {
 		fmt.Println("Leaked", n, "resources\n", leaks)

@@ -22,7 +22,7 @@ func main() {
 		panic(err)
 	}
 
-	info.Generator = "github.com/dotchain/fuss/dom/codegen.go"
+	info.Generator = self
 	ioutil.WriteFile(skip[0], []byte(fussy.Generate(*info)), 0644)
 
 	info, err = fussy.ParseDir(filepath.Dir(self), "dom_test", skip)
@@ -30,6 +30,6 @@ func main() {
 		panic(err)
 	}
 
-	info.Generator = "github.com/dotchain/fuss/dom/codegen.go"
+	info.Generator = self
 	ioutil.WriteFile(skip[1], []byte(fussy.Generate(*info)), 0644)
 }

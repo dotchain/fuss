@@ -6,26 +6,21 @@ package controls_test
 
 import (
 	"fmt"
-	"github.com/dotchain/fuss/dom"
+	"github.com/dotchain/dot/streams"
 	"github.com/dotchain/fuss/dom/html"
 	"github.com/dotchain/fuss/todo/controls"
 	"github.com/yosssi/gohtml"
 )
 
 func Example_filter() {
-	cache := controls.FilterStruct{}
-	selected := dom.NewTextStream(controls.ShowAll)
+	filter, close := controls.NewFilter()
+	selected := &streams.S16{Stream: streams.New(), Value: controls.ShowAll}
 
-	cache.Begin()
-	root := cache.Filter("root", selected)
-	cache.End()
-
+	root := filter("root", selected)
 	fmt.Println(gohtml.Format(fmt.Sprint(root)))
 
-	cache.Begin()
-	selected = selected.Append(nil, controls.ShowActive, true)
-	root = cache.Filter("root", selected)
-	cache.End()
+	selected = selected.Update(controls.ShowActive)
+	root = filter("root", selected)
 	fmt.Println(gohtml.Format(fmt.Sprint(root)))
 
 	html.Click(root.Children()[2])
@@ -33,14 +28,11 @@ func Example_filter() {
 		fmt.Println("Unexpected selection state", selected.Latest().Value)
 	}
 
-	cache.Begin()
 	selected = selected.Latest()
-	root = cache.Filter("root", selected)
-	cache.End()
+	root = filter("root", selected)
 	fmt.Println(gohtml.Format(fmt.Sprint(root)))
 
-	cache.Begin()
-	cache.End()
+	close()
 	leaks := html.GetCurrentResources()
 	if n := len(leaks); n > 0 {
 		fmt.Println("Leaked", n, "resources\n", leaks)

@@ -8,12 +8,17 @@ import (
 	"bytes"
 	"fmt"
 	"go/format"
+	"strings"
 
 	"golang.org/x/tools/imports"
 )
 
 // Generate returns the source code generated from the provided info
 func Generate(info Info) string {
+	if idx := strings.Index(info.Generator, "github.com"); idx >= 0 {
+		info.Generator = info.Generator[idx:]
+	}
+
 	var result bytes.Buffer
 	must(headerTpl.Execute(&result, info))
 	r := result.String()
