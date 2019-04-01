@@ -7,6 +7,7 @@ package todo
 
 //go:generate go run codegen.go
 //go:generate gopherjs build -m html/app.go -o html/app.js
+//go:generate gopherjs build -m collab/app.go -o collab/app.js
 import (
 	"github.com/dotchain/dot/streams"
 	"github.com/dotchain/fuss/dom"
@@ -110,10 +111,20 @@ func app(deps *appDeps, state *TodoListStream) (*TodoListStream, dom.Element) {
 		}
 	}
 
-	return state, deps.chrome(
+	return state, deps.collab("root", state)
+}
+
+type AppFunc = func(key interface{}) dom.Element
+type appDeps struct {
+	collab CollabFunc
+}
+
+// Collab hosts a collaborative todo MVC app
+func collab(deps *collabDeps, todos *TodoListStream) dom.Element {
+	return deps.chrome(
 		"root",
 		deps.textView("h", dom.Styles{}, "FUSS TODO"),
-		deps.listView("root", state),
+		deps.listView("root", todos),
 		deps.a(
 			"a",
 			dom.Styles{},
@@ -123,8 +134,8 @@ func app(deps *appDeps, state *TodoListStream) (*TodoListStream, dom.Element) {
 	)
 }
 
-type AppFunc = func(key interface{}) dom.Element
-type appDeps struct {
+type CollabFunc = func(key interface{}, todos *TodoListStream) dom.Element
+type collabDeps struct {
 	textView dom.TextViewFunc
 	listView ListViewFunc
 	a        dom.AFunc

@@ -19,6 +19,76 @@ func NewApp() (update AppFunc, closeAll func()) {
 	var laststate *TodoListStream
 	var lastresult dom.Element
 	var initialized bool
+	collabFnMap := map[interface{}]CollabFunc{}
+	collabCloseMap := map[interface{}]func(){}
+	collabUsedMap := map[interface{}]bool{}
+
+	depsLocal := &appDeps{
+		collab: func(key interface{}, todos *TodoListStream) (result dom.Element) {
+			collabUsedMap[key] = true
+			if collabFnMap[key] == nil {
+				collabFnMap[key], collabCloseMap[key] = NewCollab()
+			}
+			return collabFnMap[key](key, todos)
+		},
+	}
+
+	close := func() {
+		for key := range collabCloseMap {
+			if !collabUsedMap[key] {
+				collabCloseMap[key]()
+				delete(collabCloseMap, key)
+				delete(collabFnMap, key)
+			}
+		}
+		collabUsedMap = map[interface{}]bool{}
+	}
+
+	closeAll = func() {
+		close()
+
+	}
+
+	update = func(deps interface{}) (result dom.Element) {
+		refresh = func() {
+
+			if laststate != nil {
+				laststate = laststate.Latest()
+				laststate.Stream.Nextf(&initialized, nil)
+			}
+			laststate, lastresult = app(depsLocal, laststate)
+
+			if laststate != nil {
+				laststate = laststate.Latest()
+				laststate.Stream.Nextf(&initialized, refresh)
+			}
+			close()
+		}
+
+		if initialized {
+			switch {
+
+			default:
+
+				return lastresult
+			}
+		}
+		initialized = true
+
+		refresh()
+		return lastresult
+	}
+
+	return update, closeAll
+}
+
+// NewCollab is the constructor for CollabFunc
+func NewCollab() (update CollabFunc, closeAll func()) {
+	var refresh func()
+
+	var lasttodos *TodoListStream
+	var lastresult dom.Element
+	var initialized bool
 	textViewFnMap := map[interface{}]dom.TextViewFunc{}
 	textViewCloseMap := map[interface{}]func(){}
 	textViewUsedMap := map[interface{}]bool{}
@@ -35,7 +105,7 @@ func NewApp() (update AppFunc, closeAll func()) {
 	chromeCloseMap := map[interface{}]func(){}
 	chromeUsedMap := map[interface{}]bool{}
 
-	depsLocal := &appDeps{
+	depsLocal := &collabDeps{
 		textView: func(key interface{}, styles dom.Styles, text string) (result dom.Element) {
 			textViewUsedMap[key] = true
 			if textViewFnMap[key] == nil {
@@ -112,32 +182,25 @@ func NewApp() (update AppFunc, closeAll func()) {
 
 	}
 
-	update = func(deps interface{}) (result dom.Element) {
+	update = func(deps interface{}, todos *TodoListStream) (result dom.Element) {
 		refresh = func() {
 
-			if laststate != nil {
-				laststate = laststate.Latest()
-				laststate.Stream.Nextf(&initialized, nil)
-			}
-			laststate, lastresult = app(depsLocal, laststate)
+			lastresult = collab(depsLocal, todos)
 
-			if laststate != nil {
-				laststate = laststate.Latest()
-				laststate.Stream.Nextf(&initialized, refresh)
-			}
 			close()
 		}
 
 		if initialized {
 			switch {
 
+			case lasttodos != todos:
 			default:
 
 				return lastresult
 			}
 		}
 		initialized = true
-
+		lasttodos = todos
 		refresh()
 		return lastresult
 	}
