@@ -33,7 +33,7 @@ func main() {
 	url := "http://localhost:8080/todo/"
 	version, pending, todos := SavedSession()
 
-	_, s := dot.Reconnect(url, version, pending)
+	_, s, _ := dot.Reconnect(url, version, pending)
 	todosStream := &todo.TodoListStream{Stream: s, Value: todos}
 
 	/**
