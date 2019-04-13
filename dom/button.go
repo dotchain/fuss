@@ -5,7 +5,7 @@
 package dom
 
 // ButtonFunc implements a button control.
-type ButtonFunc = func(interface{}, Styles, *EventHandler, ...Element) Element
+type ButtonFunc = func(key interface{}, styles Styles, onClick *EventHandler, children ...Element) Element
 
 // Button implements a button control.
 func button(c *eltDep, styles Styles, onClick *EventHandler, children ...Element) Element {
