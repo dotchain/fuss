@@ -818,6 +818,75 @@ func NewTextEditO() (update TextEditOFunc, closeAll func()) {
 	return update, closeAll
 }
 
+// NewTextInput is the constructor for TextInputFunc
+func NewTextInput() (update TextInputFunc, closeAll func()) {
+	var refresh func()
+
+	var laststyles Styles
+	var lasteh *EventHandler
+	var lastid string
+	var lastresult Element
+	var initialized bool
+	eltFnMap := map[interface{}]eltFunc{}
+	eltCloseMap := map[interface{}]func(){}
+	eltUsedMap := map[interface{}]bool{}
+
+	cLocal := &eltDep{
+		elt: func(key interface{}, props Props, children ...Element) (result Element) {
+			eltUsedMap[key] = true
+			if eltFnMap[key] == nil {
+				eltFnMap[key], eltCloseMap[key] = newelt()
+			}
+			return eltFnMap[key](key, props, children...)
+		},
+	}
+
+	close := func() {
+		for key := range eltCloseMap {
+			if !eltUsedMap[key] {
+				eltCloseMap[key]()
+				delete(eltCloseMap, key)
+				delete(eltFnMap, key)
+			}
+		}
+		eltUsedMap = map[interface{}]bool{}
+	}
+
+	closeAll = func() {
+		close()
+
+	}
+
+	update = func(c interface{}, styles Styles, eh *EventHandler, id string) (result Element) {
+		refresh = func() {
+
+			lastresult = textInput(cLocal, styles, eh, id)
+
+			close()
+		}
+
+		if initialized {
+			switch {
+
+			case laststyles != styles:
+			case lasteh != eh:
+			case lastid != id:
+			default:
+
+				return lastresult
+			}
+		}
+		initialized = true
+		laststyles = styles
+		lasteh = eh
+		lastid = id
+		refresh()
+		return lastresult
+	}
+
+	return update, closeAll
+}
+
 // NewTextView is the constructor for TextViewFunc
 func NewTextView() (update TextViewFunc, closeAll func()) {
 	var refresh func()
