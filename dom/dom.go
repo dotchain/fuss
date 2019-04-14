@@ -284,6 +284,7 @@ type Props struct {
 	OnChange    *EventHandler
 	OnClick     *EventHandler
 	OnFocus     *EventHandler
+	OnInput     *EventHandler
 }
 
 // ToMap returns the map version of props (useful for diffs)
@@ -301,6 +302,7 @@ func (p Props) ToMap() map[string]interface{} {
 		"OnChange":    p.OnChange,
 		"OnClick":     p.OnClick,
 		"OnFocus":     p.OnFocus,
+		"OnInput":     p.OnInput,
 	}
 	if p.OnFocus != nil && p.Tag != "input" && p.Tag != "button" {
 		result["TabIndex"] = "0"

@@ -18,6 +18,7 @@ func init() {
 		"change": js.Global.Get("Map").New(),
 		"click":  js.Global.Get("Map").New(),
 		"focus":  js.Global.Get("Map").New(),
+		"input":  js.Global.Get("Map").New(),
 		"blur":   js.Global.Get("Map").New(),
 	}
 	dom.RegisterDriver(driver{events})
@@ -81,6 +82,8 @@ func (e element) SetProp(key string, value interface{}) {
 	case "OnFocus":
 		e.onEvent("focus", value.(*dom.EventHandler))
 		e.onEvent("blur", value.(*dom.EventHandler))
+	case "OnInput":
+		e.onEvent("input", value.(*dom.EventHandler))
 	default:
 		panic("Unknown key: " + key)
 	}

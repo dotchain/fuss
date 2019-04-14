@@ -59,7 +59,6 @@ func textEditO(c *eltDep, opt TextEditOptions) Element {
 	)
 }
 
-
 // TextInput calls the callback when user submits input
 type TextInputFunc = func(key interface{}, styles Styles, eh *EventHandler, id string) Element
 
@@ -67,5 +66,25 @@ func textInput(c *eltDep, styles Styles, eh *EventHandler, id string) Element {
 	return c.elt(
 		"root",
 		Props{Tag: "input", Type: "text", Styles: styles, OnChange: eh, ID: id},
+	)
+}
+
+// LiveTextEdit provides continuous changes as user keeps typing
+type LiveTextEditFunc = func(key interface{}, styles Styles, text *streams.S16, placeholder string) Element
+
+// LiveTextEdit provides continuous changes as user keeps typing
+func liveTextEdit(c *eltDep, styles Styles, text *streams.S16, placeholder string) Element {
+	return c.elt(
+		"root",
+		Props{
+			Tag:         "input",
+			Type:        "text",
+			Placeholder: placeholder,
+			TextContent: text.Value,
+			Styles:      styles,
+			OnInput: &EventHandler{Handle: func(e Event) {
+				text = text.Update(e.Value())
+			}},
+		},
 	)
 }

@@ -533,6 +533,75 @@ func NewLabelView() (update LabelViewFunc, closeAll func()) {
 	return update, closeAll
 }
 
+// NewLiveTextEdit is the constructor for LiveTextEditFunc
+func NewLiveTextEdit() (update LiveTextEditFunc, closeAll func()) {
+	var refresh func()
+
+	var laststyles Styles
+	var lasttext *streams.S16
+	var lastplaceholder string
+	var lastresult Element
+	var initialized bool
+	eltFnMap := map[interface{}]eltFunc{}
+	eltCloseMap := map[interface{}]func(){}
+	eltUsedMap := map[interface{}]bool{}
+
+	cLocal := &eltDep{
+		elt: func(key interface{}, props Props, children ...Element) (result Element) {
+			eltUsedMap[key] = true
+			if eltFnMap[key] == nil {
+				eltFnMap[key], eltCloseMap[key] = newelt()
+			}
+			return eltFnMap[key](key, props, children...)
+		},
+	}
+
+	close := func() {
+		for key := range eltCloseMap {
+			if !eltUsedMap[key] {
+				eltCloseMap[key]()
+				delete(eltCloseMap, key)
+				delete(eltFnMap, key)
+			}
+		}
+		eltUsedMap = map[interface{}]bool{}
+	}
+
+	closeAll = func() {
+		close()
+
+	}
+
+	update = func(c interface{}, styles Styles, text *streams.S16, placeholder string) (result Element) {
+		refresh = func() {
+
+			lastresult = liveTextEdit(cLocal, styles, text, placeholder)
+
+			close()
+		}
+
+		if initialized {
+			switch {
+
+			case laststyles != styles:
+			case lasttext != text:
+			case lastplaceholder != placeholder:
+			default:
+
+				return lastresult
+			}
+		}
+		initialized = true
+		laststyles = styles
+		lasttext = text
+		lastplaceholder = placeholder
+		refresh()
+		return lastresult
+	}
+
+	return update, closeAll
+}
+
 // NewRun is the constructor for RunFunc
 func NewRun() (update RunFunc, closeAll func()) {
 	var refresh func()

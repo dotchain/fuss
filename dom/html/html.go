@@ -24,6 +24,7 @@ func init() {
 		"change": {},
 		"click":  {},
 		"focus":  {},
+		"input":  {},
 		"blur":   {},
 	}}
 	dom.RegisterDriver(current)
@@ -159,6 +160,8 @@ func (e element) SetProp(key string, value interface{}) {
 	case "OnFocus":
 		e.onEvent("focus", value.(*dom.EventHandler))
 		e.onEvent("blur", value.(*dom.EventHandler))
+	case "OnInput":
+		e.onEvent("input", value.(*dom.EventHandler))
 	default:
 		panic("Unknown key: " + key)
 	}
