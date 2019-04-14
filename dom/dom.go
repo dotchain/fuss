@@ -115,15 +115,80 @@ type Borders struct {
 	Radius                   Size
 	Width                    Size
 	Color                    string
+	Style                    string
 	Left, Right, Top, Bottom Border
+}
+
+// Margins represents all margins
+type Margins struct {
+	Raw                      string
+	Left, Right, Top, Bottom Size
+}
+
+// Padding represents all padding
+type Padding struct {
+	Raw                      string
+	Left, Right, Top, Bottom Size
+}
+
+// BoxShadow configures box shadow
+type BoxShadow struct {
+	OffsetX, OffsetY         Size
+	BlurRadius, SpreadRadius Size
+	Color                    string
+}
+
+// String returns a stringified version of the box shadow
+func (b BoxShadow) String() string {
+	if b == (BoxShadow{}) {
+		return ""
+	}
+	result := b.OffsetX.String() + " " + b.OffsetY.String() + " "
+	result += b.BlurRadius.String() + " " + b.SpreadRadius.String()
+	result += " " + b.Color
+	return result
+}
+
+// BoxShadows implements multiple box shadow elements
+type BoxShadows struct {
+	B1, B2, B3, B4, B5 BoxShadow
+}
+
+// String returns a stringified version of the box shadow
+func (b BoxShadows) String() string {
+	result := ""
+	if x := b.B1.String(); x != "" {
+		result = x
+	}
+	if x := b.B2.String(); x != "" {
+		result += " " + x
+	}
+	if x := b.B3.String(); x != "" {
+		result += " " + x
+	}
+	if x := b.B4.String(); x != "" {
+		result += " " + x
+	}
+	return result
+}
+
+// Background configures the background css property
+type Background struct {
+	Color string
 }
 
 // Styles represents a set of CSS Styles
 type Styles struct {
+	Background           Background
 	Color                string
 	Width, Height        Size
 	OverflowX, OverflowY string
 	Borders              Borders
+	Margins              Margins
+	Padding              Padding
+	AlignItems           string // TODO add enum
+	TextAlign            string // TODO add enum
+	BoxShadows           BoxShadows
 	FlexDirection        Direction
 
 	// FlexGrow and FlexShrink should not be set to zero.
@@ -134,6 +199,9 @@ type Styles struct {
 // String converts style to "CSS" text
 func (s Styles) String() string {
 	entries := [][2]string{
+		{"align-items", s.AlignItems},
+		{"text-align", s.TextAlign},
+		{"background-color", s.Background.Color},
 		{"color", s.Color},
 		{"width", s.Width.String()},
 		{"height", s.Height.String()},
@@ -142,6 +210,7 @@ func (s Styles) String() string {
 		{"border", s.Borders.Raw},
 		{"border-radius", s.Borders.Radius.String()},
 		{"border-color", s.Borders.Color},
+		{"border-style", s.Borders.Style},
 		{"border-width", s.Borders.Width.String()},
 		{"border-left-color", s.Borders.Left.Color},
 		{"border-left-width", s.Borders.Left.Width.String()},
@@ -151,6 +220,17 @@ func (s Styles) String() string {
 		{"border-top-width", s.Borders.Top.Width.String()},
 		{"border-bottom-color", s.Borders.Bottom.Color},
 		{"border-bottom-width", s.Borders.Bottom.Width.String()},
+		{"margin", s.Margins.Raw},
+		{"margin-left", s.Margins.Left.String()},
+		{"margin-right", s.Margins.Right.String()},
+		{"margin-top", s.Margins.Top.String()},
+		{"margin-bottom", s.Margins.Bottom.String()},
+		{"padding", s.Padding.Raw},
+		{"padding-left", s.Padding.Left.String()},
+		{"padding-right", s.Padding.Right.String()},
+		{"padding-top", s.Padding.Top.String()},
+		{"padding-bottom", s.Padding.Bottom.String()},
+		{"box-shadow", s.BoxShadows.String()},
 	}
 
 	if dir := s.FlexDirection.String(); dir != "" {
