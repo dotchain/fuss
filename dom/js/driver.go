@@ -73,6 +73,8 @@ func (e element) SetProp(key string, value interface{}) {
 		} else {
 			e.n.Set("textContent", value.(string))
 		}
+	case "Src":
+		e.setAttr("src", value.(string))
 	case "Styles":
 		e.setAttr("style", value.(dom.Styles).String())
 	case "OnChange":

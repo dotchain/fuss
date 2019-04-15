@@ -151,6 +151,8 @@ func (e element) SetProp(key string, value interface{}) {
 		e.setChecked(value.(bool))
 	case "TextContent":
 		e.setTextContent(value.(string))
+	case "Src":
+		e.setStringAttribute("src", value.(string))
 	case "Styles":
 		e.setStringAttribute("style", value.(dom.Styles).String())
 	case "OnChange":
