@@ -109,6 +109,7 @@ func NewCloser() (update CloserFunc, closeAll func()) {
 	closeAll = func() {
 		close()
 		lastcloserState.Close()
+
 	}
 
 	update = func(deps interface{}) (result int) {
@@ -196,6 +197,9 @@ func NewEdgeTrigger() (update EdgeTriggerFunc, closeAll func()) {
 	closeAll = func() {
 		close()
 
+		if laststate != nil {
+			laststate.Stream.Nextf(&initialized, nil)
+		}
 	}
 
 	update = func(deps interface{}, input int) (r1 int, r2 int) {
