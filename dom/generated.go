@@ -468,6 +468,72 @@ func NewFocusable() (update FocusableFunc, closeAll func()) {
 	return update, closeAll
 }
 
+// NewImg is the constructor for ImgFunc
+func NewImg() (update ImgFunc, closeAll func()) {
+	var refresh func()
+
+	var laststyles Styles
+	var lastsrc string
+	var lastresult Element
+	var initialized bool
+	eltFnMap := map[interface{}]eltFunc{}
+	eltCloseMap := map[interface{}]func(){}
+	eltUsedMap := map[interface{}]bool{}
+
+	cLocal := &eltDep{
+		elt: func(key interface{}, props Props, children ...Element) (result Element) {
+			eltUsedMap[key] = true
+			if eltFnMap[key] == nil {
+				eltFnMap[key], eltCloseMap[key] = newelt()
+			}
+			return eltFnMap[key](key, props, children...)
+		},
+	}
+
+	close := func() {
+		for key := range eltCloseMap {
+			if !eltUsedMap[key] {
+				eltCloseMap[key]()
+				delete(eltCloseMap, key)
+				delete(eltFnMap, key)
+			}
+		}
+		eltUsedMap = map[interface{}]bool{}
+	}
+
+	closeAll = func() {
+		close()
+
+	}
+
+	update = func(c interface{}, styles Styles, src string) (result Element) {
+		refresh = func() {
+
+			lastresult = img(cLocal, styles, src)
+
+			close()
+		}
+
+		if initialized {
+			switch {
+
+			case laststyles != styles:
+			case lastsrc != src:
+			default:
+
+				return lastresult
+			}
+		}
+		initialized = true
+		laststyles = styles
+		lastsrc = src
+		refresh()
+		return lastresult
+	}
+
+	return update, closeAll
+}
+
 // NewLabelView is the constructor for LabelViewFunc
 func NewLabelView() (update LabelViewFunc, closeAll func()) {
 	var refresh func()
