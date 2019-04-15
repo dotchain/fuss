@@ -47,6 +47,9 @@ func NewApp() (update AppFunc, closeAll func()) {
 	closeAll = func() {
 		close()
 
+		if laststate != nil {
+			laststate.Stream.Nextf(&initialized, nil)
+		}
 	}
 
 	update = func(deps interface{}) (result dom.Element) {
@@ -394,6 +397,9 @@ func NewListView() (update ListViewFunc, closeAll func()) {
 	closeAll = func() {
 		close()
 
+		if lastfilterState != nil {
+			lastfilterState.Stream.Nextf(&initialized, nil)
+		}
 	}
 
 	update = func(deps interface{}, todos *TodoListStream) (result dom.Element) {
