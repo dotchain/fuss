@@ -45,6 +45,11 @@ func generateTypes() {
 			ElemType: "Todo",
 		}},
 	}
+	
+	info.StructStreams = info.Structs
+	info.SliceStreams = info.Slices
+	info.UnionStreams = info.Unions
+
 	code, err := info.Generate()
 	if err != nil {
 		panic(err)
