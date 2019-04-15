@@ -258,6 +258,10 @@ func newelt() (update eltFunc, closeAll func()) {
 	closeAll = func() {
 		close()
 		lastlastState.Close()
+
+		if lastlastState != nil {
+			lastlastState.Stream.Nextf(&initialized, nil)
+		}
 	}
 
 	update = func(c interface{}, props Props, children ...Element) (result Element) {

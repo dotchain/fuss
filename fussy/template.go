@@ -50,6 +50,10 @@ func {{.Ctor}}() (update {{.Type}}, closeAll func()) {
 	closeAll = func() {
 		close()
 		{{range .NonContextArgsArray}}{{if .ImplementsClose}}{{if .IsState}}last{{.Name}}.Close(); {{end}}{{end}}{{end}}
+		{{range .StreamStateArgs}}
+		if last{{.Name}} != nil {
+			last{{.Name}}.Stream.Nextf(&initialized, nil)
+		} {{end}}
 	}
 
 	update = func({{.PublicArgsDecl}}) {{.PublicResultsDecl}} {
