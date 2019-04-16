@@ -60,12 +60,19 @@ func textEditO(c *eltDep, opt TextEditOptions) Element {
 }
 
 // TextInput calls the callback when user submits input
-type TextInputFunc = func(key interface{}, styles Styles, eh *EventHandler, id string) Element
+type TextInputFunc = func(key interface{}, styles Styles, eh *EventHandler, id, placeholder string) Element
 
-func textInput(c *eltDep, styles Styles, eh *EventHandler, id string) Element {
+func textInput(c *eltDep, styles Styles, eh *EventHandler, id, placeholder string) Element {
 	return c.elt(
 		"root",
-		Props{Tag: "input", Type: "text", Styles: styles, OnChange: eh, ID: id},
+		Props{
+			Tag:         "input",
+			Type:        "text",
+			Styles:      styles,
+			Placeholder: placeholder,
+			OnChange:    eh,
+			ID:          id,
+		},
 	)
 }
 

@@ -964,6 +964,7 @@ func NewTextInput() (update TextInputFunc, closeAll func()) {
 	var laststyles Styles
 	var lasteh *EventHandler
 	var lastid string
+	var lastplaceholder string
 	var lastresult Element
 	var initialized bool
 	eltFnMap := map[interface{}]eltFunc{}
@@ -996,10 +997,10 @@ func NewTextInput() (update TextInputFunc, closeAll func()) {
 
 	}
 
-	update = func(c interface{}, styles Styles, eh *EventHandler, id string) (result Element) {
+	update = func(c interface{}, styles Styles, eh *EventHandler, id string, placeholder string) (result Element) {
 		refresh = func() {
 
-			lastresult = textInput(cLocal, styles, eh, id)
+			lastresult = textInput(cLocal, styles, eh, id, placeholder)
 
 			close()
 		}
@@ -1010,6 +1011,7 @@ func NewTextInput() (update TextInputFunc, closeAll func()) {
 			case laststyles != styles:
 			case lasteh != eh:
 			case lastid != id:
+			case lastplaceholder != placeholder:
 			default:
 
 				return lastresult
@@ -1019,6 +1021,7 @@ func NewTextInput() (update TextInputFunc, closeAll func()) {
 		laststyles = styles
 		lasteh = eh
 		lastid = id
+		lastplaceholder = placeholder
 		refresh()
 		return lastresult
 	}
