@@ -177,6 +177,13 @@ type Background struct {
 	Color string
 }
 
+// Font configures the font related css properties
+type Font struct {
+	Family string
+	Size   Size
+	Weight string
+}
+
 // Styles represents a set of CSS Styles
 type Styles struct {
 	Background           Background
@@ -189,6 +196,7 @@ type Styles struct {
 	AlignItems           string // TODO add enum
 	TextAlign            string // TODO add enum
 	BoxShadows           BoxShadows
+	Font                 Font
 	FlexDirection        Direction
 
 	// FlexGrow and FlexShrink should not be set to zero.
@@ -203,6 +211,9 @@ func (s Styles) String() string {
 		{"text-align", s.TextAlign},
 		{"background-color", s.Background.Color},
 		{"color", s.Color},
+		{"font-size", s.Font.Size.String()},
+		{"font-weight", s.Font.Weight},
+		{"font-family", s.Font.Family},
 		{"width", s.Width.String()},
 		{"height", s.Height.String()},
 		{"overflow-x", s.OverflowX},
